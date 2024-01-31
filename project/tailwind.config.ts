@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 const colors = require("tailwindcss/colors");
+const { fontFamily } = require("tailwindcss/defaultTheme");
 // const fonts = require("tailwindcss/fontFamily");
 
 
@@ -19,6 +20,7 @@ const config: Config = {
       },
       colors: {
         primary: '#EAA800',
+        secondary: '#EAA800',
       },
       // fontFamily: {
       //   Mali: ["Mali", 'cursive'],
