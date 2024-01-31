@@ -1,7 +1,6 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Auth } from "firebase/auth";
 import { auth } from "@/app/firebase";
 
 export const authOptions ={
@@ -10,7 +9,7 @@ export const authOptions ={
     },
     providers: [
         CredentialsProvider({
-            name: 'Caredentials',
+            name: 'Credentials',
             credentials: {},
             async authorize(credentials): Promise<any> {
                 return await signInWithEmailAndPassword(auth, (credentials as any).email || '', (credentials as any).password || '')
@@ -25,3 +24,5 @@ export const authOptions ={
         })
     ]
 }
+
+export default NextAuth(authOptions)

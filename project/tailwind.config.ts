@@ -1,4 +1,8 @@
 import type { Config } from "tailwindcss";
+const colors = require("tailwindcss/colors");
+// const fonts = require("tailwindcss/fontFamily");
+
+
 
 const config: Config = {
   content: [
@@ -13,7 +17,15 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      colors: {
+        primary: '#EAA800',
+      },
+      // fontFamily: {
+      //   Mali: ["Mali", 'cursive'],
+      //   Rampart: ["Rampart One", "cursive"],
+      // },
     },
+
   },
   plugins: [],
 };
