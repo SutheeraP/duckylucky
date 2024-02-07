@@ -1,8 +1,10 @@
 "use client";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
-
 import { auth } from "../firebase";
+
+import { signIn } from "next-auth/react";
+
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -19,7 +21,8 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const router = useRouter();
-  let [feedback, setfeedback] = useState("feedback signup");
+  let [feedback, setfeedback] = useState("");
+  let [color, setcolor] = useState("text-red-600");
 
   const checkPW = (value: string) => {
     const lowercaseRegex = /[a-z]/;
@@ -61,18 +64,18 @@ export default function Signup() {
 
   const signup = () => {
     if (password != password2) {
-      console.log('password != password2')
       setfeedback('รหัสผ่านไม่สอดคล้องกัน')
     }
     else {
       createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          // var user = userCredential.user; 
-          console.log('signup complete')
+        .then((userCredential) => {
+          var user = userCredential.user; 
+          setcolor('text-green-600')
           setfeedback('สมัครสมาชิกสำเร็จ')
-          // setTimeout(() => {
-          //   router.push("/")
-          // }, 1000)
+          setTimeout(() => {
+            signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })
+            router.push("/")
+          }, 1000)
         })
         .catch((error) => {
           setfeedback(error.message)
@@ -84,7 +87,7 @@ export default function Signup() {
     <div className={mali.className}>
       <div className="min-h-screen w-full flex flex-col items-center justify-center">
         <div className="container px-4">
-          <form className="flex flex-col gap-4" action="#">
+          <div className="flex flex-col gap-4">
             <input
               onChange={(e) => setUsername(e.target.value)}
               className="px-3 py-2 rounded-md ring-1 ring-black"
@@ -121,24 +124,23 @@ export default function Signup() {
               required
               placeholder="ยืนยันรหัสผ่าน"
             />
-            <p id="feedback-signup">{feedback}</p>
+            <p className={color} id="feedback-signup">{feedback}</p>
             <div className="grid grid-cols-2 gap-4">
               <button
-                className="disable:opacity-40 px-2 py-3  ring-1 ring-black  rounded-md hover:bg-primary transition duration-200 ease-in-out"
+                className="disable:opacity-40 px-2 py-3 font-semibold  ring-1 ring-black  rounded-md hover:bg-primary transition duration-200 ease-in-out"
                 onClick={() => router.push("/signin")}
               >
                 เข้าสู่ระบบ
               </button>
               <button
-                className="disabled:opacity-40 px-2 py-3 bg-black text-white  rounded-md"
+                className="disabled:opacity-40 px-2 py-3 font-semibold bg-black text-white  rounded-md"
                 onClick={() => signup()}
                 disabled={!email || !password || !password2 || !username}
-
               >
                 สมัครสมาชิก
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
