@@ -133,9 +133,16 @@ export default function TicTacToe() {
             </div>
             <div className={` bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
                 <div className="text-white font-bold text-3xl">{draw? 'เสมอ' : !xTurn? 'คุณชนะ !':'คุณแพ้ !'}</div>
-                <Image className="rounded-full" src="/image/icon1.svg" alt=""  width={240} height={240}/>
-                <div className="bg-black text-white font-bold text-3xl rounded-xl w-60 flex justify-center p-1 transform -translate-y-6">DavisS</div>
-                <div className="text-white transform -translate-y-6">543 คะแนน</div>
+                <Image src="/image/icon1.svg" alt="" width={250} height={250}/>
+                <div className={`flex flex-row ${draw || xTurn? 'gap-28 translate-y-12' : 'gap-20 translate-y-4'} absolute`}>
+                    <Image src={draw || xTurn? '/image/lose_Lwing.svg' : '/image/win_Lwing.svg'} alt=""  width={160} height={160}/>    
+                    <Image src={draw || xTurn? '/image/lose_Rwing.svg' : '/image/win_Rwing.svg'} alt=""  width={160} height={160}/>
+                </div>
+                <div className="flex flex-col justify-center text-center transform -translate-y-8">
+                        <div className="bg-black text-white font-bold text-xl rounded-xl w-40 h-auto flex justify-center p-1 ">DavisS</div>
+                        <div className="text-white transform">543 คะแนน</div>  
+                </div>
+                
                 <div className="bg-white text-black rounded-md w-40 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black">กลับหน้าหลัก</div>
             </div>
         </div>
