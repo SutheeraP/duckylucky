@@ -1,9 +1,8 @@
-import Board from "./component/board"
-import Boardtest from "./component/Boardtest"
-import A1 from '../image/gridA1'
 "use client";
-import { useEffect, useState } from "react"
+import Image from "next/image"
+import Board from "./component/Board";
 
+import { useEffect, useState } from "react"
 
 const WINNING_COMBO = [
     [0,1,2,3],
@@ -124,9 +123,9 @@ export default function TicTacToe() {
                     {/* <Board/> */}
                     <div className="grid grid-cols-4 grid-rows-4 gap-2">
                         {[...Array(16)].map((v, idx) => {
-                            return <div key={idx} className="bg-slate-300 w-20 h-20 cursor-pointer" onClick={() => {updateBoardData(idx)}}>
-                                {/* console.log({idx}) */}
-                                {boardData[idx]}
+                            return <div key={idx} className=" w-20 h-20 cursor-pointer relative flex justify-center" onClick={() => {updateBoardData(idx)}}>
+                                <div className="self-center text-2xl">{boardData[idx]}</div>
+                                <Image src={`/image/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
                             </div>
                         })}
                     </div>
