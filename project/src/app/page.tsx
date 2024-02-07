@@ -1,8 +1,9 @@
 'use client';
 import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import Image from "next/image";
 
+// import {getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+// const auth = getAuth();
 export default function Home() {
   const session = useSession({
     required: true,

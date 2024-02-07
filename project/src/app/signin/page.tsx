@@ -14,12 +14,27 @@ const mali = Mali({
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  let [feedback, setfeedback] = useState("test feedback");
   const router = useRouter();
 
-  const signin = () =>{
-    console.log(email, password)
+  const signin = () => {
     signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        var user = userCredential.user;
+        setfeedback('เข้าสู้ระบบสำเร็จ')
+        
+        console.log('login', user)
+
+        setTimeout(()=>{
+          console.log('timeout')
+          router.push("/")
+        }, 1000)
+      })
+      .catch((error) => {
+        setfeedback(error.message)
+      });
   }
+
 
   return (
     <div className={mali.className}>
@@ -44,17 +59,18 @@ export default function Signin() {
               required
               placeholder="รหัสผ่าน"
             />
+            <p id="feedback-signin">{feedback}</p>
             <div className="grid grid-cols-2 gap-4">
               <button
-              name="signin"
+                name="signin"
                 className="disabled:opacity-40 px-2 py-3 bg-black text-white rounded-md hover:bg-primary transition duration-200 ease-in-out"
-                onClick={() => signin()}
+                onClick={() => signIn('credentials', {email, password, redirect: true, callbackUrl: '/'})}
                 disabled={!email || !password}
               >
                 เข้าสู่ระบบ
               </button>
               <button
-              name="signup"
+                name="signup"
                 className="px-2 py-3 ring-1 ring-black rounded-md"
                 onClick={() => router.push("/signup")}
               >

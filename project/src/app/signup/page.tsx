@@ -17,16 +17,29 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const router = useRouter();
+  let [feedback, setfeedback] = useState("feedback signup");
 
   const signup = () =>{
     if(password.length <= 8){
         console.log('password < 8')
+        setfeedback('พาสเวิร์ดน้อยกว่า 9 คัวอักษร')
     }
     else if(password != password2){
         console.log('password != password2')
+        setfeedback('พาสเวิร์ดไม่สอดคล้องกัน')
     }
     else{
         createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          var user = userCredential.user;
+          setfeedback('สมัครสมาชิกสำเร็จ')
+          setTimeout(()=>{
+            router.push("/")
+          }, 1000)
+        })
+        .catch((error) => {
+          setfeedback(error.message)
+        });
     }
     
   }
@@ -72,6 +85,7 @@ export default function Signup() {
               required
               placeholder="ยืนยันรหัสผ่าน"
             />
+            <p id="feedback-signup">{feedback}</p>
             <div className="grid grid-cols-2 gap-4">
               <button
                 className="disable:opacity-40 px-2 py-3  ring-1 ring-black  rounded-md hover:bg-primary transition duration-200 ease-in-out"

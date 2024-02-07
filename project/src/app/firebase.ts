@@ -10,6 +10,7 @@ import { getAuth } from "firebase/auth";
 const firebaseConfig = {
   apiKey: "AIzaSyBPYjRhm_hznbuYIg5z17lxPEPwTbn0-BI",
   authDomain: "ducky-lucky.firebaseapp.com",
+  databaseURL: "https://ducky-lucky-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "ducky-lucky",
   storageBucket: "ducky-lucky.appspot.com",
   messagingSenderId: "122464436409",
