@@ -26,6 +26,7 @@ const config: Config = {
       //   Mali: ["Mali", 'cursive'],
       //   Rampart: ["Rampart One", "cursive"],
       // },
+    
     },
 
   },

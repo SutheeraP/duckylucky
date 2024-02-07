@@ -22,39 +22,28 @@ export default function TicTacToe() {
     const [xTurn, setXTurn] = useState(true);
     const [won, setWon] = useState(false)
     const [draw, setDraw] = useState(false)
-
     interface BoardData {
-        [key: string]: string;
+        [key: string]: any;
     }
     const [boardData, setBoardData] = useState<BoardData>({
-        0:"",
-        1:"", 
-        2:"", 
-        3:"", 
-        4:"", 
-        5:"", 
-        6:"", 
-        7:"", 
-        8:"", 
-        9:"", 
-        10:"", 
-        11:"", 
-        12:"", 
-        13:"", 
-        14:"", 
-        15:""
+        0:``,
+        1:``, 
+        2:``, 
+        3:``, 
+        4:``, 
+        5:``, 
+        6:``, 
+        7:``, 
+        8:``, 
+        9:``, 
+        10:``, 
+        11:``, 
+        12:``, 
+        13:``, 
+        14:``, 
+        15:``
     });
     const [result, setResult] = useState("")
-    const menuVariants = {
-        open: {
-          opacity: 1,
-          x: 0,
-        },  
-        closed: {
-          opacity: 0,
-          x: '-100%',
-        },
-      }
 
     useEffect(() => {
         checkWinner()
@@ -63,12 +52,12 @@ export default function TicTacToe() {
 
     const updateBoardData = (idx: number) => {
         if (!boardData[idx] && !won){
-            let value = xTurn === true ? 'X' : 'O';
+            let value = xTurn === true ? `/image/icon1.svg` : `/image/icon2.svg`;
             console.log(idx + ':' + value);
             setBoardData({...boardData, [idx]: value});
             setXTurn(!xTurn)
         }
-        checkWinner()
+        checkWinner() 
     }
 
     const checkDraw = () => {
@@ -91,22 +80,22 @@ export default function TicTacToe() {
 
     const resetBoard = () => {
         setBoardData({
-            0:"",
-            1:"", 
-            2:"", 
-            3:"", 
-            4:"", 
-            5:"", 
-            6:"", 
-            7:"", 
-            8:"", 
-            9:"", 
-            10:"", 
-            11:"", 
-            12:"", 
-            13:"", 
-            14:"", 
-            15:""
+            0:``,
+            1:``, 
+            2:``, 
+            3:``, 
+            4:``, 
+            5:``, 
+            6:``, 
+            7:``, 
+            8:``, 
+            9:``, 
+            10:``, 
+            11:``, 
+            12:``, 
+            13:``, 
+            14:``, 
+            15:``
         })
         setXTurn(true)
         setWon(false)
@@ -124,16 +113,16 @@ export default function TicTacToe() {
             <div className='container lg mx-auto'>
                 <div className="flex flex-col justify-center items-center">
                     <div className="bg-slate-300">01</div>
-                    {/* <Board/> */}
                     <div className="grid grid-cols-4 grid-rows-4 gap-2">
-                        {[...Array(16)].map((v, idx) => {
+                        {[...Array(16)].map((v, idx: number) => {
                             return <div key={idx} className=" w-20 h-20 cursor-pointer relative flex justify-center" onClick={() => {updateBoardData(idx)}}>
-                                <div className="self-center text-2xl">{boardData[idx]}</div>
+                                <div className="self-center text-2xl">
+                                    <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
+                                </div>
                                 <Image src={`/image/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
                             </div>
                         })}
                     </div>
-                    {/* <Boardtest></Boardtest> */}
                     <div className="bg-slate-300">03</div>
                 </div>
                 <div className="flex flex-row justify-center gap-4">
@@ -142,11 +131,12 @@ export default function TicTacToe() {
                     <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer">remove card</div>
                 </div>
             </div>
-            <div className=' bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center end-game hidden'>
-                <div className="text-white font-bold text-3xl">{result}</div>
-                <div className="w-60 h-60 bg-white rounded-full"></div>
-                <div className="bg-black text-white font-bold text-3xl rounded-xl w-40 flex justify-center items-center pb-2">x</div>
-                <div className="text-white">543 คะแนน</div>
+            <div className={` bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
+                <div className="text-white font-bold text-3xl">{draw? 'เสมอ' : !xTurn? 'คุณชนะ !':'คุณแพ้ !'}</div>
+                <Image className="rounded-full" src="/image/icon1.svg" alt=""  width={240} height={240}/>
+                <div className="bg-black text-white font-bold text-3xl rounded-xl w-60 flex justify-center p-1 transform -translate-y-6">DavisS</div>
+                <div className="text-white transform -translate-y-6">543 คะแนน</div>
+                <div className="bg-white text-black rounded-md w-40 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black">กลับหน้าหลัก</div>
             </div>
         </div>
     )
