@@ -14,25 +14,29 @@ const mali = Mali({
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  let [feedback, setfeedback] = useState("test feedback");
+  let [feedback, setfeedback] = useState("");
   const router = useRouter();
 
   const signin = () => {
+    console.log('click')
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         var user = userCredential.user;
         setfeedback('เข้าสู้ระบบสำเร็จ')
-        
         console.log('login', user)
 
-        setTimeout(()=>{
+        setTimeout(() => {
           console.log('timeout')
+          signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })
           router.push("/")
+          
         }, 1000)
       })
       .catch((error) => {
         setfeedback(error.message)
       });
+setEmail('')
+          setPassword('')
   }
 
 
@@ -45,6 +49,7 @@ export default function Signin() {
               onChange={(e) => setEmail(e.target.value)}
               className="px-3 py-2 rounded-md ring-1 ring-black"
               type="email"
+              value={email}
               name="email"
               id="email"
               required
@@ -56,6 +61,7 @@ export default function Signin() {
               type="password"
               name="password"
               id="password"
+              value={password}
               required
               placeholder="รหัสผ่าน"
             />
@@ -64,8 +70,9 @@ export default function Signin() {
               <button
                 name="signin"
                 className="disabled:opacity-40 px-2 py-3 bg-black text-white rounded-md hover:bg-primary transition duration-200 ease-in-out"
-                onClick={() => signIn('credentials', {email, password, redirect: true, callbackUrl: '/'})}
-                disabled={!email || !password}
+                // onClick={() => signIn('credentials', {email, password, redirect: true, callbackUrl: '/'})}
+                onClick={() => signin()}
+              // disabled={!email || !password}
               >
                 เข้าสู่ระบบ
               </button>

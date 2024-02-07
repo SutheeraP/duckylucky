@@ -1,6 +1,7 @@
 "use client";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
+
 import { auth } from "../firebase";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -11,6 +12,7 @@ const mali = Mali({
   weight: ["200", "300", "400", "500", "600"],
 });
 
+
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -19,29 +21,63 @@ export default function Signup() {
   const router = useRouter();
   let [feedback, setfeedback] = useState("feedback signup");
 
-  const signup = () =>{
-    if(password.length <= 8){
-        console.log('password < 8')
-        setfeedback('พาสเวิร์ดน้อยกว่า 9 คัวอักษร')
+  const checkPW = (value: string) => {
+    const lowercaseRegex = /[a-z]/;
+    const uppercaseRegex = /[A-Z]/;
+    const numericRegex = /[0-9]/;
+    const nonAlphanumericRegex = /[^A-Za-z0-9]/;
+    setPassword(value)
+    if (value.length < 6) {
+      setfeedback('รหัสผ่านน้อยกว่า 6 ตัวอักษร')
     }
-    else if(password != password2){
-        console.log('password != password2')
-        setfeedback('พาสเวิร์ดไม่สอดคล้องกัน')
+    else if (!lowercaseRegex.test(value)) {
+      setfeedback('รหัสผ่านขาดตัวอักษรพิมพ์เล็ก')
     }
-    else{
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          var user = userCredential.user;
+    else if (!uppercaseRegex.test(value)) {
+      setfeedback('รหัสผ่านขาดตัวอักษรพิมพ์ใหญ่')
+    }
+    else if (!numericRegex.test(value)) {
+      setfeedback('รหัสผ่านขาดตัวเลข')
+    }
+    else {
+      setfeedback('')
+    }
+    // else if(!nonAlphanumericRegex.test(value)){
+    //   setfeedback('รหัสผ่านขาดตัวอักษรพิเศษ')
+    // }
+  }
+
+  // เจ๊งอะ
+  // const checkPW2 = (value: string) => {
+  //   console.log(password, password2)
+  //   setPassword2(value)
+  //   if (password != password2) {
+  //     setfeedback('รหัสผ่านไม่สอดคล้องกัน')
+  //   }
+  //   else{
+  //     setfeedback('')
+  //   }
+  // }
+
+  const signup = () => {
+    if (password != password2) {
+      console.log('password != password2')
+      setfeedback('รหัสผ่านไม่สอดคล้องกัน')
+    }
+    else {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          // var user = userCredential.user; 
+          console.log('signup complete')
           setfeedback('สมัครสมาชิกสำเร็จ')
-          setTimeout(()=>{
-            router.push("/")
-          }, 1000)
+          // setTimeout(() => {
+          //   router.push("/")
+          // }, 1000)
         })
         .catch((error) => {
           setfeedback(error.message)
         });
     }
-    
   }
 
   return (
@@ -68,7 +104,7 @@ export default function Signup() {
               placeholder="อีเมลล์"
             />
             <input
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => checkPW(e.target.value)}
               className="px-3 py-2 rounded-md ring-1 ring-black"
               type="password"
               name="password"
@@ -97,7 +133,7 @@ export default function Signup() {
                 className="disabled:opacity-40 px-2 py-3 bg-black text-white  rounded-md"
                 onClick={() => signup()}
                 disabled={!email || !password || !password2 || !username}
-                
+
               >
                 สมัครสมาชิก
               </button>
