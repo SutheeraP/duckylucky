@@ -125,6 +125,7 @@ export default function TicTacToe() {
                     <div className="grid grid-cols-4 grid-rows-4 gap-2">
                         {[...Array(16)].map((v, idx) => {
                             return <div key={idx} className="bg-slate-300 w-20 h-20 cursor-pointer" onClick={() => {updateBoardData(idx)}}>
+                                {/* console.log({idx}) */}
                                 {boardData[idx]}
                             </div>
                         })}
@@ -138,7 +139,7 @@ export default function TicTacToe() {
                     <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer">remove card</div>
                 </div>
             </div>
-            <div className=' bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center'>
+            <div className=' bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center end-game hidden'>
                 <div className="text-white font-bold text-3xl">{result}</div>
                 <div className="w-60 h-60 bg-white rounded-full"></div>
                 <div className="bg-black text-white font-bold text-3xl rounded-xl w-40 flex justify-center items-center pb-2">x</div>
