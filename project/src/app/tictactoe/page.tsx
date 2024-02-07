@@ -22,7 +22,11 @@ export default function TicTacToe() {
     const [xTurn, setXTurn] = useState(true);
     const [won, setWon] = useState(false)
     const [draw, setDraw] = useState(false)
-    const [boardData, setBoardData] = useState({
+
+    interface BoardData {
+        [key: string]: string;
+    }
+    const [boardData, setBoardData] = useState<BoardData>({
         0:"",
         1:"", 
         2:"", 
@@ -57,7 +61,7 @@ export default function TicTacToe() {
         checkDraw()
     },[boardData])
 
-    const updateBoardData = (idx) => {
+    const updateBoardData = (idx: number) => {
         if (!boardData[idx] && !won){
             let value = xTurn === true ? 'X' : 'O';
             console.log(idx + ':' + value);
