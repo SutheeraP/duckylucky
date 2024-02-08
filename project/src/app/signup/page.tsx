@@ -140,7 +140,7 @@ export default function Signup() {
             <div className="flex flex-col gap-4">
               <input
                 onChange={(e) => setUsername(e.target.value)}
-                className="px-3 py-2 rounded-md ring-1 ring-black"
+                className="appearance-none px-3 py-2 rounded-md ring-1 ring-black"
                 type="username"
                 name="username"
                 id="username"
@@ -149,7 +149,7 @@ export default function Signup() {
               />
               <input
                 onChange={(e) => setEmail(e.target.value)}
-                className="px-3 py-2 rounded-md ring-1 ring-black"
+                className="appearance-none px-3 py-2 rounded-md ring-1 ring-black"
                 type="email"
                 name="email"
                 id="email"
@@ -158,7 +158,7 @@ export default function Signup() {
               />
               <input
                 onChange={(e) => checkPW(e.target.value)}
-                className="px-3 py-2 rounded-md ring-1 ring-black"
+                className="appearance-none px-3 py-2 rounded-md ring-1 ring-black"
                 type="password"
                 name="password"
                 id="password"
@@ -167,7 +167,7 @@ export default function Signup() {
               />
               <input
                 onChange={(e) => setPassword2(e.target.value)}
-                className="px-3 py-2 rounded-md ring-1 ring-black"
+                className="appearance-none px-3 py-2 rounded-md ring-1 ring-black"
                 type="password"
                 name="password2"
                 id="password2"

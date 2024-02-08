@@ -46,7 +46,7 @@ export default function Signin() {
           <div className="flex flex-col gap-4">
             <input
               onChange={(e) => setEmail(e.target.value)}
-              className="px-3 py-2 rounded-md ring-1 ring-black"
+              className="appearance-none px-3 py-2 rounded-md ring-1 ring-black"
               type="email"
               value={email}
               name="email"
@@ -56,7 +56,7 @@ export default function Signin() {
             />
             <input
               onChange={(e) => setPassword(e.target.value)}
-              className="px-3 py-2 rounded-md ring-1 ring-black"
+              className="appearance-none px-3 py-2 rounded-md ring-1 ring-black"
               type="password"
               name="password"
               id="password"
