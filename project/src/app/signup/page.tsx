@@ -130,8 +130,8 @@ export default function Signup() {
           <div id="signup_section" className="md:w-4/12">
             <div className="grid grid-cols-3 gap-5 mb-7">
               {iconPath.map((path, index) => (
-                <div className={`cursor-pointer rounded-full ${path == icon ? 'grayscale-0 ring-2 ring-black' : ''}`} onClick={() => { clickIcon(path) }}>
-                  <Icon key={index} path={path} />
+                <div key={index} className={`cursor-pointer rounded-full ${path == icon ? 'grayscale-0 ring-2 ring-black' : ''}`} onClick={() => { clickIcon(path) }}>
+                  <Icon path={path} />
                 </div>
 
               ))}
