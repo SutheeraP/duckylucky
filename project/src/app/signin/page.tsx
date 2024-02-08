@@ -28,14 +28,14 @@ export default function Signin() {
 
         setTimeout(() => {
           signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })
-          router.push("/")
+          // router.push("/")
         }, 1000)
       })
       .catch((error) => {
         setfeedback(error.message)
       });
-    setEmail('')
-    setPassword('')
+    // setEmail('')
+    // setPassword('')
   }
 
 
