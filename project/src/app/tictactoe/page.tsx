@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image"
 import Board from "./component/Board";
+import Card from "./component/Card";
 
 import { useEffect, useState } from "react"
 
@@ -74,7 +75,6 @@ export default function TicTacToe() {
                 // console.log(won)
             }
             setResult(!xTurn? 'คุณชนะ !':'คุณแพ้ !')
-            console.log(boardData[a])
         })
     }
 
@@ -104,26 +104,30 @@ export default function TicTacToe() {
     }
 
     return(
-        <div>
-            <head>
+        <div className='sm:container mx-auto'>
+            {/* <head>
                 <title>TicTacToe</title>
-            </head>
+            </head> */}
             {/* <h1>TicTacToe</h1> */}
-            <p>{`Game Won: ${won} Game Draw: ${draw}`}</p>
-            <div className='container lg mx-auto'>
-                <div className="flex flex-col justify-center items-center">
-                    <div className="bg-slate-300">01</div>
-                    <div className="grid grid-cols-4 grid-rows-4 gap-2">
-                        {[...Array(16)].map((v, idx: number) => {
-                            return <div key={idx} className=" w-20 h-20 cursor-pointer relative flex justify-center" onClick={() => {updateBoardData(idx)}}>
-                                <div className="self-center text-2xl">
-                                    <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
+            {/* <p>{`Game Won: ${won} Game Draw: ${draw}`}</p> */}
+            <div className='container-sm sm:mx-auto'>
+                <div className="flex flex-col justify-center items-center h-screen gap-6">
+                    <div id="enemyCard" className="bg-slate-300 w-screen h-56 flex-none">01</div>
+                    <div className="flex-grow flex align-middle">
+                        <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center">
+                            {[...Array(16)].map((v, idx: number) => {
+                                return <div key={idx} className=" w-20 h-20 cursor-pointer relative flex justify-center" onClick={() => {updateBoardData(idx)}}>
+                                    <div className="self-center text-2xl">
+                                        <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
+                                    </div>
+                                    <Image src={`/image/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
                                 </div>
-                                <Image src={`/image/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
-                            </div>
-                        })}
+                            })}
+                        </div>
                     </div>
-                    <div className="bg-slate-300">03</div>
+                    <div id="userCard" className="bg-slate-300 w-screen h-56 flex-none">
+                        <Card/>
+                    </div>
                 </div>
                 <div className="flex flex-row justify-center gap-4">
                     <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer" onClick={() => {resetBoard()}}>reset board</div>
@@ -131,6 +135,7 @@ export default function TicTacToe() {
                     <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer">remove card</div>
                 </div>
             </div>
+
             <div className={` bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
                 <div className="text-white font-bold text-3xl">{draw? 'เสมอ' : !xTurn? 'คุณชนะ !':'คุณแพ้ !'}</div>
                 <Image src="/image/icon1.svg" alt="" width={250} height={250}/>
