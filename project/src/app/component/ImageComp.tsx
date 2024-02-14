@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 // retuen image with width100%
-const Icon = ({ path }: any) => {
+const ImageComp = ({ path }: any) => {
     return (
         <Image
             src={path}
@@ -11,4 +11,4 @@ const Icon = ({ path }: any) => {
     )
 }
 
-export default Icon
+export default ImageComp

@@ -15,7 +15,7 @@ const mali = Mali({
 });
 
 import { getDatabase, ref, set, onValue } from "firebase/database";
-import Icon from "../component/Icon";
+import Icon from "../component/ImageComp";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -128,7 +128,7 @@ export default function Signup() {
 
         <div className="container px-4">
           <div id="signup_section" className="md:w-4/12">
-            <div className="grid grid-cols-3 gap-5 mb-7">
+            <div className="grid grid-cols-3 gap-x-10 gap-y-5 mb-7">
               {iconPath.map((path, index) => (
                 <div key={index} className={`cursor-pointer rounded-full ${path == icon ? 'grayscale-0 ring-2 ring-black' : ''}`} onClick={() => { clickIcon(path) }}>
                   <Icon path={path} />
