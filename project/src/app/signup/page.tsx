@@ -8,11 +8,11 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import { Mali } from "@next/font/google";
-const mali = Mali({
-  subsets: ["latin", "thai"],
-  weight: ["200", "300", "400", "500", "600"],
-});
+// import { Mali } from "@next/font/google";
+// const mali = Mali({
+//   subsets: ["latin", "thai"],
+//   weight: ["200", "300", "400", "500", "600"],
+// });
 
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import Icon from "../component/ImageComp";
@@ -125,7 +125,7 @@ export default function Signup() {
   }
 
   return (
-    <div className={mali.className}>
+    <div className='font-Mali'>
       <div className="min-h-screen w-full relative overflow-hidden">
         <Background />
         <div className="min-h-screen flex">
