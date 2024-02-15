@@ -4,16 +4,17 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 
+
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
-import { Mali } from "@next/font/google";
+// import { Mali } from "@next/font/google";
 import Background from "../component/Background";
 import ImageComp from "../component/ImageComp";
-const mali = Mali({
-  subsets: ["latin", "thai"],
-  weight: ["200", "300", "400", "500", "600"],
-});
+// const mali = Mali({
+//   subsets: ["latin", "thai"],
+//   weight: ["200", "300", "400", "500", "600"],
+// });
 
 export default function Signin() {
   const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ export default function Signin() {
 
 
   return (
-    <div className={mali.className}>
+    <div className='font-Mali'>
       <div className="min-h-screen w-full relative overflow-hidden">
         <Background />
         <div className="min-h-screen flex">

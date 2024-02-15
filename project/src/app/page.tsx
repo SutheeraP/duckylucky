@@ -5,15 +5,16 @@ import { ref, onValue } from "firebase/database";
 import { db } from "./firebase";
 import { useState } from "react";
 import Background from "./component/Background";
-
-
-
-import { Mali } from "@next/font/google";
 import ImageComp from "./component/ImageComp";
-const mali = Mali({
-  subsets: ["latin", "thai"],
-  weight: ["200", "300", "400", "500", "600"],
-});
+
+
+
+// import { Mali } from "@next/font/google";
+// import ImageComp from "./component/ImageComp";
+// const mali = Mali({
+//   subsets: ["latin", "thai"],
+//   weight: ["200", "300", "400", "500", "600"],
+// });
 
 export default function Home() {
   const session = useSession({
@@ -74,7 +75,7 @@ export default function Home() {
 
 
   return (
-    <div className={mali.className}>
+    <div className='font-Mali'>
       <main className="min-h-screen items-center relative overflow-hidden">
         <Background />
         <div className="min-h-screen flex">
