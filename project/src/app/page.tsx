@@ -135,7 +135,7 @@ export default function Home() {
               </main>
             </div>}
           />
-          <Route path="/"
+          <Route path="/waiting"
             element={<h1>hiiii</h1>} />
 
         </Routes>
