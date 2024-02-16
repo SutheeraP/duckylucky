@@ -1,16 +1,4 @@
-"use client";
-import { signOut, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-import { ref, onValue } from "firebase/database";
-import { db } from "./firebase";
-
-const waiting =():any =>{
-    const session = useSession({
-        required: true,
-        onUnauthenticated() {
-          redirect('/signin');
-        },
-      })
+const Waiting =():any =>{
     return(
         <>
             <h1>hii</h1>
@@ -18,6 +6,4 @@ const waiting =():any =>{
     )
 }
  
-export default waiting
- 
-waiting.auth = true
+export default Waiting
