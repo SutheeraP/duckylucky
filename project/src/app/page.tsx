@@ -7,8 +7,11 @@ import { useState } from "react";
 import Background from "./component/Background";
 import ImageComp from "./component/ImageComp";
 import { useRouter } from "next/navigation";
-import { BrowserRouter, Router, Routes, Route, Link } from "react-router-dom";
+
 import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
+import WaitingRoom from "./waiting/page";
+
 
 
 
@@ -78,71 +81,68 @@ export default function Home() {
 
 
 
-
   return (
     <>
-      <BrowserRouter>
-
-        <Routes>
-          <Route path="/"
+        <Router>
+          <Routes>
+            <Route path="/" 
             exact
             element={<div className='font-Mali'>
-              <main className="min-h-screen items-center relative overflow-hidden">
-                <Background />
-                <div className="min-h-screen flex">
+                <main className="min-h-screen items-center relative overflow-hidden">
+                  <Background />
+                  <div className="min-h-screen flex">
 
-                  <div className="container px-6 relative z-10 my-auto mx-auto">
-                    <div className="max-w-[1000px] mx-auto">
-                      <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
-                        <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
-                          <div className="px-6 py-2">
-                            <button className="w-5 mr-2">
-                              <ImageComp path='/image/icon/setting.svg' />
-                            </button>
-                            <button onClick={() => signOut()} className="w-5">
-                              <ImageComp path='/image/icon/logout.svg' />
-                            </button>
-                          </div>
-
-                          <div className="w-full ring-black ring-1 "></div>
-
-                          <div className="grid grid-cols-2 md:grid-cols-1 p-6">
-                            <div className='md:w-40 md:mx-auto'>
-                              <ImageComp path={img} />
+                    <div className="container px-6 relative z-10 my-auto mx-auto">
+                      <div className="max-w-[1000px] mx-auto">
+                        <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
+                          <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
+                            <div className="px-6 py-2">
+                              <button className="w-5 mr-2">
+                                <ImageComp path='/image/icon/setting.svg' />
+                              </button>
+                              <button onClick={() => signOut()} className="w-5">
+                                <ImageComp path='/image/icon/logout.svg' />
+                              </button>
                             </div>
 
-                            <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
-                              <div className="text-4xl mb-3 font-medium">{username}</div>
-                              <div>อัตราชนะ <span className="text-primary">xx</span></div>
-                              <div>คะแนน <span className="text-primary">xx</span></div>
+                            <div className="w-full ring-black ring-1 "></div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-1 p-6">
+                              <div className='md:w-40 md:mx-auto'>
+                                <ImageComp path={img} />
+                              </div>
+
+                              <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
+                                <div className="text-4xl mb-3 font-medium">{username}</div>
+                                <div>อัตราชนะ <span className="text-primary">xx</span></div>
+                                <div>คะแนน <span className="text-primary">xx</span></div>
+                              </div>
                             </div>
                           </div>
+                          <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white p-6">
+                            <div className="text-center h-20 text-lg">เป็ดดีเด่น...</div>
+                          </div>
                         </div>
-                        <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white p-6">
-                          <div className="text-center h-20 text-lg">เป็ดดีเด่น...</div>
-                        </div>
-                      </div>
 
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                        <Link to='/waiting' className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center'>สุ่มห้อง</Link>
-                        <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" >สร้างห้อง</button>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                          <Link to='/waiting' className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center'>สุ่มห้อง</Link>
+                          <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" >สร้างห้อง</button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-              </main>
-            </div>}
-          />
-          <Route path="/waiting"
-            element={<h1>hiiii</h1>} />
-
-        </Routes>
-
-      </BrowserRouter>
+                </main>
+              </div>}
+            />
+            <Route path="/waiting" element={<><WaitingRoom/></>}/>
+               
+          </Routes>
+        </Router>
     </>
-  );
+  );  
 }
-
+ 
 Home.requireAuth = true
+   
