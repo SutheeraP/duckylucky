@@ -1,8 +1,8 @@
 'use client'
 
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-import { getDatabase, ref, set, onValue, update } from "firebase/database";
+import { redirect, useRouter } from "next/navigation";
+import { getDatabase, ref, set, onValue, update, remove } from "firebase/database";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
 import { updateCurrentUser } from "firebase/auth";
@@ -11,9 +11,8 @@ import { async } from "@firebase/util";
 
 
 const Waiting = () => {
-
+    const router = useRouter()
     const [currentUid, setCurrentUid] = useState<any>()
-    const [waitingRoom, setWaitingRoom] = useState()
     const session = useSession({
         required: true,
         onUnauthenticated() {
@@ -22,6 +21,36 @@ const Waiting = () => {
     })
     // useEffect(() => {
     // console.log('HiHi')
+    const updateData = async () => {
+        const userListRef = ref(db, `waitingRoom`);
+
+        await onValue(userListRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) {
+                Object.keys(data).forEach((room) => {
+                    Object.keys(data[room]).forEach((key) => {
+                        switch (key) {
+                            case 'owner':
+                                if (data[room][key] === currentUid) {
+                                    console.log('you are Player 1')
+                                }
+                                break;
+                            case 'challenger':
+                                if (data[room][key] === currentUid) {
+                                    console.log('you are Player 2')
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                    })
+
+
+                });
+            }
+        });
+    }
     const readUser = (uid: string) => {
         const userListref = ref(db, `UserList/${uid}`);
         onValue(userListref, (snapshot: any) => {
@@ -55,10 +84,9 @@ const Waiting = () => {
             if (uid != null) {
                 readUser(uid)
             }
+
         }
-        if (waitingRoom) {
-            updateData()
-        }
+        updateData()
     };
 
     fetchUserData();
@@ -87,17 +115,16 @@ const Waiting = () => {
                         update(ref(db, `waitingRoom/${key}`), {
                             challenger: `${currentUid}`
                         });
-                        setWaitingRoom(data[key])
+
                         return;
                     }
                     else if (data[key].owner == currentUid) {
                         console.log('you are owner now')
-                        setWaitingRoom(data[key])
                         return;
                     }
-                    else{
-                        console.log('bug')
-                        
+                    else {
+                        updateData()
+                        return;
                     }
 
                 });
@@ -111,19 +138,42 @@ const Waiting = () => {
         });
     };
 
-    const updateData = async () => {
+    const removeCurrent = async () => {
         const userListRef = ref(db, `waitingRoom`);
-
         await onValue(userListRef, (snapshot: any) => {
             const data = snapshot.val();
-            Object.keys(data).forEach((key) => {
-                if (data[key] === waitingRoom && data[key].length == 2) {
+            if (data) {
+                Object.keys(data).forEach((room) => {
+                    Object.keys(data[room]).forEach((key) => {
+                        switch (key) {
+                            case 'owner':
+                                if (data[room][key] === currentUid) {
+                                    remove(ref(db, `waitingRoom/${room}/${key}`))
+                                    router.push('/')
+                                    return;
+                                }
+                                break;
+                            case 'challenger':
+                                if (data[room][key] === currentUid) {
+                                    remove(ref(db, `waitingRoom/${room}/${key}`))
+                                    router.push('/')
+                                    return;
+                                }
+                                break;
 
-                    return;
-                }
-            });
+                            default:
+                                break;
+                        }
+
+                    })
+                });
+                return;
+            }
         });
+        
     }
+
+
     useEffect(() => {
 
         console.log(currentUid)
@@ -137,6 +187,7 @@ const Waiting = () => {
     return (
         <>
             <h1>hii</h1>
+            <button onClick={removeCurrent}>back</button>
         </>
     )
 }
