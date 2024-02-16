@@ -1,18 +1,23 @@
-"use client"
+"use client";
+import { signOut, useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { ref, onValue } from "firebase/database";
+import { db } from "./firebase";
 
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from 'react';
-
-const WaitingRoom =():any =>{
-    const router = useRouter();
-       
-    useEffect(() => {
-        router.push('/')
-        console.log('hi')
-      },[]);
+const waiting =():any =>{
+    const session = useSession({
+        required: true,
+        onUnauthenticated() {
+          redirect('/signin');
+        },
+      })
     return(
-        <h1>eiei</h1>
+        <>
+            <h1>hii</h1>
+        </>
     )
 }
  
-export default WaitingRoom  
+export default waiting
+ 
+waiting.auth = true
