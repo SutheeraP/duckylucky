@@ -17,9 +17,9 @@ export default async function RootLayout({
       <body>
 
         <SessionProvider>
-          <React.StrictMode>
+     
             {children}
-          </React.StrictMode>
+       
         </SessionProvider>
 
       </body>

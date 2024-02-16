@@ -1,5 +1,7 @@
 'use client'
-const Waiting =():any =>{
+
+
+const Waiting=()=>{
     return(
         <>
             <h1>hii</h1>

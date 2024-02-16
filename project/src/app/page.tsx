@@ -121,7 +121,7 @@ export default function Home() {
 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center' onClick={()=>{router.push('/waiting')}}>สุ่มห้อง</button>
+                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center' onClick={()=>{router.push('/waitingroom')}}>สุ่มห้อง</button>
                   <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" >สร้างห้อง</button>
                 </div>
               </div>
