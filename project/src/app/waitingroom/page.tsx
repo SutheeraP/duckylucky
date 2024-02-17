@@ -5,14 +5,14 @@ import { redirect, useRouter } from "next/navigation";
 import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
-import { updateCurrentUser } from "firebase/auth";
-import { async } from "@firebase/util";
 import {v4 as uuidv4} from 'uuid'; 
 
 
 
 const Waiting = (prop) => {
+    console.log(prop['searchParams']['intend'])
     const router = useRouter()
+    const intend = prop['searchParams']['intend']
     const [currentUid, setCurrentUid] = useState<any>()
     const session = useSession({
         required: true,
@@ -113,9 +113,9 @@ const Waiting = (prop) => {
         // });
 
         console.log(rooms)
-        if (rooms) {
+        if (rooms && intend == 'challenge') {
             for (const [roomId, info] of Object.entries(rooms)) {
-                if (!info.challenger && info.owner != currentUid) {
+                if (!info.challenger && info.owner != currentUid && roomId.includes('challenge')) {
                     const db = getDatabase();
                     update(ref(db, `waitingRoom/${roomId}`), {
                         challenger: `${currentUid}`
@@ -123,16 +123,16 @@ const Waiting = (prop) => {
                     return;
                 }
                 else if (info.owner == currentUid){
-                    
+
                     return;
                 }
             }
-            set(ref(db, `waitingRoom/${uuidv4()}`), {
+            set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
             });
             return;
         } else {
-            set(ref(db, `waitingRoom/${uuidv4()}`), {
+            set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
             });
             return;
