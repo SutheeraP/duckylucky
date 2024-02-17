@@ -11,7 +11,7 @@ import {v4 as uuidv4} from 'uuid';
 
 
 
-const Waiting = () => {
+const Waiting = (prop) => {
     const router = useRouter()
     const [currentUid, setCurrentUid] = useState<any>()
     const session = useSession({
@@ -120,6 +120,10 @@ const Waiting = () => {
                     update(ref(db, `waitingRoom/${roomId}`), {
                         challenger: `${currentUid}`
                     });
+                    return;
+                }
+                else if (info.owner == currentUid){
+                    
                     return;
                 }
             }
