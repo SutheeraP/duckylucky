@@ -2,11 +2,12 @@
 
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import { getDatabase, ref, set, onValue, update, remove } from "firebase/database";
+import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
 import { updateCurrentUser } from "firebase/auth";
 import { async } from "@firebase/util";
+import {v4 as uuidv4} from 'uuid'; 
 
 
 
@@ -21,7 +22,7 @@ const Waiting = () => {
     })
     // useEffect(() => {
     // console.log('HiHi')
-    const updateData = async () => {
+    const updateDataU = async () => {
         const userListRef = ref(db, `waitingRoom`);
 
         await onValue(userListRef, (snapshot: any) => {
@@ -79,115 +80,161 @@ const Waiting = () => {
 
     const fetchUserData = async () => {
         const email = session?.data?.user?.email;
-        if (email) {
+        if (currentUid == undefined) {
             const uid = await getUserUid(email);
             if (uid != null) {
                 readUser(uid)
             }
 
         }
-        updateData()
+        updateDataU()
     };
 
     fetchUserData();
 
     // }, [])
 
-    const createWaitingRoom = () => {
-        const db = getDatabase();
-        set(ref(db, `waitingRoom/owner:${currentUid}`), {
-            owner: `${currentUid}`
-        });
-
-    };
+    // const createWaitingRoom = () => {
+    //     if (currentUid != 'remove') {
+    //     const db = getDatabase();
+    //     set(ref(db, `waitingRoom/${currentUid}`), {
+    //         owner: `${currentUid}`
+    //     });
+    //     return;
+    // }
+    // };
 
     const findWaitingRoom = async () => {
+        console.log("Finding")
         const waitingRoomRef = ref(db, `waitingRoom`);
+        const rooms = (await get(waitingRoomRef)).val()
+        // onValue(waitingRoomRef, (snapshot: any) => {
+        //     rooms = snapshot.val();
+        // });
 
-        await onValue(waitingRoomRef, (snapshot: any) => {
-            const data = snapshot.val();
-            if (data) {
-                Object.keys(data).forEach((key) => {
-                    // console.log('key : ', data[key].email)
-                    if (Object.keys(data[key]).length == 1 && data[key].owner != currentUid) {
-                        console.log(data[key])
-                        const db = getDatabase();
-                        update(ref(db, `waitingRoom/${key}`), {
-                            challenger: `${currentUid}`
-                        });
-
-                        return;
-                    }
-                    else if (data[key].owner == currentUid) {
-                        console.log('you are owner now')
-                        return;
-                    }
-                    else {
-                        updateData()
-                        return;
-                    }
-
-                });
-                return;
+        console.log(rooms)
+        if (rooms) {
+            for (const [roomId, info] of Object.entries(rooms)) {
+                if (!info.challenger && info.owner != currentUid) {
+                    const db = getDatabase();
+                    update(ref(db, `waitingRoom/${roomId}`), {
+                        challenger: `${currentUid}`
+                    });
+                    return;
+                }
             }
-            else {
-                console.log('Room not found, will turn you into owner')
-                createWaitingRoom()
-                return;
-            }
-        });
+            set(ref(db, `waitingRoom/${uuidv4()}`), {
+                owner: `${currentUid}`
+            });
+            return;
+        } else {
+            set(ref(db, `waitingRoom/${uuidv4()}`), {
+                owner: `${currentUid}`
+            });
+            return;
+        }
+
+
+        // else {
+        //     console.log('Room not found, will turn you into owner')
+        //     set(ref(db, `waitingRoom/${currentUid}`), {
+        //         owner: `${currentUid}`
+        //     });
+        //     return;
+        // }
+        // if (currentUid != 'remove') {
+        //     const waitingRoomRef = ref(db, `waitingRoom`);
+        //     onValue(waitingRoomRef, (snapshot: any) => {
+        //         const data = snapshot.val();
+        //         console.log(data)
+        //         console.log('eiei')
+        //         console.log(currentUid)
+        // if (data && currentUid != 'remove') {
+        //     Object.keys(data).forEach((key) => {
+        //         // console.log('key : ', data[key].email)
+        //         if (Object.keys(data[key]).length == 1 && data[key].owner != currentUid) {
+        //             console.log(data[key])
+        //             const db = getDatabase();
+        //             update(ref(db, `waitingRoom/${key}`), {
+        //                 challenger: `${currentUid}`
+        //             });
+
+
+        //         }
+        //         else if (data[key].owner == currentUid) {
+        //             console.log('you are owner now')
+
+        //         }
+
+        //     });
+        //     return;
+        // }
+        // else if(currentUid != 'remove') {
+        //     console.log('Room not found, will turn you into owner')
+        //     set(ref(db, `waitingRoom/${currentUid}`), {
+        //         owner: `${currentUid}`
+        //     });
+        //     return;
+        // }
+        // });
     };
 
-    const removeCurrent = async () => {
-        const userListRef = ref(db, `waitingRoom`);
-        await onValue(userListRef, (snapshot: any) => {
-            const data = snapshot.val();
-            if (data) {
-                Object.keys(data).forEach((room) => {
-                    Object.keys(data[room]).forEach((key) => {
-                        switch (key) {
-                            case 'owner':
-                                if (data[room][key] === currentUid) {
-                                    remove(ref(db, `waitingRoom/${room}/${key}`))
-                                    router.push('/')
-                                    return;
-                                }
-                                break;
-                            case 'challenger':
-                                if (data[room][key] === currentUid) {
-                                    remove(ref(db, `waitingRoom/${room}/${key}`))
-                                    router.push('/')
-                                    return;
-                                }
-                                break;
 
-                            default:
-                                break;
-                        }
-
-                    })
-                });
-                return;
-            }
-        });
-        
-    }
 
 
     useEffect(() => {
 
         console.log(currentUid)
-        if (currentUid) {
+        if (currentUid && currentUid != 'remove') {
             console.log('waiting...')
             findWaitingRoom()
             console.log('finding another player...')
         }
     }, [currentUid])
 
+
+    const removeCurrent = async () => {
+
+        const RoomRef = ref(db, `waitingRoom`);
+        let rooms = null;
+        console.log("Exit")
+        await onValue(RoomRef, (snapshot: any) => {
+            rooms = snapshot.val();
+        });
+        console.log(rooms);
+        if (rooms) {
+            console.log("removeCurrent")
+            for (const [roomId, value] of Object.entries(rooms)) {
+                const owner = value?.owner;
+                const challenger = value?.challenger;
+                if (owner == currentUid) {
+                    console.log("System must remove this room as owner");
+                    if (!challenger) {
+                        remove(ref(db,`waitingRoom/${roomId}`));
+                    } else {
+                        update(ref(db, `waitingRoom/${roomId}`), {
+                            owner: `${challenger}`
+                        });
+                    }
+                    remove(ref(db,`waitingRoom/${roomId}/challenger`));
+                    router.push('/');
+                    return;
+                }
+                if (challenger == currentUid) {
+                    console.log("System must remove this room as challenger");
+                    remove(ref(db,`waitingRoom/${roomId}/challenger`));
+                    router.push('/');
+                    return;
+                }
+            }
+            return;
+        }
+    }
+
     return (
         <>
             <h1>hii</h1>
-            <button onClick={removeCurrent}>back</button>
+            <button type="button" id='button' onClick={() => { removeCurrent() }}>back</button>
         </>
     )
 }
