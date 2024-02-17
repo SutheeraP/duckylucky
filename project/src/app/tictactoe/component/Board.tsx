@@ -1,122 +1,101 @@
-import Image from 'next/image'
-import A1 from '../image/gridA1.svg'
-import A2 from '../image/gridA2.svg'
-import A3 from '../image/gridA3.svg'
-import A4 from '../image/gridA4.svg'
-import B1 from '../image/gridB1.svg'
-import B2 from '../image/gridB2.svg'
-import B3 from '../image/gridB3.svg'
-import B4 from '../image/gridB4.svg'
-import C1 from '../image/gridC1.svg'
-import C2 from '../image/gridC2.svg'
-import C3 from '../image/gridC3.svg'
-import C4 from '../image/gridC4.svg'
-import D1 from '../image/gridD1.svg'
-import D2 from '../image/gridD2.svg'
-import D3 from '../image/gridD3.svg'
-import D4 from '../image/gridD4.svg'
+import Image from "next/image"
+import { useEffect } from "react"
 
+const WINNING_COMBO = [
+    [0,1,2,3],
+    [4,5,6,7],
+    [8,9,10,11],
+    [12,13,14,15],
+    [0,4,8,12],
+    [1,5,9,13],
+    [2,6,10,14],
+    [3,7,11,15],
+    [0,5,10,15],
+    [3,6,9,12]
+]
 
+const Board = (props:any) => {
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset } = props;
+    // const { xTurn } = xTurn_b
+    // const { won } = won_b
+    // const { draw } = draw_b
+    // const { boardData } = boardData_b
+    // const { result } = reset_b
 
-const Board = () =>{
-    return (
-        <div className="grid grid-cols-4 grid-rows-4">
-            <Image
-                src={A1}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={A2}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={A3}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={A4}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={B1}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={B2}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={B3}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={B4}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={C1}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={C2}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={C3}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={C4}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={D1}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={D2}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={D3}
-                width={80}
-                height={80}
-                alt=""
-            />
-            <Image
-                src={D4}
-                width={80}
-                height={80}
-                alt=""
-            />
+    // xTurn.setXturn()
+    // won.setWon(bool)
+    // draw.setDraw(bool)
+    // boardData.setBoardData(idx:value)
+    // const {xTurn , won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset} = props
+
+    useEffect(() => {
+        checkWinner()
+        checkDraw()
+    },[boardData])
+
+    const updateBoardData = (idx: number) => {
+        if (!boardData[idx] && !won){
+            let value = xTurn === true ? `/image/icon1.svg` : `/image/icon2.svg`;
+            console.log(idx + ':' + value);
+            setBoardData(idx, value)
+            setXTurn()
+        }
+        checkWinner() 
+    }
+
+    const checkDraw = () => {
+        let check = Object.keys(boardData).every((v) => boardData[v])
+        setDraw(check)
+    }
+
+    const checkWinner = () => {
+        WINNING_COMBO.map((bd) => {
+            const [a,b,c,d] = bd
+            if (boardData[a] && boardData[a] == boardData[b] && boardData[b] == boardData[c] && boardData[c] == boardData[d]){
+                setWon(true)
+                return
+                // console.log(won)
+            }
+            setResult(!xTurn? 'คุณชนะ !':'คุณแพ้ !')
+        })
+    }
+
+    // const resetBoard = () => {
+    //     setBoardData({
+    //         0:``,
+    //         1:``, 
+    //         2:``, 
+    //         3:``, 
+    //         4:``, 
+    //         5:``, 
+    //         6:``, 
+    //         7:``, 
+    //         8:``, 
+    //         9:``, 
+    //         10:``, 
+    //         11:``, 
+    //         12:``, 
+    //         13:``, 
+    //         14:``, 
+    //         15:``
+    //     })
+    //     reset()
+    //     setWon(false)
+    //     setDraw(false)
+    // }
+    return(
+        <div className="flex-grow flex flex-col align-middle gap-4">
+            <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center">
+                {[...Array(16)].map((v, idx: number) => {
+                    return <div key={idx} className=" w-20 h-20 cursor-pointer relative flex justify-center" onClick={() => {updateBoardData(idx)}}>
+                        <div className="self-center text-2xl">
+                            <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
+                        </div>
+                        <Image src={`/image/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
+                    </div>
+                })}
+            </div>
+            <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer self-center" onClick={() => {reset()}}>reset board</div>
         </div>
     )
 }
