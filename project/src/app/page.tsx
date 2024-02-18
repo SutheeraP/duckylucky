@@ -80,9 +80,6 @@ export default function Home() {
 
   const invitation = async () => {
     const inviting = ref(db, `inviting`);
-
-
-
     await onValue(inviting, (snapshot: any) => {
       const data = snapshot.val();
       if (data) {
@@ -95,7 +92,6 @@ export default function Home() {
     });
   }
   invitation()
-
   return (
     <>
       <div className='font-Mali'>

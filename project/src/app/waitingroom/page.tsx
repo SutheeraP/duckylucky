@@ -117,7 +117,7 @@ const Waiting = (prop) => {
         console.log(rooms)
         if (rooms) {
             for (const [roomId, info] of Object.entries(rooms)) {
-                if (!info.challenger && info.owner != currentUid && roomId.includes('challenge')) {
+                if (!info.challenger && info.owner != currentUid && !roomId.includes('custom')) {
                     const db = getDatabase();
                     update(ref(db, `waitingRoom/${roomId}`), {
                         challenger: `${currentUid}`
@@ -245,6 +245,8 @@ const Waiting = (prop) => {
             <button type="button" id='button' onClick={() => { removeCurrent() }}>back</button>
 
             {intend == 'custom'? <Invitation props={{currentUid, roomId}}/>:''}
+
+            {<button>ready?</button>}
         </>
     )
 }
