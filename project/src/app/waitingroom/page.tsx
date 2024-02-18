@@ -6,6 +6,7 @@ import { getDatabase, ref, set, onValue, update, remove, child, get } from "fire
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
 import {v4 as uuidv4} from 'uuid'; 
+import Invitation from "./component/Invitation";
 
 
 
@@ -14,6 +15,7 @@ const Waiting = (prop) => {
     const router = useRouter()
     const intend = prop['searchParams']['intend']
     const [currentUid, setCurrentUid] = useState<any>()
+    const [roomId, setRoomId] = useState<any>()
     const session = useSession({
         required: true,
         onUnauthenticated() {
@@ -113,28 +115,33 @@ const Waiting = (prop) => {
         // });
 
         console.log(rooms)
-        if (rooms && intend == 'challenge') {
+        if (rooms) {
             for (const [roomId, info] of Object.entries(rooms)) {
                 if (!info.challenger && info.owner != currentUid && roomId.includes('challenge')) {
                     const db = getDatabase();
                     update(ref(db, `waitingRoom/${roomId}`), {
                         challenger: `${currentUid}`
                     });
+                    setRoomId(roomId)
                     return;
                 }
                 else if (info.owner == currentUid){
-
+                    setRoomId(roomId)
                     return;
                 }
             }
             set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
+                
             });
+            setRoomId(roomId)
             return;
         } else {
             set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
+                
             });
+            setRoomId(roomId)
             return;
         }
 
@@ -182,9 +189,6 @@ const Waiting = (prop) => {
         // }
         // });
     };
-
-
-
 
     useEffect(() => {
 
@@ -239,6 +243,8 @@ const Waiting = (prop) => {
         <>
             <h1>hii</h1>
             <button type="button" id='button' onClick={() => { removeCurrent() }}>back</button>
+
+            {intend == 'custom'? <Invitation props={{currentUid, roomId}}/>:''}
         </>
     )
 }

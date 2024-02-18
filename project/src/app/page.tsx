@@ -78,7 +78,18 @@ export default function Home() {
 
   fetchUserData(); // Fetch user data when the component mounts
 
-
+  const invitation = async()=>{
+    const inviting = ref(db, `inviting`);
+    await onValue(inviting, (snapshot: any) => {
+      const data = snapshot.val();
+      Object.keys(data).forEach((key) => {
+        if (key == userid){
+          console.log('you have to invite')
+        }
+      });
+    });
+  }
+  invitation()
 
   return (
     <>
