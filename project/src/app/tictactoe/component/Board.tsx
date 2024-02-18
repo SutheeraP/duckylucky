@@ -15,18 +15,7 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props:any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset } = props;
-    // const { xTurn } = xTurn_b
-    // const { won } = won_b
-    // const { draw } = draw_b
-    // const { boardData } = boardData_b
-    // const { result } = reset_b
-
-    // xTurn.setXturn()
-    // won.setWon(bool)
-    // draw.setDraw(bool)
-    // boardData.setBoardData(idx:value)
-    // const {xTurn , won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset} = props
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset , gameStatus} = props;
 
     useEffect(() => {
         checkWinner()
@@ -36,7 +25,7 @@ const Board = (props:any) => {
     const updateBoardData = (idx: number) => {
         if (!boardData[idx] && !won){
             let value = xTurn === true ? `/image/icon1.svg` : `/image/icon2.svg`;
-            console.log(idx + ':' + value);
+            // console.log(idx + ':' + value);
             setBoardData(idx, value)
             setXTurn()
         }
@@ -54,48 +43,21 @@ const Board = (props:any) => {
             if (boardData[a] && boardData[a] == boardData[b] && boardData[b] == boardData[c] && boardData[c] == boardData[d]){
                 setWon(true)
                 return
-                // console.log(won)
             }
             setResult(!xTurn? 'คุณชนะ !':'คุณแพ้ !')
         })
     }
 
-    // const resetBoard = () => {
-    //     setBoardData({
-    //         0:``,
-    //         1:``, 
-    //         2:``, 
-    //         3:``, 
-    //         4:``, 
-    //         5:``, 
-    //         6:``, 
-    //         7:``, 
-    //         8:``, 
-    //         9:``, 
-    //         10:``, 
-    //         11:``, 
-    //         12:``, 
-    //         13:``, 
-    //         14:``, 
-    //         15:``
-    //     })
-    //     reset()
-    //     setWon(false)
-    //     setDraw(false)
-    // }
     return(
-        <div className="flex-grow flex flex-col align-middle gap-4">
-            <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center">
-                {[...Array(16)].map((v, idx: number) => {
-                    return <div key={idx} className=" w-20 h-20 cursor-pointer relative flex justify-center" onClick={() => {updateBoardData(idx)}}>
-                        <div className="self-center text-2xl">
-                            <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
-                        </div>
-                        <Image src={`/image/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
+        <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center">
+            {[...Array(16)].map((v, idx: number) => {
+                return <div key={idx} className="w-20 h-20 cursor-pointer relative flex justify-center" onClick={gameStatus == 'mark'? () => {updateBoardData(idx)} : undefined}>
+                    <div className="self-center text-2xl">
+                        <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
                     </div>
-                })}
-            </div>
-            <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer self-center" onClick={() => {reset()}}>reset board</div>
+                    <Image src={`/image/board/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
+                </div>
+            })}
         </div>
     )
 }

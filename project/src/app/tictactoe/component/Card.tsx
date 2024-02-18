@@ -1,50 +1,18 @@
-"use client";
-import { useState } from "react"
+import Image from "next/image";
+import { useState } from "react";
 
+const Card = (props:any) => {
+    const { key, id, name, point, img, description, selectedCard, setSelectedCard } = props;
+    // const [isSelected, setIsSelected] = useState(false)
 
-const Card = () => {
-
-    interface CardData {
-        [key: string]: any;
-    }
-    const [cardData, setCardData] = useState<CardData>({
-        0:`t`,
-        1:`e`, 
-        2:`w`, 
-        3:`t`, 
-        4:`#>`, 
-        5:`<#`, 
-    });
-
-    const insertCard = (cardID: string) => {
-        Object.entries(cardData).every(([key, value]) => {
-            console.log(`${value}`);
-            if (`${value}` == ``){
-                setCardData({...cardData, [`${key}`]: cardID});
-                console.log(`${value}`)
-                return false;
-            }
-            else{
-                return true;
-            }
-        });
+    const handleClick = () => {
+        // setSelectedCard({ key: key, id: id })
+        setSelectedCard(id)
+        // setIsSelected(true)
     }
 
-    const [selectedCard, setSelectedCard] = useState('')
-    
-    const removeCard = (idx: number) => {
-        setCardData({...cardData, [`${selectedCard}`]: ``});
-    }
-
-    return(
-        <div id="userCardContainer" className="container mx-auto flex justify-center relative">
-            {[...Array(6)].map((v, idx: number) => {
-                return <div key={idx} className={`w-40 h-60 bg-white rounded-lg border border-black relative -ml-32 left-16 ${cardData[idx]? 'block' : 'hidden'}`} onClick={() => {setSelectedCard(`${idx}`)}}>
-                </div>
-            })}
-            {/* <div className="bg-slate-300 rounded-lg flex w-28 p-2 justify-center items-center cursor-pointer" onClick={() => {insertCard('test')}}>insertcard</div> */}
-        </div>
-    )
+    return <Image key={key} src={img} alt=""  width={140} height={280} className={`relative -ml-46 left-23 border border-black rounded-lg`} onClick={handleClick}/>
 }
+// ${selectedCard.key == key? '-translate-y-4':'translate-y-0'}
 
 export default Card;

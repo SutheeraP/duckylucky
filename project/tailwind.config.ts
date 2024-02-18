@@ -26,7 +26,12 @@ const config: Config = {
         'Mali': ["Mali"],
         // Rampart: ["Rampart One", "cursive"],
       },
-    
+      margin: {
+        '-46':'-11.5rem'
+      },
+      inset: {
+        '23':'5.75rem'
+      }
     },
 
   },
