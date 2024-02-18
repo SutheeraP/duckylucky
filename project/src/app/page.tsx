@@ -78,15 +78,20 @@ export default function Home() {
 
   fetchUserData(); // Fetch user data when the component mounts
 
-  const invitation = async()=>{
+  const invitation = async () => {
     const inviting = ref(db, `inviting`);
+
+
+
     await onValue(inviting, (snapshot: any) => {
       const data = snapshot.val();
-      Object.keys(data).forEach((key) => {
-        if (key == userid){
-          console.log('you have to invite')
-        }
-      });
+      if (data) {
+        Object.keys(data).forEach((key) => {
+          if (key == userid) {
+            console.log('you have to invite')
+          }
+        });
+      }
     });
   }
   invitation()
@@ -132,8 +137,8 @@ export default function Home() {
 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center' onClick={()=>{router.push('/waitingroom?intend=challenge')}}>สุ่มห้อง</button>
-                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" onClick={()=>{router.push('/waitingroom?intend=custom')}}>สร้างห้อง</button>
+                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
+                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
                 </div>
               </div>
             </div>
@@ -146,4 +151,3 @@ export default function Home() {
 }
 
 Home.requireAuth = true
- 
