@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
+import { getDatabase, ref, set, onValue, update, remove, child, get, push } from "firebase/database";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +11,6 @@ import Invitation from "./component/Invitation";
 
 
 const Waiting = (prop: any) => {
-    console.log(prop['searchParams']['intend'])
     const router = useRouter()
     const intend = prop['searchParams']['intend']
     const [currentUid, setCurrentUid] = useState<any>()
@@ -25,31 +24,28 @@ const Waiting = (prop: any) => {
     // useEffect(() => {
     // console.log('HiHi')
     const updateDataU = async () => {
-        const userListRef = ref(db, `waitingRoom`);
-
-        await onValue(userListRef, (snapshot: any) => {
+        
+        const waitingRef = ref(db, `waitingRoom`);
+        await onValue(waitingRef, (snapshot: any) => {
             const data = snapshot.val();
             if (data) {
-                Object.keys(data).forEach((room) => {
+                Object.keys(data).forEach((room) => {console.log(Object.keys(data[room]).length)
                     Object.keys(data[room]).forEach((key) => {
-                        switch (key) {
-                            case 'owner':
-                                if (data[room][key] === currentUid) {
-                                    console.log('you are Player 1')
-                                }
-                                break;
-                            case 'challenger':
-                                if (data[room][key] === currentUid) {
-                                    console.log('you are Player 2')
-                                }
-                                break;
-
-                            default:
-                                break;
+                        if (Object.keys(data[room]).length == 2 && data[room][key] === currentUid) {
+                            if (key == 'owner' && intend == 'custom') {
+                                //นี่จ่ะ ทำให้มันขึ้นกดเริ่มเกม เฉพาะโอนเนอในโหมดสร้างห้องเท่านั้น
+                            }
+                            else {
+                                const db = getDatabase();
+                                update(ref(db, `Matching/${room}/player`), {
+                                    player1: data[room]['owner'],
+                                    player2: data[room]['challenger']
+                                });
+                                remove(ref(db, `waitingRoom/${room}`));
+                                router.push('/tictactoe')
+                            }
                         }
                     })
-
-
                 });
             }
         });
@@ -89,7 +85,7 @@ const Waiting = (prop: any) => {
             }
 
         }
-        updateDataU()
+
     };
 
     fetchUserData();
@@ -119,7 +115,7 @@ const Waiting = (prop: any) => {
             for (const [roomId, info] of Object.entries(rooms)) {
 
                 if (typeof info == 'object' && info != null) {
-                    if (intend == roomId) {
+                    if (intend == roomId && !(info as any).challenger) {
                         // console.log('hiie')
                         const db = getDatabase();
                         update(ref(db, `waitingRoom/${roomId}`), {
@@ -155,49 +151,6 @@ const Waiting = (prop: any) => {
             return;
         }
 
-
-        // else {
-        //     console.log('Room not found, will turn you into owner')
-        //     set(ref(db, `waitingRoom/${currentUid}`), {
-        //         owner: `${currentUid}`
-        //     });
-        //     return;
-        // }
-        // if (currentUid != 'remove') {
-        //     const waitingRoomRef = ref(db, `waitingRoom`);
-        //     onValue(waitingRoomRef, (snapshot: any) => {
-        //         const data = snapshot.val();
-        //         console.log(data)
-        //         console.log('eiei')
-        //         console.log(currentUid)
-        // if (data && currentUid != 'remove') {
-        //     Object.keys(data).forEach((key) => {
-        //         // console.log('key : ', data[key].email)
-        //         if (Object.keys(data[key]).length == 1 && data[key].owner != currentUid) {
-        //             console.log(data[key])
-        //             const db = getDatabase();
-        //             update(ref(db, `waitingRoom/${key}`), {
-        //                 challenger: `${currentUid}`
-        //             });
-
-
-        //         }
-        //         else if (data[key].owner == currentUid) {
-        //             console.log('you are owner now')
-
-        //         }
-
-        //     });
-        //     return;
-        // }
-        // else if(currentUid != 'remove') {
-        //     console.log('Room not found, will turn you into owner')
-        //     set(ref(db, `waitingRoom/${currentUid}`), {
-        //         owner: `${currentUid}`
-        //     });
-        //     return;
-        // }
-        // });
     };
 
     useEffect(() => {
@@ -206,6 +159,7 @@ const Waiting = (prop: any) => {
         if (currentUid && currentUid != 'remove') {
             console.log('waiting...')
             findWaitingRoom()
+            updateDataU()
             console.log('finding another player...')
         }
     }, [currentUid])
@@ -260,10 +214,6 @@ const Waiting = (prop: any) => {
             }
             // return;
         }
-
-
-
-
     }
 
 
