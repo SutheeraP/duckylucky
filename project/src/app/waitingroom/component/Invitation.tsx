@@ -30,7 +30,7 @@ const Invitation = (prop:any) => {
     }, [props['currentUid']])
 
     const inviteUser = () => {
-        const invite = document.getElementById('invite-username')?.value
+        const invite = (document.getElementById('invite-username') as HTMLInputElement)?.value
         if (userInfo) {
             for (const uid of Object.entries(userInfo)) {
                 if (uid[1]['username'] == invite && uid[0] != props['currentUid']) {
