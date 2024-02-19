@@ -45,7 +45,7 @@ export default function Signin() {
 
 
   return (
-    <div className='font-Mali'>
+    <div className=''>
       <div className="min-h-screen w-full relative overflow-hidden">
         <Background />
         <div className="min-h-screen flex">

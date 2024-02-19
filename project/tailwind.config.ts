@@ -22,10 +22,10 @@ const config: Config = {
         primary: '#EAA800',
         secondary: '#EAA800',
       },
-      fontFamily: {
-        'Mali': ["Mali"],
-        // Rampart: ["Rampart One", "cursive"],
-      },
+      // fontFamily: {
+      //   'Mali': ['Mali', 'sans-serif'],
+      //   // Rampart: ["Rampart One", "cursive"],
+      // },
       margin: {
         '-46':'-11.5rem'
       },
