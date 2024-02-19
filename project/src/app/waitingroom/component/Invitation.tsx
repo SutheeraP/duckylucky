@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 
-const Invitation = (prop) => {
+const Invitation = (prop:any) => {
     const { props } = prop
     const [userInfo, setUserInfo] = useState()
 
