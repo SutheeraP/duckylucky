@@ -2,6 +2,7 @@
 import Image from "next/image"
 import Board from "./component/Board";
 import CardLayout from "./component/CardLayout";
+import ModalCard from "./component/MadalCard";
 
 import { useState } from "react"
 
@@ -102,10 +103,10 @@ export default function TicTacToe() {
         setXTurn(!xTurn)
     }
 
-    const removeCard = (idx: number) => {
-        // console.log('test remove')
-        // console.log(inhandCard)
-        // setCardData(prevState => ({...prevState,[idx]: ``}));
+    const removeCard = () => {
+        setInhandCard(prevArray => {
+            return prevArray.filter((_, index) => index !== selectedCard);
+        });
     }
 
     // interface SelectedCard {
@@ -114,24 +115,20 @@ export default function TicTacToe() {
     // const [selectedCard, setSelectedCard] = useState<SelectedCard>({});
     // console.log(selectedCard)
     const [selectedCard, setSelectedCard] = useState<any>(``);
+    // console.log(selectedCard)
 
-    // const setInhandCardbyCardLayout = (card1:number, card2:number) => {
-    //     setInhandCard([...inhandCard, card[card1], card[card2]]);
-    //     console.log(inhandCard)
-    // }
-
-    const setSelectedCardbyCardLayout = (id:number) => {
-        setSelectedCard(id)
-        console.log(selectedCard)
+    const setSelectedCardbyCardLayout = (index:number) => {
+        setSelectedCard(index)
+        // console.log(selectedCard)
     }
 
     return(
         <div className='container'>
             <div className='container-sm sm:mx-auto'>
                 <div className="flex flex-col justify-center items-center h-screen gap-6">
-                    <div id="enemyCard" className="bg-slate-300 w-screen h-56 flex-none">01</div>
+                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``)? 'h-32':'h-48'}`}>01</div>
 
-                    <div className="flex-grow flex flex-col align-middle gap-4">
+                    <div className="flex-grow flex flex-col align-middle gap-4 justify-evenly">
                         <Board  xTurn = { xTurn } 
                                 won = { won } 
                                 draw = { draw } 
@@ -144,12 +141,18 @@ export default function TicTacToe() {
                                 setResult = { setResultbyBoard }
                                 reset = { resetbyBoard }
                                 gameStatus = { gameStatus }/>
+                        
+                        <div>
+                            <ModalCard  selectedCard = { selectedCard }
+                                        inhandCard = { [...inhandCard] }/>
+                        </div>
+
                         <div className={`flex justify-between ${gameStatus == 'start'? 'block':'hidden'}`}>
                             <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${inhandCard.length >= 5? 'pointer-events-none opacity-50':''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
-                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={() => {setGameStatus('usecard'); console.log(gameStatus)}}>ใช้การ์ดและกา</div>
+                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={() => {setGameStatus('usecard');}}>ใช้การ์ดและกา</div>
                         </div>
-                        <div className={`flex ${!selectedCard? 'justify-center':'justify-between'} ${gameStatus == 'usecard'? 'block':'hidden'}`}>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${selectedCard? 'block':'hidden'}`}>ใช้การ์ด</div>
+                        <div className={`flex ${!(selectedCard === ``)? 'justify-center':'justify-between'} ${gameStatus == 'usecard'? 'block':'hidden'}`}>
+                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``)? 'block':'hidden'}`} onClick={() => removeCard()}>ใช้การ์ด</div>
                             <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer`} onClick={() => setGameStatus('mark')}>จบการใช้การ์ด</div>
                         </div>
                         <div className={`flex justify-center ${gameStatus == 'mark'? 'block':'hidden'}`}>
@@ -157,7 +160,7 @@ export default function TicTacToe() {
                         </div>
                     </div>
 
-                    <div id="userCard" className="bg-slate-300 w-screen h-56 flex-none">
+                    <div id="userCard" className={`bg-slate-300 w-screen flex-none ${!(selectedCard === ``)? 'h-32':'h-48'}`}>
                         <CardLayout card = { [...card] }
                                     inhandCard = { [...inhandCard] }
                                     selectedCard = { selectedCard }
