@@ -117,7 +117,11 @@ const Waiting = (prop:any) => {
         console.log(rooms)
         if (rooms) {
             for (const [roomId, info] of Object.entries(rooms)) {
-                if (!info.challenger && info.owner != currentUid && !roomId.includes('custom')) {
+
+                if(typeof info == 'object' && info != null){
+
+                
+                if (!(info as any).challenger && (info as any).owner != currentUid && !roomId.includes('custom')) {
                     const db = getDatabase();
                     update(ref(db, `waitingRoom/${roomId}`), {
                         challenger: `${currentUid}`
@@ -125,21 +129,20 @@ const Waiting = (prop:any) => {
                     setRoomId(roomId)
                     return;
                 }
-                else if (info.owner == currentUid){
+                else if ((info as any).owner == currentUid || (info as any).challenger == currentUid){
                     setRoomId(roomId)
                     return;
                 }
             }
+            }
             set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
-                
             });
             setRoomId(roomId)
             return;
         } else {
             set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
-                
             });
             setRoomId(roomId)
             return;
@@ -213,8 +216,8 @@ const Waiting = (prop:any) => {
         if (rooms) {
             console.log("removeCurrent")
             for (const [roomId, value] of Object.entries(rooms)) {
-                const owner = value?.owner;
-                const challenger = value?.challenger;
+                const owner = (value as any)?.owner;
+                const challenger = (value as any)?.challenger;
                 if (owner == currentUid) {
                     console.log("System must remove this room as owner");
                     if (!challenger) {
