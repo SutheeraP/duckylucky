@@ -214,12 +214,25 @@ const Waiting = (prop: any) => {
     const removeCurrent = async () => {
 
         const RoomRef = ref(db, `waitingRoom`);
+        const invitingRef = ref(db, `inviting`);
         let rooms = null;
+        let invites = null
         console.log("Exit")
         await onValue(RoomRef, (snapshot: any) => {
             rooms = snapshot.val();
         });
         console.log(rooms);
+        await onValue(invitingRef, (snapshot: any) => {
+            invites = snapshot.val();
+        });
+        if (invites) {
+            console.log("removeCurrent")
+            for (const [detination, value] of Object.entries(invites)) {
+                if((value as any)?.inviter == currentUid){
+                    remove(ref(db, `inviting/${detination}`));
+                }
+            }
+        }
         if (rooms) {
             console.log("removeCurrent")
             for (const [roomId, value] of Object.entries(rooms)) {
@@ -245,9 +258,14 @@ const Waiting = (prop: any) => {
                     return;
                 }
             }
-            return;
+            // return;
         }
+ 
+            
+      
+        
     }
+
 
     return (
         <>
