@@ -134,22 +134,22 @@ export default function TicTacToe() {
     // maxpoint ใช้ตอนช่องพิเศษบัญชาจากราชินีหงส์ (+2point next round)
     // useable ใช้ตอนทำคำสาปแม่มดน้ำเงิน (ห้ามใช้สกิล)
 
-    const useCard = () => {
+    const checkUseCard = () => {
         if (point >= inhandCard[selectedCard].point) {
             setPoint(point - inhandCard[selectedCard].point)
             removeCard()
+            console.log('used card')
         }
     }
     // useCard เป็น filter เวลาใช้สกิล เอาไว้เช็คว่าเป็นสกิลอะไรด้วย
 
     // fix error ห้ามใช้ useCard ใน callback function
-    const handleUseCard = () => {
-        setGameStatus('usecard');
-      };
+    // const handleUseCard = () => {
+    //     setGameStatus('usecard');
+    //   };
 
 
     useEffect(() => {
-        // ฟังก์ชันที่จะทำงานทุกครั้งที่มีการเปลี่ยน xTurn
         const countdown = setTimeout(() => {
             if (timeLeft === 0) {
                 setXTurnbyBoard()
@@ -160,8 +160,6 @@ export default function TicTacToe() {
 
         return () => clearTimeout(countdown);
     }, [xTurn, timeLeft]);
-    
-    console.log(timeLeft)
 
     return(
         <div className='container'>
@@ -190,7 +188,7 @@ export default function TicTacToe() {
                 </div>
                 
                 <div className="flex flex-col justify-center items-center h-screen gap-4">
-                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``)? 'h-40':'h-48'}`}>01</div>
+                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``)? 'h-40':'h-48'}`}></div>
                     
                     <div className="flex-grow flex flex-col align-middle gap-4 justify-evenly max-w-full px-10">
                         <Board  xTurn = { xTurn } 
@@ -215,11 +213,11 @@ export default function TicTacToe() {
 
                         <div className={`flex justify-between ${gameStatus == 'start'? 'block':'hidden'}`}>
                             <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${inhandCard.length >= 5? 'pointer-events-none opacity-50':''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
-                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={handleUseCard}>ใช้การ์ดและกา</div>
+                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={() => {setGameStatus('usecard')}}>ใช้การ์ดและกา</div>
                         </div>
                         <div className={`flex ${!(selectedCard === ``)? 'justify-between':'justify-center'} ${gameStatus == 'usecard'? 'block':'hidden'}`}>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``)? 'block':'hidden'} ${!useable? 'pointer-events-none opacity-50':''}`} onClick={handleUseCard}>ใช้การ์ด</div>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer`} onClick={() => setGameStatus('mark')}>จบการใช้การ์ด</div>
+                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``)? 'block':'hidden'} ${!useable? 'pointer-events-none opacity-50':''}`} onClick={() => {checkUseCard()}}>ใช้การ์ด</div>
+                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer`} onClick={() => {setGameStatus('mark')}}>จบการใช้การ์ด</div>
                         </div>
                         <div className={`flex justify-center ${gameStatus == 'mark'? 'block':'hidden'}`}>
                             <div className={` text-black p-2`}>กาสัญลักษณ์</div>

@@ -33,7 +33,8 @@ const config: Config = {
         '23':'5.75rem'
       },
       spacing: {
-        '34':'8.5rem'
+        '34':'8.5rem',
+        '38':'9.5rem'
       }
     },
 
