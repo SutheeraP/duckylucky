@@ -33,14 +33,17 @@ const Invitation = (prop:any) => {
         const invite = (document.getElementById('invite-username') as HTMLInputElement)?.value
         if (userInfo) {
             for (const uid of Object.entries(userInfo)) {
-                if (uid[1]['username'] == invite && uid[0] != props['currentUid']) {
+              if(typeof uid[1] === 'string'){
+
+              
+                if ( uid[1]['username'] == invite && uid[0] != props['currentUid']) {
                     console.log('eiei')
                     const db = getDatabase();
                     update(ref(db, `inviting/${uid[0]}`), {
                         inviter: props['currentUid'],
                         roomId: props['roomId']
                     })
-                }
+                }}
             }
         }
     }
