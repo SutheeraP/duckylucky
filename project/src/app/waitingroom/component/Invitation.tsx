@@ -8,9 +8,9 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 
-const Invitation = (prop:any) => {
+const Invitation = (prop: any) => {
     const { props } = prop
-    const [userInfo, setUserInfo] = useState()
+    const [userInfo, setUserInfo] = useState<string>()
 
     const user = async () => {
         const userListRef = ref(db, `UserList`);
@@ -31,19 +31,20 @@ const Invitation = (prop:any) => {
 
     const inviteUser = () => {
         const invite = (document.getElementById('invite-username') as HTMLInputElement)?.value
+
         if (userInfo) {
             for (const uid of Object.entries(userInfo)) {
-              if(typeof uid[1] === 'string'){
-
-              
-                if ( uid[1]['username'] == invite && uid[0] != props['currentUid']) {
-                    console.log('eiei')
-                    const db = getDatabase();
-                    update(ref(db, `inviting/${uid[0]}`), {
-                        inviter: props['currentUid'],
-                        roomId: props['roomId']
-                    })
-                }}
+                if (typeof uid[1] === 'object') {
+                    console.log(typeof uid[1] && uid[1])
+                    if (uid[1]['username'] == invite && uid[0] != props['currentUid']) {
+                        console.log('eiei')
+                        const db = getDatabase();
+                        update(ref(db, `inviting/${uid[0]}`), {
+                            inviter: props['currentUid'],
+                            roomId: props['roomId']
+                        })
+                    }
+                }
             }
         }
     }
