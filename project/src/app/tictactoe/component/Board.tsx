@@ -15,7 +15,7 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props:any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset , gameStatus} = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset , gameStatus, selectedCard} = props;
 
     useEffect(() => {
         checkWinner()
@@ -49,11 +49,11 @@ const Board = (props:any) => {
     }
 
     return(
-        <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center">
+        <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center ">
             {[...Array(16)].map((v, idx: number) => {
-                return <div key={idx} className="w-20 h-20 cursor-pointer relative flex justify-center" onClick={gameStatus == 'mark'? () => {updateBoardData(idx)} : undefined}>
+                return <div key={idx} className={`${selectedCard === ``? 'w-20 h-20':'w-12 h-12'} cursor-pointer relative flex justify-center`} onClick={gameStatus == 'mark'? () => {updateBoardData(idx)} : undefined}>
                     <div className="self-center text-2xl">
-                        <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={50} height={50}/>
+                        <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={selectedCard === ``? 50:30} height={selectedCard === ``? 50:30}/>
                     </div>
                     <Image src={`/image/board/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
                 </div>
