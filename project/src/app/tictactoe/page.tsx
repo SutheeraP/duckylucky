@@ -5,7 +5,7 @@ import CardLayout from "./component/CardLayout";
 import ModalCard from "./component/MadalCard";
 import {v4 as uuidv4} from 'uuid'; 
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function TicTacToe() {
     const [gameStatus, setGameStatus] = useState<any>('start')
@@ -13,6 +13,7 @@ export default function TicTacToe() {
     // usecard : เฟสต่อเมื่อเลือก ใช้การ์ดและกา เป็นเฟสให้ใช้สกิล
     // mark : เฟสต่อจากใช้สกิล กาสัญลักษณ์
 
+    const [timeLeft, setTimeLeft] = useState(20);
 
     const [xTurn, setXTurn] = useState(true)
     const [won, setWon] = useState(false)
@@ -44,6 +45,7 @@ export default function TicTacToe() {
         setXTurn(!xTurn)
         setGameStatus('start')
         setPoint(5)
+        setTimeLeft(20)
     }
 
     const resetbyBoard = () => {
@@ -140,26 +142,47 @@ export default function TicTacToe() {
     }
     // useCard เป็น filter เวลาใช้สกิล เอาไว้เช็คว่าเป็นสกิลอะไรด้วย
 
+    useEffect(() => {
+        // ฟังก์ชันที่จะทำงานทุกครั้งที่มีการเปลี่ยน xTurn
+        const countdown = setTimeout(() => {
+            if (timeLeft === 0) {
+                setXTurnbyBoard()
+            } else {
+                setTimeLeft(timeLeft - 1);
+            }
+        }, 1000);
+
+        return () => clearTimeout(countdown);
+    }, [xTurn, timeLeft]);
+    
+    console.log(timeLeft)
+
     return(
         <div className='container'>
             <div className='container-sm sm:mx-auto relactive'>
-                <div className="absolute top-14 inset-x-2/4 -translate-x-20 w-40 bg-white border border-black p-3 flex flex-col gap-2">
-                    <div>
-                        {xTurn? 'X Player' : 'O player'}
+                <div className="flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
+                    <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
+                        {timeLeft}
                     </div>
-                    <div className="flex gap-1">
-                        {[...Array(point)].map((v, idx: number) => {
-                            return <div key={uuidv4()}>
-                                <Image src={'/image/point_full.svg'} alt=""  width={16} height={16}></Image>
-                            </div>
-                        })}
-                        {[...Array(maxPoint-point)].map((v, idx: number) => {
-                            return <div key={uuidv4()}>
-                                <Image src={'/image/point_empty.svg'} alt=""  width={16} height={16}></Image>
-                            </div>
-                        })}
+                    <div className="w-48 h-16 pl-12 bg-white border -translate-x-8 border-black flex flex-col gap-1 rounded-lg justify-center">
+                        <div>
+                            {xTurn? 'X Player' : 'O player'}
+                        </div>
+                        <div className="flex gap-1">
+                            {[...Array(point)].map((v, idx: number) => {
+                                return <div key={uuidv4()}>
+                                    <Image src={'/image/point_full.svg'} alt=""  width={16} height={16}></Image>
+                                </div>
+                            })}
+                            {[...Array(maxPoint-point)].map((v, idx: number) => {
+                                return <div key={uuidv4()}>
+                                    <Image src={'/image/point_empty.svg'} alt=""  width={16} height={16}></Image>
+                                </div>
+                            })}
+                        </div>
                     </div>
                 </div>
+                
                 <div className="flex flex-col justify-center items-center h-screen gap-4">
                     <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``)? 'h-40':'h-48'}`}>01</div>
                     

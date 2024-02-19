@@ -25,7 +25,6 @@ const Board = (props:any) => {
     const updateBoardData = (idx: number) => {
         if (!boardData[idx] && !won){
             let value = xTurn === true ? `/image/icon1.svg` : `/image/icon2.svg`;
-            // console.log(idx + ':' + value);
             setBoardData(idx, value)
             setXTurn()
         }
