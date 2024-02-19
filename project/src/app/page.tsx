@@ -103,7 +103,7 @@ export default function Home() {
   }
   return (
     <>
-      <div className='font-Mali'>
+      <div className=''>
         <main className="min-h-screen items-center relative overflow-hidden">
           <Background />
           <div className="min-h-screen flex">
