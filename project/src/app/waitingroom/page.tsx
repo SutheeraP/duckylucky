@@ -42,7 +42,7 @@ const Waiting = (prop: any) => {
                                     player2: data[room]['challenger']
                                 });
                                 remove(ref(db, `waitingRoom/${room}`));
-                                router.push('/tictactoe')
+                                router.push(`/tictactoe?match=${room}`)
                             }
                         }
                     })
