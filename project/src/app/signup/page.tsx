@@ -129,12 +129,11 @@ export default function Signup() {
       <div className="min-h-screen w-full relative overflow-hidden">
         <Background />
         <div className="min-h-screen flex">
-
           <div className="container px-4 z-10 m-auto">
             <div className="grid grid-cols-1 md:grid-cols-2">
               <div className="w-4/5 mx-auto hidden md:block my-auto"><ImageComp path='/image/icon/logo.svg' /></div>
               <div className="my-auto">
-              <div className="text-4xl lg:text-6xl text-center font-medium mb-8">Ducky Lucky</div>
+              <div className="text-4xl lg:text-6xl text-center font-medium mb-8 bg-white lg:bg-transparent py-2 rounded-lg">Ducky Lucky</div>
                 <div id="signup_section" className="md:w-4/5 lg:w-3/5 mx-auto">
                   <div className="grid grid-cols-3 gap-x-10 gap-y-5 mb-7">
                     {iconPath.map((path, index) => (
