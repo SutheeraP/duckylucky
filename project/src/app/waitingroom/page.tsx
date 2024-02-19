@@ -62,7 +62,7 @@ const Waiting = (prop:any) => {
         });
     }
 
-    const getUserUid = async (email: string) => {
+    const getUserUid = async (email: any) => {
         const userListRef = ref(db, `UserList`);
         let uid;
 
