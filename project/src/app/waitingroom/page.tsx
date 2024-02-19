@@ -119,7 +119,7 @@ const Waiting = (prop: any) => {
             for (const [roomId, info] of Object.entries(rooms)) {
 
                 if (typeof info == 'object' && info != null) {
-                    if(intend == roomId){
+                    if (intend == roomId) {
                         // console.log('hiie')
                         const db = getDatabase();
                         update(ref(db, `waitingRoom/${roomId}`), {
@@ -128,7 +128,7 @@ const Waiting = (prop: any) => {
                         setRoomId(roomId)
                         return;
                     }
-                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomId.includes('custom')) {
+                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomId.includes('custom') && intend != 'custom') {
                         const db = getDatabase();
                         update(ref(db, `waitingRoom/${roomId}`), {
                             challenger: `${currentUid}`
@@ -228,7 +228,7 @@ const Waiting = (prop: any) => {
         if (invites) {
             console.log("removeCurrent")
             for (const [detination, value] of Object.entries(invites)) {
-                if((value as any)?.inviter == currentUid){
+                if ((value as any)?.inviter == currentUid) {
                     remove(ref(db, `inviting/${detination}`));
                 }
             }
@@ -260,10 +260,10 @@ const Waiting = (prop: any) => {
             }
             // return;
         }
- 
-            
-      
-        
+
+
+
+
     }
 
 
