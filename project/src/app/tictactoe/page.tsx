@@ -147,7 +147,7 @@ export default function TicTacToe() {
         setGameStatus('usecard');
       };
 
-      
+
     useEffect(() => {
         // ฟังก์ชันที่จะทำงานทุกครั้งที่มีการเปลี่ยน xTurn
         const countdown = setTimeout(() => {
@@ -218,7 +218,7 @@ export default function TicTacToe() {
                             <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={handleUseCard}>ใช้การ์ดและกา</div>
                         </div>
                         <div className={`flex ${!(selectedCard === ``)? 'justify-between':'justify-center'} ${gameStatus == 'usecard'? 'block':'hidden'}`}>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``)? 'block':'hidden'} ${!useable? 'pointer-events-none opacity-50':''}`} onClick={() => useCard()}>ใช้การ์ด</div>
+                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``)? 'block':'hidden'} ${!useable? 'pointer-events-none opacity-50':''}`} onClick={handleUseCard}>ใช้การ์ด</div>
                             <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer`} onClick={() => setGameStatus('mark')}>จบการใช้การ์ด</div>
                         </div>
                         <div className={`flex justify-center ${gameStatus == 'mark'? 'block':'hidden'}`}>
