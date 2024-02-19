@@ -10,7 +10,7 @@ import Invitation from "./component/Invitation";
 
 
 
-const Waiting = (prop) => {
+const Waiting = (prop:any) => {
     console.log(prop['searchParams']['intend'])
     const router = useRouter()
     const intend = prop['searchParams']['intend']
