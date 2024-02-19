@@ -9,9 +9,10 @@ import { useState } from "react"
 
 export default function TicTacToe() {
     const [gameStatus, setGameStatus] = useState<any>('start')
-    // usecard
-    // mark
-    // console.log(gameStatus)
+    // start : เฟสแรกที่เลือกระหว่าง จั่ว2การ์ด กับ ใช้การ์ดและกา
+    // usecard : เฟสต่อเมื่อเลือก ใช้การ์ดและกา เป็นเฟสให้ใช้สกิล
+    // mark : เฟสต่อจากใช้สกิล กาสัญลักษณ์
+
 
     const [xTurn, setXTurn] = useState(true)
     const [won, setWon] = useState(false)
@@ -97,6 +98,7 @@ export default function TicTacToe() {
     const [inhandCard, setInhandCard] = useState<CardType[]>([]);
 
     const randomCard = () => { return Math.floor(Math.random() * 6)}
+    // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
 
     const drawTwoCard = () => {
         const card1 = randomCard();
@@ -112,21 +114,14 @@ export default function TicTacToe() {
         resetSelectedCard()
     }
 
-    // interface SelectedCard {
-    //     [key: string]: any;
-    // }
-    // const [selectedCard, setSelectedCard] = useState<SelectedCard>({});
-    // console.log(selectedCard)
     const [selectedCard, setSelectedCard] = useState<any>(``);
-    // console.log(selectedCard)
 
     const setSelectedCardbyCardLayout = (index:number) => {
         setSelectedCard(index)
-        // console.log(selectedCard)
         if (point >= inhandCard[index].point){setUseable(true)}
         else{setUseable(false)}
-        console.log(useable)
     }
+
     const resetSelectedCard = () => {
         setSelectedCard(``)
     }
@@ -134,6 +129,8 @@ export default function TicTacToe() {
     const [maxPoint, setMaxPoint] = useState<number>(5)
     const [point, setPoint] = useState<number>(maxPoint)
     const [useable, setUseable] = useState<boolean>(true)
+    // maxpoint ใช้ตอนช่องพิเศษบัญชาจากราชินีหงส์ (+2point next round)
+    // useable ใช้ตอนทำคำสาปแม่มดน้ำเงิน (ห้ามใช้สกิล)
 
     const useCard = () => {
         if (point >= inhandCard[selectedCard].point) {
@@ -141,11 +138,12 @@ export default function TicTacToe() {
             removeCard()
         }
     }
+    // useCard เป็น filter เวลาใช้สกิล เอาไว้เช็คว่าเป็นสกิลอะไรด้วย
 
     return(
         <div className='container'>
             <div className='container-sm sm:mx-auto relactive'>
-                <div className="absolute top-20 inset-x-2/4 -translate-x-20 w-40 bg-white border border-black p-3 flex flex-col gap-2">
+                <div className="absolute top-14 inset-x-2/4 -translate-x-20 w-40 bg-white border border-black p-3 flex flex-col gap-2">
                     <div>
                         {xTurn? 'X Player' : 'O player'}
                     </div>
@@ -162,8 +160,8 @@ export default function TicTacToe() {
                         })}
                     </div>
                 </div>
-                <div className="flex flex-col justify-center items-center h-screen gap-6">
-                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``)? 'h-32':'h-48'}`}>01</div>
+                <div className="flex flex-col justify-center items-center h-screen gap-4">
+                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``)? 'h-40':'h-48'}`}>01</div>
                     
                     <div className="flex-grow flex flex-col align-middle gap-4 justify-evenly max-w-full px-10">
                         <Board  xTurn = { xTurn } 
@@ -199,7 +197,7 @@ export default function TicTacToe() {
                         </div>
                     </div>
 
-                    <div id="userCard" className={`bg-slate-300 w-screen flex-none ${!(selectedCard === ``)? 'h-32':'h-48'}`}>
+                    <div id="userCard" className={`bg-slate-300 w-screen flex-none ${!(selectedCard === ``)? 'h-40':'h-48'}`}>
                         <CardLayout card = { [...card] }
                                     inhandCard = { [...inhandCard] }
                                     selectedCard = { selectedCard }
