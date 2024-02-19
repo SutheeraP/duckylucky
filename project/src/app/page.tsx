@@ -1,12 +1,13 @@
 'use client';
 import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { ref, onValue } from "firebase/database";
 import { db } from "./firebase";
 import { useState } from "react";
 import Background from "./component/Background";
 import ImageComp from "./component/ImageComp";
 import { useRouter } from "next/navigation";
+
+import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
 
 // import React from "react";
 // import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
@@ -36,11 +37,13 @@ export default function Home() {
   const [img, setImg] = useState("/image/icon1.svg");
   const [userid, setUserid] = useState("Loading...");
 
+  const [invite, setInvite] = useState()
+
   let readUser = (uid: string) => {
     const userListref = ref(db, `UserList/${uid}`);
     onValue(userListref, (snapshot: any) => {
       const data = snapshot.val();
-      console.log(data)
+      // console.log(data)
       setUserid(uid)
       setEmail(data.email)
       setImg(data.profile_img)
@@ -72,6 +75,7 @@ export default function Home() {
       const uid = await getUserUid(email);
       if (uid != null) {
         readUser(uid)
+        invitation()
       }
     }
   };
@@ -85,13 +89,18 @@ export default function Home() {
       if (data) {
         Object.keys(data).forEach((key) => {
           if (key == userid) {
-            console.log('you have to invite')
+            console.log('you have to invite',data[key]['roomId'])
+            setInvite(data[key]['roomId'])
+
           }
         });
       }
     });
   }
-  invitation()
+  
+  const removeInvite =()=>{
+    remove(ref(db, `inviting/${userid}`));
+  }
   return (
     <>
       <div className='font-Mali'>
@@ -135,6 +144,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                   <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
                   <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
+                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" onClick={() => { router.push(`/waitingroom?intend=${invite}`); removeInvite() }}>invite</button>
                 </div>
               </div>
             </div>

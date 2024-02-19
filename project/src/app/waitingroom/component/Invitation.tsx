@@ -35,7 +35,7 @@ const Invitation = (prop: any) => {
         if (userInfo) {
             for (const uid of Object.entries(userInfo)) {
                 if (typeof uid[1] === 'object') {
-                    console.log(typeof uid[1] && uid[1])
+                    console.log(userInfo)
                     if (uid[1]['username'] == invite && uid[0] != props['currentUid']) {
                         console.log('eiei')
                         const db = getDatabase();

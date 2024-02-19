@@ -5,12 +5,12 @@ import { redirect, useRouter } from "next/navigation";
 import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
-import {v4 as uuidv4} from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 import Invitation from "./component/Invitation";
 
 
 
-const Waiting = (prop:any) => {
+const Waiting = (prop: any) => {
     console.log(prop['searchParams']['intend'])
     const router = useRouter()
     const intend = prop['searchParams']['intend']
@@ -118,22 +118,29 @@ const Waiting = (prop:any) => {
         if (rooms) {
             for (const [roomId, info] of Object.entries(rooms)) {
 
-                if(typeof info == 'object' && info != null){
-
-                
-                if (!(info as any).challenger && (info as any).owner != currentUid && !roomId.includes('custom')) {
-                    const db = getDatabase();
-                    update(ref(db, `waitingRoom/${roomId}`), {
-                        challenger: `${currentUid}`
-                    });
-                    setRoomId(roomId)
-                    return;
+                if (typeof info == 'object' && info != null) {
+                    if(intend == roomId){
+                        // console.log('hiie')
+                        const db = getDatabase();
+                        update(ref(db, `waitingRoom/${roomId}`), {
+                            challenger: `${currentUid}`
+                        });
+                        setRoomId(roomId)
+                        return;
+                    }
+                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomId.includes('custom')) {
+                        const db = getDatabase();
+                        update(ref(db, `waitingRoom/${roomId}`), {
+                            challenger: `${currentUid}`
+                        });
+                        setRoomId(roomId)
+                        return;
+                    }
+                    else if ((info as any).owner == currentUid || (info as any).challenger == currentUid) {
+                        setRoomId(roomId)
+                        return;
+                    }
                 }
-                else if ((info as any).owner == currentUid || (info as any).challenger == currentUid){
-                    setRoomId(roomId)
-                    return;
-                }
-            }
             }
             set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
@@ -221,19 +228,19 @@ const Waiting = (prop:any) => {
                 if (owner == currentUid) {
                     console.log("System must remove this room as owner");
                     if (!challenger) {
-                        remove(ref(db,`waitingRoom/${roomId}`));
+                        remove(ref(db, `waitingRoom/${roomId}`));
                     } else {
                         update(ref(db, `waitingRoom/${roomId}`), {
                             owner: `${challenger}`
                         });
                     }
-                    remove(ref(db,`waitingRoom/${roomId}/challenger`));
+                    remove(ref(db, `waitingRoom/${roomId}/challenger`));
                     router.push('/');
                     return;
                 }
                 if (challenger == currentUid) {
                     console.log("System must remove this room as challenger");
-                    remove(ref(db,`waitingRoom/${roomId}/challenger`));
+                    remove(ref(db, `waitingRoom/${roomId}/challenger`));
                     router.push('/');
                     return;
                 }
@@ -247,7 +254,7 @@ const Waiting = (prop:any) => {
             <h1>hii</h1>
             <button type="button" id='button' onClick={() => { removeCurrent() }}>back</button>
 
-            {intend == 'custom'? <Invitation props={{currentUid, roomId}}/>:''}
+            {intend == 'custom' ? <Invitation props={{ currentUid, roomId }} /> : ''}
 
             {<button>ready?</button>}
         </>
