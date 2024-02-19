@@ -7,8 +7,6 @@ const Card = (props:any) => {
 
     const handleClick = () => {
         setSelectedCard(idx)
-        console.log(selectedCard)
-        console.log(idx)
     }
 
     return <Image src={img} alt=""  width={140} height={280} className={`relative -ml-46 left-23 border rounded-lg ${selectedCard === ``? 'translate-y-0 border-black':selectedCard === idx? 'translate-y-0 border-yellow-500':'translate-y-4 border-black'}`} onClick={() => {handleClick()}}/>
