@@ -37,7 +37,7 @@ export default function Home() {
   const [img, setImg] = useState("/image/icon1.svg");
   const [userid, setUserid] = useState("Loading...");
 
-  const [invite, setInvite] = useState()
+  const [invite, setInvite] = useState('')
 
   let readUser = (uid: string) => {
     const userListref = ref(db, `UserList/${uid}`);
@@ -89,7 +89,8 @@ export default function Home() {
       if (data) {
         Object.keys(data).forEach((key) => {
           if (key == userid) {
-            console.log('you have to invite',data[key]['roomId'])
+
+            console.log('you have to invite', data[key]['roomId'])
             setInvite(data[key]['roomId'])
 
           }
@@ -97,8 +98,8 @@ export default function Home() {
       }
     });
   }
-  
-  const removeInvite =()=>{
+
+  const removeInvite = () => {
     remove(ref(db, `inviting/${userid}`));
   }
   return (
@@ -106,9 +107,26 @@ export default function Home() {
       <div className=''>
         <main className="min-h-screen items-center relative overflow-hidden">
           <Background />
+
+          {invite == '' ? '' :
+            <div className="absolute h-full w-full flex z-20 bg-[#0005]">
+              <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
+                <div className="text-center">ได้รับคำเชิญ !</div>
+                <div className="grid grid-cols-2 gap-8">
+
+                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                  onClick={() => { router.push(`/waitingroom?intend=${invite}`); removeInvite() }}>เข้าร่วม</button>
+                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                  onClick={() => { setInvite(''); removeInvite() }}>ปฏิเสธ</button>
+             
+                  </div>
+              </div>
+            </div>
+          }
+
           <div className="min-h-screen flex">
             <div className="container px-6 relative z-10 my-auto mx-auto">
-              <div className="max-w-[1000px] mx-auto">
+              <div className="">
                 <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
                   <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
                     <div className="px-6 py-2">
@@ -123,7 +141,7 @@ export default function Home() {
                     <div className="w-full ring-black ring-1 "></div>
 
                     <div className="grid grid-cols-2 md:grid-cols-1 p-6">
-                      <div className='md:w-40 md:mx-auto'>
+                      <div className='md:w-2/5 md:mx-auto'>
                         <ImageComp path={img} />
                       </div>
 
@@ -141,9 +159,10 @@ export default function Home() {
 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
-                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
-                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4" onClick={() => { router.push(`/waitingroom?intend=${invite}`); removeInvite() }}>invite</button>
+                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center hover:scale-105' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
+                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4 hover:scale-105" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
+
+
                 </div>
               </div>
             </div>

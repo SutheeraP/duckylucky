@@ -2,6 +2,7 @@
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import { db } from "../firebase";
 
 import { signIn } from "next-auth/react";
 
@@ -24,23 +25,21 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const [currentUsernameList, setCurrentUsernameList] = useState<string[]>([]);
   const [icon, setIcon] = useState("/image/icon1.svg");
   const router = useRouter();
   const [feedback, setfeedback] = useState("");
   const [color, setcolor] = useState("text-red-600");
-  const [ucheck, setUcheck] = useState(false)
   const iconPath = ["/image/icon1.svg", "/image/icon2.svg", "/image/icon3.svg", "/image/icon4.svg", "/image/icon5.svg", "/image/icon6.svg"]
 
   const checkPW = (value: string) => {
+
     const lowercaseRegex = /[a-z]/;
     const uppercaseRegex = /[A-Z]/;
     const numericRegex = /[0-9]/;
     const nonAlphanumericRegex = /[^A-Za-z0-9]/;
     setPassword(value)
-    if (value.length < 6) {
-      setfeedback('รหัสผ่านน้อยกว่า 6 ตัวอักษร')
-    }
-    else if (!lowercaseRegex.test(value)) {
+    if (!lowercaseRegex.test(value)) {
       setfeedback('รหัสผ่านขาดตัวอักษรพิมพ์เล็ก')
     }
     else if (!uppercaseRegex.test(value)) {
@@ -49,42 +48,35 @@ export default function Signup() {
     else if (!numericRegex.test(value)) {
       setfeedback('รหัสผ่านขาดตัวเลข')
     }
+    else if (value.length < 6) {
+      setfeedback('รหัสผ่านน้อยกว่า 6 ตัวอักษร')
+    }
     else {
       setfeedback('')
     }
-    // else if(!nonAlphanumericRegex.test(value)){
-    //   setfeedback('รหัสผ่านขาดตัวอักษรพิเศษ')
-    // }
   }
+  
 
-  const fetchUsername = () => {
-    setUcheck(false)
-    console.log('ucheck before =', ucheck)
+  const getUsernameList = async () => {
+    let usernameList: string[] = [];
 
-    const db = getDatabase();
     const userListRef = ref(db, `UserList`);
-
-    return new Promise<boolean>((resolve) => {
-      onValue(userListRef, (snapshot) => {
-        const data = snapshot.val();
-        let uname = Object.values(data).map((user: any) => user.username)
-        let check = uname.includes(username)
-        setUcheck(uname.includes(username))
-        resolve(check)
-      })
-    })
+    await onValue(userListRef, (snapshot: any) => {
+      const data = snapshot.val();
+      Object.keys(data).forEach((key) => {
+        usernameList.push(data[key].username)
+      });
+    });
+    // console.log('after get : ', usernameList)
+    return usernameList
   }
-
 
   async function signup() {
-    // กุเชต username ซ้ำไม่ได้ดดด
-    // await fetchUsername()
-    // console.log('ucheck after =', ucheck)
-    // if (ucheck) {
-    //   setfeedback('ชื่อผู้ใช้งานซ้ำ')
-    // }
-
-    if (password != password2) {
+    let usernameList = await getUsernameList();
+    if (usernameList.includes(username)) {
+      setfeedback('ชื่อผู้ใช้งานซ้ำ')
+    }
+    else if (password != password2) {
       setfeedback('รหัสผ่านไม่สอดคล้องกัน')
     }
     else {
@@ -124,6 +116,8 @@ export default function Signup() {
     console.log(path)
   }
 
+  getUsernameList(); // get
+
   return (
     <div className=''>
       <div className="min-h-screen w-full relative overflow-hidden">
@@ -133,7 +127,7 @@ export default function Signup() {
             <div className="grid grid-cols-1 md:grid-cols-2">
               <div className="w-4/5 mx-auto hidden md:block my-auto"><ImageComp path='/image/icon/logo.svg' /></div>
               <div className="my-auto">
-              <div className="text-4xl lg:text-6xl text-center font-medium mb-8 bg-white lg:bg-transparent py-2 rounded-lg">Ducky Lucky</div>
+                <div className="text-4xl lg:text-6xl text-center font-medium mb-8 bg-white lg:bg-transparent py-2 rounded-lg">Ducky Lucky</div>
                 <div id="signup_section" className="md:w-4/5 lg:w-3/5 mx-auto">
                   <div className="grid grid-cols-3 gap-x-10 gap-y-5 mb-7">
                     {iconPath.map((path, index) => (
@@ -181,7 +175,8 @@ export default function Signup() {
                       required
                       placeholder="ยืนยันรหัสผ่าน"
                     />
-                    <p className={color} id="feedback-signup">{feedback}</p>
+                    {feedback != "" ? <p className={`${color} bg-white py-1 rounded-md`} id="feedback-signup">{feedback}</p> : ""}
+
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         className="disable:opacity-40 px-2 py-3 font-semibold  ring-1 ring-black bg-white rounded-md hover:bg-primary transition duration-200 ease-in-out"

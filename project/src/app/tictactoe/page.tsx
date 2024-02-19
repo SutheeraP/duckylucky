@@ -10,6 +10,7 @@ import CardLayout from "./component/CardLayout";
 import ModalCard from "./component/MadalCard";
 import { v4 as uuidv4 } from 'uuid';
 
+
 import { useState, useEffect } from "react"
 
 export default function TicTacToe(params :any) {
@@ -203,9 +204,9 @@ export default function TicTacToe(params :any) {
         
     // }, [boardData])
     return (
-        <div className='container'>
-            <div className='container-sm sm:mx-auto relactive'>
-                <div className="flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
+        <div className='container relative mx-auto'>
+            <div className=''>
+                <div id="time&point" className="flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
                     <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
                         {timeLeft}
                     </div>
@@ -229,7 +230,9 @@ export default function TicTacToe(params :any) {
                 </div>
 
                 <div className="flex flex-col justify-center items-center h-screen gap-4">
-                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}></div>
+                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
+                        <div className="w-40 aspect-[3/4] bg-black rounded-lg ring-1 ring-white"></div>
+                    </div>
 
                     <div className="flex-grow flex flex-col align-middle gap-4 justify-evenly max-w-full px-10">
                         <Board xTurn={xTurn}
@@ -285,7 +288,7 @@ export default function TicTacToe(params :any) {
                     <div className="bg-black text-white font-bold text-md rounded-xl w-40 h-auto flex justify-center p-1 ">DavisS</div>
                     <div className="text-white text-sm transform">543 คะแนน</div>
                 </div>
-                <div className="bg-white text-black text-sm rounded-md w-36 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black" onClick={resetbyBoard}>กลับหน้าหลัก</div>
+                <div className="bg-white text-black text-sm rounded-md w-36 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black" onClick={() => { router.push(`/`); resetbyBoard }}>กลับหน้าหลัก</div>
             </div>
         </div>
     )

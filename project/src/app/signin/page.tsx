@@ -29,7 +29,7 @@ export default function Signin() {
         var user = userCredential.user;
         setcolor('text-green-600')
         setfeedback('เข้าสู้ระบบสำเร็จ')
-        console.log('login', user)
+        // console.log('login', user)
 
         setTimeout(() => {
           signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })
