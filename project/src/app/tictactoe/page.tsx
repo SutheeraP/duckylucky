@@ -140,6 +140,11 @@ export default function TicTacToe() {
     }
     // useCard เป็น filter เวลาใช้สกิล เอาไว้เช็คว่าเป็นสกิลอะไรด้วย
 
+    // fix error ห้ามใช้ useCard ใน callback function
+    const handleUseCard = () => {
+        setGameStatus('usecard');
+      };
+
     return(
         <div className='container'>
             <div className='container-sm sm:mx-auto relactive'>
@@ -186,7 +191,7 @@ export default function TicTacToe() {
 
                         <div className={`flex justify-between ${gameStatus == 'start'? 'block':'hidden'}`}>
                             <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${inhandCard.length >= 5? 'pointer-events-none opacity-50':''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
-                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={() => {setGameStatus('usecard');}}>ใช้การ์ดและกา</div>
+                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={handleUseCard}>ใช้การ์ดและกา</div>
                         </div>
                         <div className={`flex ${!(selectedCard === ``)? 'justify-between':'justify-center'} ${gameStatus == 'usecard'? 'block':'hidden'}`}>
                             <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``)? 'block':'hidden'} ${!useable? 'pointer-events-none opacity-50':''}`} onClick={() => useCard()}>ใช้การ์ด</div>

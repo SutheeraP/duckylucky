@@ -107,7 +107,6 @@ export default function Home() {
         <main className="min-h-screen items-center relative overflow-hidden">
           <Background />
           <div className="min-h-screen flex">
-
             <div className="container px-6 relative z-10 my-auto mx-auto">
               <div className="max-w-[1000px] mx-auto">
                 <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
