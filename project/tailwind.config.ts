@@ -31,6 +31,9 @@ const config: Config = {
       },
       inset: {
         '23':'5.75rem'
+      },
+      spacing: {
+        '34':'8.5rem'
       }
     },
 
