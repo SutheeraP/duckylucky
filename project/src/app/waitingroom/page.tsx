@@ -184,27 +184,27 @@ const Waiting = (prop: any) => {
 
         console.log('all rooms : ', rooms)
         if (rooms) {
-            for (const [roomId, info] of Object.entries(rooms)) {
+            for (const [roomid, info] of Object.entries(rooms)) {
                 if (typeof info == 'object' && info != null) {
-                    if (intend == roomId && !(info as any).challenger) {
+                    if (intend == roomid && !(info as any).challenger) {
                         // console.log('hiie')
                         const db = getDatabase();
-                        update(ref(db, `waitingRoom/${roomId}`), {
+                        update(ref(db, `waitingRoom/${roomid}`), {
                             challenger: `${currentUid}`
                         });
-                        setRoomId(roomId)
+                        setRoomId(roomid)
                         return;
                     }
-                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomId.includes('custom') && intend != 'custom') {
+                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomid.includes('custom') && intend != 'custom') {
                         const db = getDatabase();
-                        update(ref(db, `waitingRoom/${roomId}`), {
+                        update(ref(db, `waitingRoom/${roomid}`), {
                             challenger: `${currentUid}`
                         });
-                        setRoomId(roomId)
+                        setRoomId(roomid)
                         return;
                     }
                     else if ((info as any).owner == currentUid || (info as any).challenger == currentUid) {
-                        setRoomId(roomId)
+                        setRoomId(roomid)
                         return;
                     }
                 }
