@@ -18,10 +18,16 @@ const Waiting = (prop: any) => {
     const [p1img, setP1Img] = useState("/image/icon1.svg");
     const [p2username, setP2Username] = useState("waiting...");
     const [p2img, setP2Img] = useState("/image/icon/waitP2.svg");
+    const [showReady, setShowReady] = useState(false);
     const router = useRouter()
     const intend = prop['searchParams']['intend']
     const [currentUid, setCurrentUid] = useState<any>()
     const [roomId, setRoomId] = useState<any>()
+    const [go, setGo] = useState(false)
+    const [centerText, setCenterText] = useState<any>('VS')
+    // const [roomStart, setRoomStart] = useState('')
+    // const [p1uid, setP1uid] = useState('')
+    // const [p2uid, setP2uid] = useState('')
     const session = useSession({
         required: true,
         onUnauthenticated() {
@@ -32,32 +38,88 @@ const Waiting = (prop: any) => {
     // console.log('HiHi')
     const updateDataU = async () => {
         const waitingRef = ref(db, `waitingRoom`);
+
         await onValue(waitingRef, (snapshot: any) => {
             const data = snapshot.val();
             if (data) {
                 Object.keys(data).forEach((room) => {
-                    console.log(Object.keys(data[room]).length)
+                    console.log('object in update U : ', Object.keys(data[room]))
                     Object.keys(data[room]).forEach((key) => {
                         if (Object.keys(data[room]).length == 2 && data[room][key] === currentUid) {
+                            console.log('found 2 player')
+                            // setRoomStart(room)
+                            // room ที่มีผู้เล่น 2 คน & มี value เป้นผู้เล่น 
+                            // update profile ที่แสดง
+                            // ซ้าย owner ขวา challenger
+
+                            const dbRef = ref(getDatabase());
+                            get(child(dbRef, `UserList/${data[room].owner}`)).then((snapshot) => {
+                                if (snapshot.exists()) {
+                                    setP1Username(snapshot.val().username)
+                                    setP1Img(snapshot.val().profile_img)
+                                    // setP1uid(data[room].owner)
+                                } else {
+                                    console.log("No data available");
+                                }
+                            }).catch((error) => {
+                                console.error(error);
+                            });
+
+                            get(child(dbRef, `UserList/${data[room].challenger}`)).then((snapshot) => {
+                                if (snapshot.exists()) {
+                                    setP2Username(snapshot.val().username)
+                                    setP2Img(snapshot.val().profile_img)
+                                    // setP2uid(data[room].challenger)
+                                } else {
+                                    console.log("No data available");
+                                }
+                            }).catch((error) => {
+                                console.error(error);
+                            });
+
+                            let counter = 5
+                            const interval = setInterval(() => {
+                                // console.log(counter);
+                                setCenterText(counter)
+                                counter--;
+
+                                if (counter == 0) {
+                                    clearInterval(interval);
+                                    const db = getDatabase();
+                                    update(ref(db, `Matching/${room}/player`), {
+                                        player1: data[room]['owner'],
+                                        player2: data[room]['challenger']
+                                    });
+                                    remove(ref(db, `waitingRoom/${room}`));
+                                    router.push(`/tictactoe?match=${room}`)
+                                }
+                            }, 1000);
+
                             if (key == 'owner' && intend == 'custom') {
-                                //นี่จ่ะ ทำให้มันขึ้นกดเริ่มเกม เฉพาะโอนเนอในโหมดสร้างห้องเท่านั้น
-                                //ให้ owner กด ready เต้าอัน
+                                // if เปนเจ้าของห้อง กดพร้อมได้
+                                setShowReady(true)
                             }
                             else {
-                                const db = getDatabase();
-                                update(ref(db, `Matching/${room}/player`), {
-                                    player1: data[room]['owner'],
-                                    player2: data[room]['challenger']
-                                });
-                                remove(ref(db, `waitingRoom/${room}`));
-                                router.push(`/tictactoe?match=${room}`)
+
                             }
+
                         }
                     })
                 });
             }
         });
     }
+
+    // const startGame = () => {
+    //     const db = getDatabase();
+    //     update(ref(db, `Matching/${roomStart}/player`), {
+    //         player1: p1uid,
+    //         player2: p2uid
+    //     });
+    //     remove(ref(db, `waitingRoom/${roomStart}`));
+    //     router.push(`/tictactoe?match=${roomStart}`)
+    // }
+
     const readUser = (uid: string) => {
         const userListref = ref(db, `UserList/${uid}`);
         onValue(userListref, (snapshot: any) => {
@@ -115,15 +177,14 @@ const Waiting = (prop: any) => {
     const findWaitingRoom = async () => {
         console.log("Finding")
         const waitingRoomRef = ref(db, `waitingRoom`);
-        const rooms = (await get(waitingRoomRef)).val()
+        const rooms = await (await get(waitingRoomRef)).val()
         // onValue(waitingRoomRef, (snapshot: any) => {
         //     rooms = snapshot.val();
         // });
 
-        console.log(rooms)
+        console.log('all rooms : ', rooms)
         if (rooms) {
             for (const [roomId, info] of Object.entries(rooms)) {
-
                 if (typeof info == 'object' && info != null) {
                     if (intend == roomId && !(info as any).challenger) {
                         // console.log('hiie')
@@ -148,6 +209,7 @@ const Waiting = (prop: any) => {
                     }
                 }
             }
+            console.log('room id', roomId)
             set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
             });
@@ -231,6 +293,22 @@ const Waiting = (prop: any) => {
         <>
             <div className="min-h-screen relative overflow-hidden flex flex-col">
                 <Background />
+                {showReady ?
+                    // <div className="absolute h-full w-full flex z-20 bg-[#0005]">
+                    //     <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
+                    //         <div className="text-center text-xl">พร้อมมั้ย ?</div>
+                    //         <div className="grid grid-cols-2 gap-8">
+                    //             <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                    //                 onClick={() => { }}>พร้อม</button>
+                    //             <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                    //                 onClick={() => { }}>ไม่พร้อม</button>
+
+                    //         </div>
+                    //     </div>
+                    // </div> 
+                    ''
+                    : ''
+                }
                 <div className="container px-4 relative mx-auto">
                     <button type="button" id='button' className="mt-12 px-3 py-1 bg-white ring-1 ring-black rounded-md" onClick={() => { removeCurrent() }}>
                         <div className="flex">
@@ -247,17 +325,13 @@ const Waiting = (prop: any) => {
                             <div className="text-center text-3xl mt-3">{p1username}</div>
                         </div>
                         <div id="vs" className="text-5xl text-center md:col-span-2 my-auto font-semibold">
-                            VS
+                            {centerText}
                         </div>
                         <div id="player2" className="w-3/5 mx-auto md:col-span-5">
                             <ImageComp path={p2img} />
-                            {intend == 'custom' ? <Invitation props={{ currentUid, roomId }} /> : <div className="text-center text-3xl mt-3">{p2username}</div>}
+                            {intend == 'custom' && !showReady ? <Invitation props={{ currentUid, roomId }} /> : <div className="text-center text-3xl mt-3">{p2username}</div>}
                         </div>
-
                     </div>
-
-
-                    {<button>ready?</button>}
                 </div>
 
             </div>

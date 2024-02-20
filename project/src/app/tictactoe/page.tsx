@@ -12,8 +12,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 import { useState, useEffect } from "react"
+import Background from "../component/Background";
 
-export default function TicTacToe(params :any) {
+export default function TicTacToe(params: any) {
 
     const router = useRouter()
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
@@ -182,13 +183,13 @@ export default function TicTacToe(params :any) {
     const updateBoard = async () => {
         const MatchRef = ref(db, `Matching/${roomId}`);
         const match = (await get(MatchRef)).val()
-            
-            console.log(match['board'])
-            if(match && match['board'] != boardData){
-                setBoardData(match['board'])
-            }
 
-        
+        // console.log(match['board'])
+        if (match && match['board'] != boardData) {
+            setBoardData(match['board'])
+        }
+
+
     }
 
     updateBoard()
@@ -196,17 +197,21 @@ export default function TicTacToe(params :any) {
     // useEffect(() => {
     //     const db = getDatabase();
     //     if(){
-             
+
     //     });
     //     updateBoard()
     //     }
-       
-        
+
+
     // }, [boardData])
+
+    const btnClass = 'bg-black text-white rounded-lg ring-1 flex w-40 p-2 justify-center items-center cursor-pointer hover:bg-white hover:text-black hover:scale-105 hover:ring-black'
+
     return (
-        <div className='container relative mx-auto'>
-            <div className=''>
-                <div id="time&point" className="flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
+        <div className='relative overflow-hidden'>
+            <Background />
+            <div className='container mx-auto relative z-10'>
+                <div id="time&point_sm" className="md:hidden flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
                     <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
                         {timeLeft}
                     </div>
@@ -228,10 +233,34 @@ export default function TicTacToe(params :any) {
                         </div>
                     </div>
                 </div>
+                <div id="time&point_md" className="hidden md:flex absolute w-fit h-full">
+                    <div className="my-auto flex items-center">
+                        <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
+                            {timeLeft}
+                        </div>
+                        <div className="w-48 h-16 pl-12 bg-white border -translate-x-8 border-black flex flex-col gap-1 rounded-lg justify-center">
+                            <div>
+                                {xTurn ? 'X Player' : 'O player'}
+                            </div>
+                            <div className="flex gap-1">
+                                {[...Array(point)].map((v, idx: number) => {
+                                    return <div key={uuidv4()}>
+                                        <Image src={'/image/point_full.svg'} alt="" width={16} height={16}></Image>
+                                    </div>
+                                })}
+                                {[...Array(maxPoint - point)].map((v, idx: number) => {
+                                    return <div key={uuidv4()}>
+                                        <Image src={'/image/point_empty.svg'} alt="" width={16} height={16}></Image>
+                                    </div>
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="flex flex-col justify-center items-center h-screen gap-4">
-                    <div id="enemyCard" className={`bg-slate-300 w-screen flex-none  ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
-                        <div className="w-40 aspect-[3/4] bg-black rounded-lg ring-1 ring-white"></div>
+                    <div id="enemyCard" className={` w-screen flex-none  ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
+
                     </div>
 
                     <div className="flex-grow flex flex-col align-middle gap-4 justify-evenly max-w-full px-10">
@@ -256,19 +285,19 @@ export default function TicTacToe(params :any) {
                         </div>
 
                         <div className={`flex justify-between ${gameStatus == 'start' ? 'block' : 'hidden'}`}>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
-                            <div className="bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer" onClick={() => { setGameStatus('usecard') }}>ใช้การ์ดและกา</div>
+                            <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
+                            <div className={`${btnClass}`} onClick={() => { setGameStatus('usecard') }}>ใช้การ์ดและกา</div>
                         </div>
                         <div className={`flex ${!(selectedCard === ``) ? 'justify-between' : 'justify-center'} ${gameStatus == 'usecard' ? 'block' : 'hidden'}`}>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
-                            <div className={`bg-black text-white rounded-lg flex w-40 p-2 justify-center items-center cursor-pointer`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div>
+                            <div className={`${btnClass} ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
+                            <div className={`${btnClass}`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div>
                         </div>
                         <div className={`flex justify-center ${gameStatus == 'mark' ? 'block' : 'hidden'}`}>
                             <div className={` text-black p-2`}>กาสัญลักษณ์</div>
                         </div>
                     </div>
 
-                    <div id="userCard" className={`bg-slate-300 w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
+                    <div id="userCard" className={` w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
                         <CardLayout card={[...card]}
                             inhandCard={[...inhandCard]}
                             selectedCard={selectedCard}
@@ -277,7 +306,7 @@ export default function TicTacToe(params :any) {
                 </div>
             </div>
 
-            <div className={` bg-black bg-opacity-50 w-full h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
+            <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
                 <div className="text-white font-bold text-3xl">{draw ? 'เสมอ' : !xTurn ? 'คุณชนะ !' : 'คุณแพ้ !'}</div>
                 <Image src="/image/icon1.svg" alt="" width={200} height={200} />
                 <div className={`flex flex-row ${draw || xTurn ? 'gap-28 translate-y-6' : 'gap-28 -translate-y-2'} absolute`}>

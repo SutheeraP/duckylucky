@@ -30,8 +30,8 @@ const Invitation = (prop: any) => {
     }, [props['currentUid']])
 
     const inviteUser = () => {
-        console.log('click invite')
-        console.log('userinfo : ', user)
+        // console.log('click invite')
+        // console.log('userinfo : ', user)
         const inviteWho = (document.getElementById('invite-username') as HTMLInputElement)?.value
         if (userInfo) {
             for (const uid of Object.entries(userInfo)) {
@@ -39,18 +39,18 @@ const Invitation = (prop: any) => {
                     // console.log('userinfo in inviteUSer()',userInfo)
                     if (uid[1]['username'] == inviteWho && uid[0] != props['currentUid']) {
                         setIsFound(true)
-                        console.log('player found')
+                        console.log('player found | inviter : ', props['currentUid'],' | roomId : ', props['roomId'])
                         const db = getDatabase();
                         update(ref(db, `inviting/${uid[0]}`), {
                             inviter: props['currentUid'],
-                            roomId: props['roomId']
+                            roomId: props['roomId'],
                         })
                     }
                 }
             }
-            if(!isFound){
-                console.log('player not found')
-            }
+            // if(!isFound){
+            //     console.log('player not found')
+            // }
         }
     }
 

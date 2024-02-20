@@ -38,6 +38,7 @@ export default function Home() {
   const [userid, setUserid] = useState("Loading...");
 
   const [invite, setInvite] = useState('')
+  const [showLogout, setShowLogout] = useState(false)
 
   let readUser = (uid: string) => {
     const userListref = ref(db, `UserList/${uid}`);
@@ -108,7 +109,23 @@ export default function Home() {
         <main className="min-h-screen items-center relative overflow-hidden">
           <Background />
 
-          {invite == '' ? '' :
+          {showLogout?
+            <div className="absolute h-full w-full flex z-20 bg-[#0005]">
+              <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
+                <div className="text-center">ออกจากระบบ</div>
+                <div className="grid grid-cols-2 gap-8">
+
+                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                  onClick={() => signOut()}>ยืนยัน</button>
+                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                  onClick={() => { setShowLogout(false) }}>ยกเลิก</button>
+             
+                  </div>
+              </div>
+            </div>:null
+          }
+
+          {invite == '' ? null :
             <div className="absolute h-full w-full flex z-20 bg-[#0005]">
               <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
                 <div className="text-center">ได้รับคำเชิญ !</div>
@@ -133,7 +150,7 @@ export default function Home() {
                       <button className="w-5 mr-2">
                         <ImageComp path='/image/icon/setting.svg' />
                       </button>
-                      <button onClick={() => signOut()} className="w-5">
+                      <button onClick={() => {setShowLogout(true)}} className="w-5">
                         <ImageComp path='/image/icon/logout.svg' />
                       </button>
                     </div>
@@ -161,8 +178,6 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                   <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center hover:scale-105' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
                   <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4 hover:scale-105" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
-
-
                 </div>
               </div>
             </div>
