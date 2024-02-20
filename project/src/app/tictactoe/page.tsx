@@ -163,7 +163,7 @@ export default function TicTacToe(params: any) {
     useEffect(() => {
         const countdown = setTimeout(() => {
             if (timeLeft === 0) {
-                setXTurnbyBoard()
+                // setXTurnbyBoard()
             } else {
                 setTimeLeft(timeLeft - 1);
             }
