@@ -209,16 +209,15 @@ const Waiting = (prop: any) => {
                     }
                 }
             }
-            console.log('room id', roomId)
-            setRoomId(`${intend}-${uuidv4()}`)
-            set(ref(db, `waitingRoom/${roomId}`), {
+            set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
                 owner: `${currentUid}`
             });
             
             return;
         } else {
-            setRoomId(`${intend}-${uuidv4()}`)
-            set(ref(db, `waitingRoom/${roomId}`), {
+            let thisRoom = `${intend}-${uuidv4()}`
+            setRoomId(thisRoom)
+            set(ref(db, `waitingRoom/${thisRoom}`), {
                 owner: `${currentUid}`
             });
             return;
