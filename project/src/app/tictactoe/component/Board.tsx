@@ -52,7 +52,7 @@ const Board = (props:any) => {
             {[...Array(16)].map((v, idx: number) => {
                 return <div key={idx} className={`${selectedCard === ``? 'w-20 h-20':'w-12 h-12'} cursor-pointer relative flex justify-center`} onClick={gameStatus == 'mark'? () => {updateBoardData(idx)} : undefined}>
                     <div className="self-center text-2xl">
-                        <Image className={boardData[idx] == `` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={selectedCard === ``? 50:30} height={selectedCard === ``? 50:30}/>
+                        <Image className={boardData[idx] ==`` ? `hidden`:`block`} src={boardData[idx]} alt=""  width={selectedCard === ``? 50:30} height={selectedCard === ``? 50:30}/>
                     </div>
                     <Image src={`/image/board/grid${idx+1}.svg`} alt=""  width={80} height={80} className="absolute top-0 left-0"/>
                 </div>

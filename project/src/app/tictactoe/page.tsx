@@ -175,7 +175,7 @@ export default function TicTacToe(params: any) {
             time: timeLeft
         })
         return () => clearTimeout(countdown);
-    }, [xTurn, timeLeft]);
+    }, [xTurn]);
 
 
 
@@ -185,7 +185,7 @@ export default function TicTacToe(params: any) {
         const match = (await get(MatchRef)).val()
 
         // console.log(match['board'])
-        if (match && match['board'] != boardData) {
+        if (match['board'] && match['board'] != boardData) {
             setBoardData(match['board'])
         }
 
@@ -194,16 +194,9 @@ export default function TicTacToe(params: any) {
 
     updateBoard()
 
-    // useEffect(() => {
-    //     const db = getDatabase();
-    //     if(){
-
-    //     });
-    //     updateBoard()
-    //     }
-
-
-    // }, [boardData])
+    useEffect(() => {
+        updateBoard()
+    }, [boardData])
 
     const btnClass = 'bg-black text-white rounded-lg ring-1 flex w-40 p-2 justify-center items-center cursor-pointer hover:bg-white hover:text-black hover:scale-105 hover:ring-black'
 
