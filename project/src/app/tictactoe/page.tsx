@@ -18,6 +18,9 @@ export default function TicTacToe(params: any) {
 
     const router = useRouter()
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
+    let x = ''
+    let o = '' 
+    const [currentUid, setCurrentUid] = useState<any>()
 
     const [gameStatus, setGameStatus] = useState<any>('start')
     // start : เฟสแรกที่เลือกระหว่าง จั่ว2การ์ด กับ ใช้การ์ดและกา
@@ -30,6 +33,42 @@ export default function TicTacToe(params: any) {
     const [won, setWon] = useState(false)
     const [draw, setDraw] = useState(false)
     const [result, setResult] = useState("")
+
+    const session = useSession({
+        required: true,
+        onUnauthenticated() {
+            redirect('/signin');
+        },
+    })
+
+    const getUserUid = async (email: any) => {
+        const userListRef = ref(db, `UserList`);
+        let uid;
+
+        await onValue(userListRef, (snapshot: any) => {
+            const data = snapshot.val();
+            Object.keys(data).forEach((key) => {
+                // console.log('key : ', data[key].email)
+                if (data[key].email === email) {
+                    uid = key; // Found the user's UID
+                    return;
+                }
+            });
+        });
+        setCurrentUid(uid)
+        return uid;
+    };
+    const fetchUserData = async () => {
+        const email = session?.data?.user?.email;
+        if (currentUid == undefined) {
+            const uid = await getUserUid(email);
+
+        }
+
+    };
+
+    fetchUserData()
+
     interface BoardData {
         [key: string]: any;
     }
@@ -53,11 +92,15 @@ export default function TicTacToe(params: any) {
     });
 
     const setXTurnbyBoard = () => {
-        setXTurn(!xTurn)
+        update(ref(db, `Matching/${roomId}`), {
+            currentTurn: !xTurn
+        })
+        update(ref(db, `Matching/${roomId}`), {
+            time: 20
+        })
         setGameStatus('start')
         setPoint(5)
-        setTimeLeft(20)
-    }
+    } 
 
     const resetbyBoard = () => {
         setXTurn(true)
@@ -93,6 +136,7 @@ export default function TicTacToe(params: any) {
 
     const setBoardDatabyBoard = (idx: number, value: any) => {
         setBoardData({ ...boardData, [idx]: value });
+        
     }
 
     const setResultbyBoard = (string: string) => {
@@ -161,44 +205,134 @@ export default function TicTacToe(params: any) {
 
 
     useEffect(() => {
+        // console.log('test')
         const countdown = setTimeout(() => {
             if (timeLeft === 0) {
-                // setXTurnbyBoard()
+                update(ref(db, `Matching/${roomId}`), {
+                    currentTurn: !xTurn
+                })
+                update(ref(db, `Matching/${roomId}`), {
+                    time: 20
+                })
+
+
             } else {
-                setTimeLeft(timeLeft - 1);
+                update(ref(db, `Matching/${roomId}`), {
+                    time: timeLeft - 1
+                })
             }
         }, 1000);
-        update(ref(db, `Matching/${roomId}`), {
-            board: boardData
-        })
-        update(ref(db, `Matching/${roomId}`), {
-            time: timeLeft
-        })
+        console.log(x, currentUid)
+        baseBoard()
+
         return () => clearTimeout(countdown);
-    }, [xTurn]);
+
+    }, [xTurn, timeLeft]);
 
 
 
 
     const updateBoard = async () => {
-        const MatchRef = ref(db, `Matching/${roomId}`);
+        const MatchRef = ref(db, `Matching/${roomId}/board`);
         const match = (await get(MatchRef)).val()
 
-        // console.log(match['board'])
-        if (match['board'] && match['board'] != boardData) {
-            setBoardData(match['board'])
+        for (let i = 0; i < 16; i++) {
+            if (Object.values(match)[i] != Object.values(boardData)[i]) {
+                if (xTurn != undefined && currentUid != undefined) {
+
+                    if (xTurn && x != currentUid) {
+                        setBoardData(match)
+                    }
+                    else if (!xTurn && o != currentUid) {
+                        setBoardData(match)
+                    }
+                }
+
+                return;
+            }
         }
-
-
     }
-
     updateBoard()
 
-    useEffect(() => {
-        updateBoard()
-    }, [boardData])
+
+
+
+    const baseBoard = async () => {
+        console.log(xTurn ,x, currentUid)
+        const MatchRef = ref(db, `Matching/${roomId}/board`);
+        const match = (await get(MatchRef)).val()
+
+        for (let i = 0; i < 16; i++) {
+            if (Object.values(match)[i] != Object.values(boardData)[i]) {
+                if (xTurn != undefined && currentUid != undefined) {
+
+                    if (xTurn && x == currentUid) {
+
+                        update(ref(db, `Matching/${roomId}`), {
+                            board: boardData
+                        })
+                    }
+                    else if (!xTurn && o == currentUid) {
+                        update(ref(db, `Matching/${roomId}`), {
+                            board: boardData
+                        })
+                    }
+                }
+            }
+        }
+    }
 
     const btnClass = 'bg-black text-white rounded-lg ring-1 flex w-40 p-2 justify-center items-center cursor-pointer hover:bg-white hover:text-black hover:scale-105 hover:ring-black'
+
+    const multiplayerState = async () => {
+        const waitingRef = ref(db, `Matching/${roomId}`);
+        await onValue(waitingRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) {
+                x =(data['player']['player1'])
+                o =(data['player']['player2'])
+                if (data['board'] != undefined && data['currentTurn'] != undefined) {
+
+                    // if (xTurn != undefined && currentUid != undefined) {
+                    //     updateBoard()
+                    // }
+                    // for (let i = 0; i < 16; i++) {
+                    //     if (Object.values(data['board'])[i] != Object.values(boardData)[i]) {
+                    //         // setBoardData(data['board'])
+                    //         // updateBoard()
+                    //         return;
+                    //     }
+                    // }
+
+                    if (data['time'] != timeLeft) {
+                        setTimeLeft(data['time'])
+                    }
+                    if (data['currentTurn'] != xTurn) {
+                        // console.log(data['currentTurn'], xTurn)
+                        setXTurn(data['currentTurn'])
+                    }
+
+
+                }
+                else {
+                    update(ref(db, `Matching/${roomId}`), {
+                        board: boardData
+                    })
+                    update(ref(db, `Matching/${roomId}`), {
+                        time: timeLeft
+                    })
+                    update(ref(db, `Matching/${roomId}`), {
+                        currentTurn: true
+                    })
+                }
+            }
+            else {
+                router.push('/')
+            }
+
+        })
+    }
+    multiplayerState()
 
     return (
         <div className='relative overflow-hidden'>
@@ -269,7 +403,11 @@ export default function TicTacToe(params: any) {
                             setResult={setResultbyBoard}
                             reset={resetbyBoard}
                             gameStatus={gameStatus}
-                            selectedCard={selectedCard} />
+                            selectedCard={selectedCard} 
+                            x={x}
+                            o={o}
+                            currentUid={currentUid}
+                            />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>
                             <ModalCard selectedCard={selectedCard}

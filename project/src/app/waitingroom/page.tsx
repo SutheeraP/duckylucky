@@ -23,7 +23,6 @@ const Waiting = (prop: any) => {
     const intend = prop['searchParams']['intend']
     const [currentUid, setCurrentUid] = useState<any>()
     const [roomId, setRoomId] = useState<any>()
-    const [go, setGo] = useState(false)
     const [centerText, setCenterText] = useState<any>('VS')
     // const [roomStart, setRoomStart] = useState('')
     // const [p1uid, setP1uid] = useState('')
@@ -209,10 +208,11 @@ const Waiting = (prop: any) => {
                     }
                 }
             }
-            set(ref(db, `waitingRoom/${intend}-${uuidv4()}`), {
+            let thisRoom = `${intend}-${uuidv4()}`
+            setRoomId(thisRoom)
+            set(ref(db, `waitingRoom/${thisRoom}`), {
                 owner: `${currentUid}`
             });
-            
             return;
         } else {
             let thisRoom = `${intend}-${uuidv4()}`
@@ -222,7 +222,6 @@ const Waiting = (prop: any) => {
             });
             return;
         }
-
     };
 
     useEffect(() => {
