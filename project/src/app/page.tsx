@@ -9,20 +9,6 @@ import { useRouter } from "next/navigation";
 
 import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
 
-// import React from "react";
-// import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
-
-
-
-
-// import { Mali } from "@next/font/google";
-// import ImageComp from "./component/ImageComp";
-// const mali = Mali({
-//   subsets: ["latin", "thai"],
-//   weight: ["200", "300", "400", "500", "600"],
-// });
-
 export default function Home() {
   const router = useRouter()
   const session = useSession({
@@ -36,9 +22,16 @@ export default function Home() {
   const [username, setUsername] = useState("Loading...");
   const [img, setImg] = useState("/image/icon1.svg");
   const [userid, setUserid] = useState("Loading...");
+  const [editIcon, setEditIcon] = useState("/image/icon1.svg");
+  const [editName, setEditName] = useState("ชื่อผู้ใช้งานใหม่");
 
   const [invite, setInvite] = useState('')
   const [showLogout, setShowLogout] = useState(false)
+  const [showEdit, setShowEdit] = useState(false);
+  const iconPath = ["/image/icon1.svg", "/image/icon2.svg", "/image/icon3.svg", "/image/icon4.svg", "/image/icon5.svg", "/image/icon6.svg"]
+
+
+
 
   let readUser = (uid: string) => {
     const userListref = ref(db, `UserList/${uid}`);
@@ -66,14 +59,15 @@ export default function Home() {
         }
       });
     });
-
     return uid;
   };
 
   const fetchUserData = async () => {
     const email = session?.data?.user?.email;
-    if (email) {
+    console.log('get email', email)
+    if (email != null) {
       const uid = await getUserUid(email);
+      // console.log('fetchUserData : uid ', uid)
       if (uid != null) {
         readUser(uid)
         invitation()
@@ -103,26 +97,72 @@ export default function Home() {
   const removeInvite = () => {
     remove(ref(db, `inviting/${userid}`));
   }
+
+  const saveEditProfile = () =>{
+    console.log(userid, editName, editIcon)
+    update(ref(db, `UserList/${userid}`), {
+      username: editName,
+      profile_img : editIcon,
+    });
+    setShowEdit(false)
+  }
+
+  let clickIcon = (path: string) => {
+    console.log('in click icon-----', path)
+    setEditIcon(path)
+    console.log('edit i ', editIcon)
+  }
+
   return (
     <>
       <div className=''>
         <main className="min-h-screen items-center relative overflow-hidden">
           <Background />
 
-          {showLogout?
+          {showEdit ?
             <div className="absolute h-full w-full flex z-20 bg-[#0005]">
-              <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
-                <div className="text-center">ออกจากระบบ</div>
-                <div className="grid grid-cols-2 gap-8">
-
-                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                  onClick={() => signOut()}>ยืนยัน</button>
-                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                  onClick={() => { setShowLogout(false) }}>ยกเลิก</button>
-             
+              <div className="container px-6 m-auto md:w-[600px]">
+                <div className=" bg-white ring-2 ring-black py-4 rounded-lg grid gap-8">
+                  <div>
+                    <div className="text-center mb-4">แก้ไขโปรไฟล์</div>
+                    <div className="bg-black w-full h-[2px]" />
                   </div>
+                  <div className="px-4 md:px-8 pb-3 grid gap-7">
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-x-5 gap-y-5">
+                      {iconPath.map((path, index) => (
+                        
+                        <div key={index} className={`cursor-pointer rounded-full ${path == editIcon ? 'grayscale-0 ring-2 ring-black' : ''}`} onClick={() => {clickIcon(path)}}>
+                          <ImageComp path={path} />
+                        </div>
+
+                      ))}
+                    </div>
+                    <input type="text" className="border-black border-2 w-full rounded-lg md:w-[200px] mx-auto p-2" placeholder={username} onChange={(e) => {setEditName(e.target.value)}}></input>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button className="ring-2 ring-black rounded-lg bg-black text-white hover:bg-white hover:text-black py-2 px-6"
+                        onClick={() => saveEditProfile()}>บันทึก</button>
+                      <button className="ring-2 ring-black rounded-lg bg-black text-white hover:bg-white hover:text-black py-2 px-6"
+                        onClick={() => { setShowEdit(false) }}>ยกเลิก</button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>:null
+            </div> : null}
+
+          {showLogout ?
+            <div className="absolute h-full w-full flex z-20 bg-[#0005]">
+              <div className="container px-4 m-auto md:w-96">
+                <div className=" bg-white ring-2 ring-black px-4 py-8 rounded-lg grid gap-8">
+                  <div className="text-center">ออกจากระบบ</div>
+                  <div className="grid grid-cols-2 gap-8">
+                    <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                      onClick={() => signOut()}>ยืนยัน</button>
+                    <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                      onClick={() => { setShowLogout(false) }}>ยกเลิก</button>
+                  </div>
+                </div>
+              </div>
+            </div> : null
           }
 
           {invite == '' ? null :
@@ -131,12 +171,12 @@ export default function Home() {
                 <div className="text-center">ได้รับคำเชิญ !</div>
                 <div className="grid grid-cols-2 gap-8">
 
-                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                  onClick={() => { router.push(`/waitingroom?intend=${invite}`); removeInvite() }}>เข้าร่วม</button>
-                <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                  onClick={() => { setInvite(''); removeInvite() }}>ปฏิเสธ</button>
-             
-                  </div>
+                  <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                    onClick={() => { router.push(`/waitingroom?intend=${invite}`); removeInvite() }}>เข้าร่วม</button>
+                  <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                    onClick={() => { setInvite(''); removeInvite() }}>ปฏิเสธ</button>
+
+                </div>
               </div>
             </div>
           }
@@ -146,11 +186,11 @@ export default function Home() {
               <div className="">
                 <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
                   <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
-                    <div className="px-6 py-2">
-                      <button className="w-5 mr-2">
+                    <div className="px-3 py-2">
+                      <button onClick={() => { setShowEdit(true) }} className="w-5 mr-2">
                         <ImageComp path='/image/icon/setting.svg' />
                       </button>
-                      <button onClick={() => {setShowLogout(true)}} className="w-5">
+                      <button onClick={() => { setShowLogout(true) }} className="w-5">
                         <ImageComp path='/image/icon/logout.svg' />
                       </button>
                     </div>
