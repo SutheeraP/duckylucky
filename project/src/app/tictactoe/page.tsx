@@ -231,6 +231,7 @@ export default function TicTacToe(params: any) {
             if (timeLeft === 0) {
                 update(ref(db, `Matching/${roomId}`), {
                     currentTurn: !xTurn
+                    
                 })
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
@@ -243,7 +244,7 @@ export default function TicTacToe(params: any) {
                 })
             }
         }, 1000);
-        console.log(x, currentUid)
+        console.log(x, currentUid, (x==currentUid))
         baseBoard()
 
         return () => clearTimeout(countdown);
@@ -350,16 +351,16 @@ export default function TicTacToe(params: any) {
                     update(ref(db, `Matching/${roomId}`), {
                         currentTurn: true
                     })
-                    if (x == currentUid) {
-                        update(ref(db, `Matching/${roomId}/player/player1`), {
-                            action: 5
-                        })
-                    }
-                    else if (o == currentUid) {
-                        update(ref(db, `Matching/${roomId}/player/player2`), {
-                            action: 5
-                        })
-                    }
+                    // if (x == currentUid) {
+                    //     update(ref(db, `Matching/${roomId}/player/player1`), {
+                    //         action: 5
+                    //     })
+                    // }
+                    // else if (o == currentUid) {
+                    //     update(ref(db, `Matching/${roomId}/player/player2`), {
+                    //         action: 5
+                    //     })
+                    // }
                 }
             }
             else {
@@ -456,14 +457,15 @@ export default function TicTacToe(params: any) {
                             <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
                             <div className={`${btnClass}`} onClick={() => { setGameStatus('play') }}>ใช้การ์ดและกา</div>
                         </div>
-                        <div className={`flex justify-center ${(gameStatus == 'start') && ((!xTurn && x != currentUid) || (xTurn && o != currentUid))? 'block' : 'hidden'}`}>
+                        {/* <div className={`flex justify-center ${(gameStatus == 'start') && ((!xTurn && x != currentUid) || (xTurn && o != currentUid))? 'block' : 'hidden'}`}>
                             <div className={` text-black p-2`}>รอผู้เล่นฝั่งตรงข้ามเล่นเสร็จก่อนนะ</div>
-                        </div>
+                        </div> */}
                         {/* phase start เลือกจั่วหรือเล่น */}
 
                         {/* phase play ใช้การ์ดหรือกา */}
-                        <div className={`flex justify-center ${gameStatus == 'play' ? 'block' : 'hidden'}`}>
+                        <div className={`flex justify-center ${gameStatus == 'play' && ((!xTurn && x == currentUid) || (xTurn && o == currentUid))? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
+                            <div className={` text-black p-2 ${(selectedCard === ``) ? 'block' : 'hidden'}`}>เลือกใช้การ์ด หรือกาได้เลย แต่ถ้ากาจะจบเทิร์นนะ</div>
                             {/* <div className={`${btnClass}`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div> */}
                         </div>
                         {/* <div className={`flex justify-center ${gameStatus == 'mark' ? 'block' : 'hidden'}`}>
