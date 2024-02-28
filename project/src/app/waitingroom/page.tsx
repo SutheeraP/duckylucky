@@ -119,47 +119,42 @@ const Waiting = (prop: any) => {
     //     router.push(`/tictactoe?match=${roomStart}`)
     // }
 
-    const readUser = (uid: string) => {
-        const userListref = ref(db, `UserList/${uid}`);
-        onValue(userListref, (snapshot: any) => {
-            const data = snapshot.val();
-            setP1Img(data.profile_img)
-            setP1Username(data.username)
-            // console.log(data)
+
+    // del
+    // const readUser = (uid: string) => {
+    //     const userListref = ref(db, `UserList/${uid}`);
+    //     onValue(userListref, (snapshot: any) => {
+    //         const data = snapshot.val();
+    //         setP1Img(data.profile_img)
+    //         setP1Username(data.username)
+    //         // console.log(data)
+    //     });
+    // }
+
+    const userListRef = ref(db, `UserList`);
+    const emailAuth = session?.data?.user?.email;
+
+    interface User {
+        email: string;
+        profile_img: string;
+        username: string;
+      }
+
+    const readData = (data: Record<string, unknown>) => {
+        Object.keys(data).forEach((key) => {
+          let obj = data[key] as User
+          if (p1username == "Loading..." && obj.email === emailAuth) {
+            setCurrentUid(key)
+            setP1Username(obj.username)
+            setP1Img(obj.profile_img)
+          }
         });
-    }
+      }
 
-    const getUserUid = async (email: any) => {
-        const userListRef = ref(db, `UserList`);
-        let uid;
-
-        await onValue(userListRef, (snapshot: any) => {
-            const data = snapshot.val();
-            Object.keys(data).forEach((key) => {
-                // console.log('key : ', data[key].email)
-                if (data[key].email === email) {
-                    uid = key; // Found the user's UID
-                    return;
-                }
-            });
-        });
-        setCurrentUid(uid)
-        return uid;
-    };
-
-    const fetchUserData = async () => {
-        const email = session?.data?.user?.email;
-        if (currentUid == undefined) {
-            const uid = await getUserUid(email);
-            if (uid != null) {
-                readUser(uid)
-            }
-
-        }
-
-    };
-
-    fetchUserData();
+      onValue(userListRef, (snapshot: any) => {
+        const data = snapshot.val();
+        readData(data)
+      });
 
     // }, [])
 

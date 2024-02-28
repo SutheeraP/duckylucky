@@ -28,7 +28,7 @@ export default function Signin() {
       .then((userCredential) => {
         var user = userCredential.user;
         setcolor('text-green-600')
-        setfeedback('เข้าสู้ระบบสำเร็จ')
+        setfeedback('เข้าสู่ระบบสำเร็จ')
         // console.log('login', user)
 
         setTimeout(() => {

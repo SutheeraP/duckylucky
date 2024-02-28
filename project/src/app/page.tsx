@@ -21,7 +21,7 @@ export default function Home() {
   const [email, setEmail] = useState("Loading...");
   const [username, setUsername] = useState("Loading...");
   const [img, setImg] = useState("/image/icon1.svg");
-  const [userid, setUserid] = useState("Loading...");
+  const [currentUid, setcurrentUid] = useState("Loading...");
   const [editIcon, setEditIcon] = useState("/image/icon1.svg");
   const [editName, setEditName] = useState("ชื่อผู้ใช้งานใหม่");
 
@@ -30,88 +30,76 @@ export default function Home() {
   const [showEdit, setShowEdit] = useState(false);
   const iconPath = ["/image/icon1.svg", "/image/icon2.svg", "/image/icon3.svg", "/image/icon4.svg", "/image/icon5.svg", "/image/icon6.svg"]
 
+  const userListRef = ref(db, `UserList`);
+  const emailAuth = session?.data?.user?.email;
 
+  interface User {
+    email: string;
+    profile_img: string;
+    username: string;
+  }
 
+  interface Inviter {
+    inviter: string;
+    roomId: string;
+  }
 
-  let readUser = (uid: string) => {
-    const userListref = ref(db, `UserList/${uid}`);
-    onValue(userListref, (snapshot: any) => {
-      const data = snapshot.val();
-      // console.log(data)
-      setUserid(uid)
-      setEmail(data.email)
-      setImg(data.profile_img)
-      setUsername(data.username)
+  const readData = (data: Record<string, unknown>) => {
+    console.log(data)
+    Object.keys(data).forEach((key) => {
+      let obj = data[key] as User
+      console.log(obj.email)
+      if (username == "Loading..." && obj.email === emailAuth) {
+        console.log(key)
+        setcurrentUid(key)
+        setEmail(obj.email)
+        setImg(obj.profile_img)
+        setUsername(obj.username)
+      }
     });
   }
 
-  const getUserUid = async (email: string) => {
-    const userListRef = ref(db, `UserList`);
-    let uid;
-
-    await onValue(userListRef, (snapshot: any) => {
-      const data = snapshot.val();
+  const readInvite = (data: Record<string, object>) => {
+    if (data) {
       Object.keys(data).forEach((key) => {
-        // console.log('key : ', data[key].email)
-        if (data[key].email === email) {
-          uid = key; // Found the user's UID
-          return;
+        if (key == currentUid && invite == '') {
+          let obj = data[key] as Inviter
+          setInvite(obj.roomId)
+          console.log(obj)
         }
       });
-    });
-    return uid;
-  };
-
-  const fetchUserData = async () => {
-    const email = session?.data?.user?.email;
-    console.log('get email', email)
-    if (email != null) {
-      const uid = await getUserUid(email);
-      // console.log('fetchUserData : uid ', uid)
-      if (uid != null) {
-        readUser(uid)
-        invitation()
-      }
     }
-  };
-
-  fetchUserData(); // Fetch user data when the component mounts
-
-  const invitation = async () => {
-    const inviting = ref(db, `inviting`);
-    await onValue(inviting, (snapshot: any) => {
-      const data = snapshot.val();
-      if (data) {
-        Object.keys(data).forEach((key) => {
-          if (key == userid) {
-
-            console.log('you have to invite', data[key]['roomId'])
-            setInvite(data[key]['roomId'])
-
-          }
-        });
-      }
-    });
   }
+
+  const inviting = ref(db, `inviting`);
+  onValue(inviting, (snapshot: any) => {
+    const data = snapshot.val();
+    readInvite(data)
+  });
+
+  onValue(userListRef, (snapshot: any) => {
+    const data = snapshot.val();
+    readData(data)
+  });
 
   const removeInvite = () => {
-    remove(ref(db, `inviting/${userid}`));
+    remove(ref(db, `inviting/${currentUid}`));
   }
 
-  const saveEditProfile = () =>{
-    console.log(userid, editName, editIcon)
-    update(ref(db, `UserList/${userid}`), {
+  const saveEditProfile = () => {
+    console.log(currentUid, editName, editIcon)
+    update(ref(db, `UserList/${currentUid}`), {
       username: editName,
-      profile_img : editIcon,
+      profile_img: editIcon,
     });
     setShowEdit(false)
   }
 
   let clickIcon = (path: string) => {
-    console.log('in click icon-----', path)
     setEditIcon(path)
-    console.log('edit i ', editIcon)
   }
+
+
 
   return (
     <>
@@ -130,14 +118,14 @@ export default function Home() {
                   <div className="px-4 md:px-8 pb-3 grid gap-7">
                     <div className="grid grid-cols-3 md:grid-cols-6 gap-x-5 gap-y-5">
                       {iconPath.map((path, index) => (
-                        
-                        <div key={index} className={`cursor-pointer rounded-full ${path == editIcon ? 'grayscale-0 ring-2 ring-black' : ''}`} onClick={() => {clickIcon(path)}}>
+
+                        <div key={index} className={`cursor-pointer rounded-full ${path == editIcon ? 'grayscale-0 ring-2 ring-black' : ''}`} onClick={() => { clickIcon(path) }}>
                           <ImageComp path={path} />
                         </div>
 
                       ))}
                     </div>
-                    <input type="text" className="border-black border-2 w-full rounded-lg md:w-[200px] mx-auto p-2" placeholder={username} onChange={(e) => {setEditName(e.target.value)}}></input>
+                    <input type="text" className="border-black border-2 w-full rounded-lg md:w-[200px] mx-auto p-2" placeholder={username} onChange={(e) => { setEditName(e.target.value) }}></input>
                     <div className="grid grid-cols-2 gap-4">
                       <button className="ring-2 ring-black rounded-lg bg-black text-white hover:bg-white hover:text-black py-2 px-6"
                         onClick={() => saveEditProfile()}>บันทึก</button>
