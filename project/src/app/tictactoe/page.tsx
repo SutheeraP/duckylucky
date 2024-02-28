@@ -20,10 +20,13 @@ export default function TicTacToe(params: any) {
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
     let x = ''
     let o = ''
+    // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
 
     const [gameStatus, setGameStatus] = useState<any>('start')
     // start : เฟสแรกที่เลือกระหว่าง จั่ว2การ์ด กับ ใช้การ์ดและกา
+    // play : เฟสเมื่อเือกใช้การ์ดหรือกา จะสามารถใช้การ์ดได้เรื่อยๆ และจะจบเทิร์นเมื่อกา
+
     // usecard : เฟสต่อเมื่อเลือก ใช้การ์ดและกา เป็นเฟสให้ใช้สกิล
     // mark : เฟสต่อจากใช้สกิล กาสัญลักษณ์
 
@@ -448,17 +451,25 @@ export default function TicTacToe(params: any) {
                                 inhandCard={[...inhandCard]} />
                         </div>
 
-                        <div className={`flex justify-between ${gameStatus == 'start' ? 'block' : 'hidden'}`}>
+                        {/* phase start เลือกจั่วหรือเล่น */}
+                        <div className={`flex justify-between ${(gameStatus == 'start') && ((!xTurn && x == currentUid) || (xTurn && o == currentUid))? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
-                            <div className={`${btnClass}`} onClick={() => { setGameStatus('usecard') }}>ใช้การ์ดและกา</div>
+                            <div className={`${btnClass}`} onClick={() => { setGameStatus('play') }}>ใช้การ์ดและกา</div>
                         </div>
-                        <div className={`flex ${!(selectedCard === ``) ? 'justify-between' : 'justify-center'} ${gameStatus == 'usecard' ? 'block' : 'hidden'}`}>
+                        <div className={`flex justify-center ${(gameStatus == 'start') && ((!xTurn && x != currentUid) || (xTurn && o != currentUid))? 'block' : 'hidden'}`}>
+                            <div className={` text-black p-2`}>รอผู้เล่นฝั่งตรงข้ามเล่นเสร็จก่อนนะ</div>
+                        </div>
+                        {/* phase start เลือกจั่วหรือเล่น */}
+
+                        {/* phase play ใช้การ์ดหรือกา */}
+                        <div className={`flex justify-center ${gameStatus == 'play' ? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
-                            <div className={`${btnClass}`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div>
+                            {/* <div className={`${btnClass}`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div> */}
                         </div>
-                        <div className={`flex justify-center ${gameStatus == 'mark' ? 'block' : 'hidden'}`}>
+                        {/* <div className={`flex justify-center ${gameStatus == 'mark' ? 'block' : 'hidden'}`}>
                             <div className={` text-black p-2`}>กาสัญลักษณ์</div>
-                        </div>
+                        </div> */}
+                        {/* phase play ฬช้การ์ดหรือกา */}
                     </div>
 
                     <div id="userCard" className={` w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
