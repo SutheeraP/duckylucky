@@ -282,28 +282,29 @@ export default function TicTacToe(params: any) {
         console.log(xTurn, x, currentUid)
         const MatchRef = ref(db, `Matching/${roomId}/board`);
         const match = (await get(MatchRef)).val()
+        if (match) {
+            for (let i = 0; i < 16; i++) {
+                if (Object.values(match)[i] != Object.values(boardData)[i]) {
+                    if (xTurn != undefined && currentUid != undefined) {
 
-        for (let i = 0; i < 16; i++) {
-            if (Object.values(match)[i] != Object.values(boardData)[i]) {
-                if (xTurn != undefined && currentUid != undefined) {
+                        if (xTurn && x == currentUid) {
 
-                    if (xTurn && x == currentUid) {
-
-                        update(ref(db, `Matching/${roomId}`), {
-                            board: boardData
-                        })
-                    }
-                    else if (!xTurn && o == currentUid) {
-                        update(ref(db, `Matching/${roomId}`), {
-                            board: boardData
-                        })
+                            update(ref(db, `Matching/${roomId}`), {
+                                board: boardData
+                            })
+                        }
+                        else if (!xTurn && o == currentUid) {
+                            update(ref(db, `Matching/${roomId}`), {
+                                board: boardData
+                            })
+                        }
                     }
                 }
             }
         }
     }
 
-    const baseAction =async()=>{
+    const baseAction = async () => {
         const MatchRef = ref(db, `Matching/${roomId}/player`);
         const act = (await get(MatchRef)).val()
         if (!xTurn && x == currentUid) {
