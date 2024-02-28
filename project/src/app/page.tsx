@@ -18,18 +18,26 @@ export default function Home() {
     },
   })
 
+  // base
   const [email, setEmail] = useState("Loading...");
   const [username, setUsername] = useState("Loading...");
   const [img, setImg] = useState("/image/icon1.svg");
   const [currentUid, setcurrentUid] = useState("Loading...");
-  const [editIcon, setEditIcon] = useState("/image/icon1.svg");
-  const [editName, setEditName] = useState("ชื่อผู้ใช้งานใหม่");
 
+  // extension
   const [invite, setInvite] = useState('')
   const [showLogout, setShowLogout] = useState(false)
+
+  // for edit profile
+  const [editIcon, setEditIcon] = useState("/image/icon1.svg");
+  const [editName, setEditName] = useState("ชื่อผู้ใช้งานใหม่");
+  const [feedback, setFeedback] = useState('');
+  const [usernameList, setUsernameList] = useState<string[]>([]);
   const [showEdit, setShowEdit] = useState(false);
   const iconPath = ["/image/icon1.svg", "/image/icon2.svg", "/image/icon3.svg", "/image/icon4.svg", "/image/icon5.svg", "/image/icon6.svg"]
+  const [color, setcolor] = useState("text-red-600");
 
+  // data
   const userListRef = ref(db, `UserList`);
   const emailAuth = session?.data?.user?.email;
 
@@ -45,16 +53,21 @@ export default function Home() {
   }
 
   const readData = (data: Record<string, unknown>) => {
-    console.log(data)
     Object.keys(data).forEach((key) => {
+
       let obj = data[key] as User
-      console.log(obj.email)
+      if(!usernameList.includes(obj.username)){
+        setUsernameList(prevList => [...prevList, obj.username])
+      } 
+      
       if (username == "Loading..." && obj.email === emailAuth) {
-        console.log(key)
         setcurrentUid(key)
         setEmail(obj.email)
         setImg(obj.profile_img)
         setUsername(obj.username)
+
+        setEditIcon(obj.profile_img)
+        setEditName(obj.username)
       }
     });
   }
@@ -65,7 +78,7 @@ export default function Home() {
         if (key == currentUid && invite == '') {
           let obj = data[key] as Inviter
           setInvite(obj.roomId)
-          console.log(obj)
+          // console.log(obj)
         }
       });
     }
@@ -88,15 +101,26 @@ export default function Home() {
 
   const saveEditProfile = () => {
     console.log(currentUid, editName, editIcon)
-    update(ref(db, `UserList/${currentUid}`), {
-      username: editName,
-      profile_img: editIcon,
-    });
-    setShowEdit(false)
+    console.log(usernameList)
+    // validate username
+
+    if (usernameList.includes(editName)) {
+      console.log('ซ้ำ')
+      setFeedback('ชื่อผู้ใช้งานซ้ำ')
+    }
+    else {
+      update(ref(db, `UserList/${currentUid}`), {
+        username: editName,
+        profile_img: editIcon,
+      });
+      setShowEdit(false)
+    }
+
   }
 
   let clickIcon = (path: string) => {
     setEditIcon(path)
+    console.log(usernameList)
   }
 
 
@@ -126,6 +150,7 @@ export default function Home() {
                       ))}
                     </div>
                     <input type="text" className="border-black border-2 w-full rounded-lg md:w-[200px] mx-auto p-2" placeholder={username} onChange={(e) => { setEditName(e.target.value) }}></input>
+                    {feedback != "" ? <p className={`${color} bg-white py-1 rounded-md`} id="feedback-signup">{feedback}</p> : ""}
                     <div className="grid grid-cols-2 gap-4">
                       <button className="ring-2 ring-black rounded-lg bg-black text-white hover:bg-white hover:text-black py-2 px-6"
                         onClick={() => saveEditProfile()}>บันทึก</button>
@@ -146,7 +171,7 @@ export default function Home() {
                     <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
                       onClick={() => signOut()}>ยืนยัน</button>
                     <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                      onClick={() => { setShowLogout(false) }}>ยกเลิก</button>
+                      onClick={() => { setShowLogout(false); setEditIcon(img) }}>ยกเลิก</button>
                   </div>
                 </div>
               </div>

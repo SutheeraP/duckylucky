@@ -25,7 +25,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const [currentUsernameList, setCurrentUsernameList] = useState<string[]>([]);
+  const [usernameList, setUsernameList] = useState<string[]>([]);
   const [icon, setIcon] = useState("/image/icon1.svg");
   const router = useRouter();
   const [feedback, setfeedback] = useState("");
