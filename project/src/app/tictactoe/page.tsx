@@ -269,7 +269,7 @@ export default function TicTacToe(params: any) {
                 })
             }
         }, 1000);
-        console.log(x, currentUid, (x == currentUid))
+        
         baseBoard()
 
         return () => clearTimeout(countdown);
@@ -356,8 +356,8 @@ export default function TicTacToe(params: any) {
 
             if (data) {
                 if (data['PlayerActioninTurn']) {
-                    console.log('oo')
-                    if (data['PlayerActioninTurn']['phrase'] != gameStatus) {
+                    console.log(xTurn)
+                    if (data['PlayerActioninTurn']['phrase'] != gameStatus || data['PlayerActioninTurn']['action'] != point) {
                         if (xTurn && data['player1'] == currentUid ) {
                             setPoint(data['PlayerActioninTurn']['action'])
                             setGameStatus(data['PlayerActioninTurn']['phrase'])
@@ -373,7 +373,7 @@ export default function TicTacToe(params: any) {
                 else {
 
                     if (xTurn && data['player1'] == currentUid ) {
-                        console.log('eiei')
+                        // console.log('eiei')
                         update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
                         
                             action: 5,
