@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { useState, useEffect } from "react"
 import Background from "../component/Background";
+import { start } from "repl";
 
 export default function TicTacToe(params: any) {
 
@@ -22,7 +23,7 @@ export default function TicTacToe(params: any) {
     // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
 
-    const [gameStatus, setGameStatus] = useState<any>('start')
+    const [gameStatus, setGameStatus] = useState<any>('Deciding')
     // start : เฟสแรกที่เลือกระหว่าง จั่ว2การ์ด กับ ใช้การ์ดและกา
     // play : เฟสเมื่อเือกใช้การ์ดหรือกา จะสามารถใช้การ์ดได้เรื่อยๆ และจะจบเทิร์นเมื่อกา
 
@@ -50,21 +51,23 @@ export default function TicTacToe(params: any) {
         email: string;
         profile_img: string;
         username: string;
-      }
+    }
 
     const readData = (data: Record<string, unknown>) => {
         Object.keys(data).forEach((key) => {
-          let obj = data[key] as User
-          if (currentUid && obj.email === emailAuth) {
-            setCurrentUid(key)
-          }
+            let obj = data[key] as User
+            if (!currentUid && obj.email === emailAuth) {
+                setCurrentUid(key)
+                console.log(key)
+            }
         });
-      }
+    }
 
-      onValue(userListRef, (snapshot: any) => {
+    onValue(userListRef, (snapshot: any) => {
         const data = snapshot.val();
         readData(data)
-      });
+
+    });
 
     interface BoardData {
         [key: string]: any;
@@ -95,8 +98,28 @@ export default function TicTacToe(params: any) {
         update(ref(db, `Matching/${roomId}`), {
             time: 20
         })
-        setGameStatus('start')
+        setGameStatus('Deciding')
         setPoint(5)
+        if (xTurn && x == currentUid) {
+            update(ref(db, `Matching/${roomId}`), {
+                currentTurn: !xTurn
+            })
+            update(ref(db, `Matching/${roomId}`), {
+                time: 20
+            })
+            remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
+            return
+        }
+        if (!xTurn && o == currentUid) {
+            update(ref(db, `Matching/${roomId}`), {
+                currentTurn: !xTurn
+            })
+            update(ref(db, `Matching/${roomId}`), {
+                time: 20
+            })
+            remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
+            return
+        }
     }
 
     const resetbyBoard = () => {
@@ -159,22 +182,18 @@ export default function TicTacToe(params: any) {
         const card2 = randomCard();
         setInhandCard([...inhandCard, card[card1], card[card2]]);
         // setXTurn(!xTurn)
-        if (!xTurn && x == currentUid) {
-            update(ref(db, `Matching/${roomId}`), {
-                currentTurn: !xTurn
-            })
-            update(ref(db, `Matching/${roomId}`), {
-                time: 20
-            })
+        update(ref(db, `Matching/${roomId}`), {
+            currentTurn: !xTurn
+        })
+        update(ref(db, `Matching/${roomId}`), {
+            time: 20
+        })
+        if (xTurn && x == currentUid) {
+            remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
             return
         }
-        if (xTurn && o == currentUid) {
-            update(ref(db, `Matching/${roomId}`), {
-                currentTurn: !xTurn
-            })
-            update(ref(db, `Matching/${roomId}`), {
-                time: 20
-            })
+        if (!xTurn && o == currentUid) {
+            remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
             return
         }
     }
@@ -206,7 +225,10 @@ export default function TicTacToe(params: any) {
 
     const checkUseCard = () => {
         if (point >= inhandCard[selectedCard].point) {
-            setPoint(point - inhandCard[selectedCard].point)
+            update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
+                action: point - inhandCard[selectedCard].point
+            })
+            // setPoint(point - inhandCard[selectedCard].point)
             removeCard()
             console.log('used card')
         }
@@ -225,11 +247,19 @@ export default function TicTacToe(params: any) {
             if (timeLeft === 0) {
                 update(ref(db, `Matching/${roomId}`), {
                     currentTurn: !xTurn
-                    
+
                 })
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
                 })
+                if (xTurn && x == currentUid) {
+                    remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
+                    return
+                }
+                if (!xTurn && o == currentUid) {
+                    remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
+                    return
+                }
 
 
             } else {
@@ -238,7 +268,7 @@ export default function TicTacToe(params: any) {
                 })
             }
         }, 1000);
-        console.log(x, currentUid, (x==currentUid))
+        console.log(x, currentUid, (x == currentUid))
         baseBoard()
 
         return () => clearTimeout(countdown);
@@ -277,7 +307,7 @@ export default function TicTacToe(params: any) {
 
 
     const baseBoard = async () => {
-        console.log(xTurn, x, currentUid)
+        // console.log(xTurn, x, currentUid)
         const MatchRef = ref(db, `Matching/${roomId}/board`);
         const match = (await get(MatchRef)).val()
         if (match) {
@@ -302,20 +332,73 @@ export default function TicTacToe(params: any) {
         }
     }
 
-    const baseAction = async () => {
-        const MatchRef = ref(db, `Matching/${roomId}/player`);
-        const act = (await get(MatchRef)).val()
-        if (!xTurn && x == currentUid) {
-            update(ref(db, `Matching/${roomId}/player/player1`), {
-                action: 5
-            })
-        }
-        else if (xTurn && o == currentUid) {
-            update(ref(db, `Matching/${roomId}/player/player2`), {
-                action: 5
-            })
-        }
+    // const baseAction = async () => {
+    //     const MatchRef = ref(db, `Matching/${roomId}/player`);
+    //     const act = (await get(MatchRef)).val()
+    //     if (!xTurn && x == currentUid) {
+    //         update(ref(db, `Matching/${roomId}/player/player1`), {
+    //             action: 5
+    //         })
+    //     }
+    //     else if (xTurn && o == currentUid) {
+    //         update(ref(db, `Matching/${roomId}/player/player2`), {
+    //             action: 5
+    //         })
+    //     }
+    // }
+
+    const updateAction = async() => {
+
+        const ActionRef = ref(db, `Matching/${roomId}/player`);
+        await onValue(ActionRef, (snapshot: any) => {
+            const data = snapshot.val();
+
+            if (data) {
+                if (data['PlayerActioninTurn']) {
+                    console.log('oo')
+                    if (data['PlayerActioninTurn']['phrase'] != gameStatus) {
+                        if (xTurn && data['player1'] == currentUid) {
+                            setPoint(data['PlayerActioninTurn']['action'])
+                            setGameStatus(data['PlayerActioninTurn']['phrase'])
+                            return
+                        }
+                        else if (!xTurn && data['player2'] == currentUid) {
+                            setPoint(data['PlayerActioninTurn']['action'])
+                            setGameStatus(data['PlayerActioninTurn']['phrase'])
+                            return
+                        }
+                    }
+                }
+                else {
+
+                    if (xTurn && data['player1'] == currentUid) {
+                        console.log('eiei')
+                        update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
+                            turn: 'x',
+                            action: 5,
+                            phrase: 'Deciding',
+                            card: inhandCard
+                        })
+                        setPoint(5)
+                        setGameStatus('Deciding')
+                        return
+                    }
+                    else if (!xTurn && data['player2'] == currentUid) {
+                        update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
+                            turn: 'o',
+                            action: 5,
+                            phrase: 'Deciding',
+                            card: inhandCard
+                        })
+                        setPoint(5)
+                        setGameStatus('Deciding')
+                        return
+                    }
+                }
+            }
+        });
     }
+    updateAction()
 
     const btnClass = 'bg-black text-white rounded-lg ring-1 flex w-40 p-2 justify-center items-center cursor-pointer hover:bg-white hover:text-black hover:scale-105 hover:ring-black'
 
@@ -364,6 +447,19 @@ export default function TicTacToe(params: any) {
         })
     }
     multiplayerState()
+
+    const updateStatus = async () => {
+        const MatchRef = ref(db, `Matching/${roomId}/player`);
+        const data = (await get(MatchRef)).val()
+        if (xTurn && data['player1'] == currentUid) {
+            update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), { phrase: 'Playing' })
+            return
+        }
+        else if (!xTurn && data['player2'] == currentUid) {
+            update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), { phrase: 'Playing' })
+            return
+        }
+    }
 
     return (
         <div className='relative overflow-hidden'>
@@ -447,17 +543,17 @@ export default function TicTacToe(params: any) {
                         </div>
 
                         {/* phase start เลือกจั่วหรือเล่น */}
-                        <div className={`flex justify-between ${(gameStatus == 'start') && ((!xTurn && x == currentUid) || (xTurn && o == currentUid))? 'block' : 'hidden'}`}>
-                            <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={drawTwoCard}>จั่วการ์ด 2 ใบ</div>
-                            <div className={`${btnClass}`} onClick={() => { setGameStatus('play') }}>ใช้การ์ดและกา</div>
+                        <div className={`flex justify-between ${(gameStatus == 'Deciding') && ((xTurn && x == currentUid) || (!xTurn && o == currentUid)) ? 'block' : 'hidden'}`}>
+                            <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { drawTwoCard(); }}>จั่วการ์ด 2 ใบ</div>
+                            <div className={`${btnClass}`} onClick={() => { setGameStatus('Playing'); updateStatus() }}>ใช้การ์ดและกา</div>
                         </div>
-                        {/* <div className={`flex justify-center ${(gameStatus == 'start') && ((!xTurn && x != currentUid) || (xTurn && o != currentUid))? 'block' : 'hidden'}`}>
+                        {/* <div className={`flex justify-center ${(gameStatus == 'Deciding') && ((!xTurn && x != currentUid) || (xTurn && o != currentUid))? 'block' : 'hidden'}`}>
                             <div className={` text-black p-2`}>รอผู้เล่นฝั่งตรงข้ามเล่นเสร็จก่อนนะ</div>
                         </div> */}
                         {/* phase start เลือกจั่วหรือเล่น */}
 
                         {/* phase play ใช้การ์ดหรือกา */}
-                        <div className={`flex justify-center ${gameStatus == 'play' && ((!xTurn && x == currentUid) || (xTurn && o == currentUid))? 'block' : 'hidden'}`}>
+                        <div className={`flex justify-center ${gameStatus == 'Playing' && ((xTurn && x == currentUid) || (!xTurn && o == currentUid)) ? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
                             <div className={` text-black p-2 ${(selectedCard === ``) ? 'block' : 'hidden'}`}>เลือกใช้การ์ด หรือกาได้เลย แต่ถ้ากาจะจบเทิร์นนะ</div>
                             {/* <div className={`${btnClass}`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div> */}

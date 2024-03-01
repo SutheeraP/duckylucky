@@ -23,7 +23,7 @@ const Board = (props: any) => {
     }, [boardData])
 
     const updateBoardData = (idx: number) => {
-        if (!xTurn && x == currentUid || xTurn && o == currentUid) {
+        if (xTurn && x == currentUid || !xTurn && o == currentUid) {
 
             if (!boardData[idx] && !won) {
                 let value = xTurn === true ? `/image/icon1.svg` : `/image/icon2.svg`;
@@ -53,7 +53,7 @@ const Board = (props: any) => {
     return (
         <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center ">
             {[...Array(16)].map((v, idx: number) => {
-                return <div key={idx} className={`${selectedCard === `` ? 'w-20 h-20' : 'w-12 h-12'} cursor-pointer relative flex justify-center`} onClick={gameStatus == 'play' ? () => { updateBoardData(idx) } : undefined}>
+                return <div key={idx} className={`${selectedCard === `` ? 'w-20 h-20' : 'w-12 h-12'} cursor-pointer relative flex justify-center`} onClick={gameStatus == 'Playing' ? () => { updateBoardData(idx) } : undefined}>
                     <div className="self-center text-2xl">
                         <Image className={boardData[idx] == `` ? `hidden` : `block`} src={boardData[idx]} alt="" width={selectedCard === `` ? 50 : 30} height={selectedCard === `` ? 50 : 30} />
                     </div>
