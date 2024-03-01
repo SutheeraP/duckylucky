@@ -249,14 +249,15 @@ export default function TicTacToe(params: any) {
                     currentTurn: !xTurn
 
                 })
+                
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
                 })
-                if (xTurn && x == currentUid) {
+                if (!xTurn && x == currentUid) {
                     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
                     return
                 }
-                if (!xTurn && o == currentUid) {
+                if (xTurn && o == currentUid) {
                     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
                     return
                 }
@@ -287,10 +288,10 @@ export default function TicTacToe(params: any) {
                 if (Object.values(match)[i] != Object.values(boardData)[i]) {
                     if (xTurn != undefined && currentUid != undefined) {
 
-                        if (xTurn && x != currentUid) {
+                        if (!xTurn && x != currentUid) {
                             setBoardData(match)
                         }
-                        else if (!xTurn && o != currentUid) {
+                        else if (xTurn && o != currentUid) {
                             setBoardData(match)
                         }
                     }
@@ -315,13 +316,13 @@ export default function TicTacToe(params: any) {
                 if (Object.values(match)[i] != Object.values(boardData)[i]) {
                     if (xTurn != undefined && currentUid != undefined) {
 
-                        if (xTurn && x == currentUid) {
+                        if (!xTurn && x == currentUid) {
 
                             update(ref(db, `Matching/${roomId}`), {
                                 board: boardData
                             })
                         }
-                        else if (!xTurn && o == currentUid) {
+                        else if (xTurn && o == currentUid) {
                             update(ref(db, `Matching/${roomId}`), {
                                 board: boardData
                             })
@@ -357,12 +358,12 @@ export default function TicTacToe(params: any) {
                 if (data['PlayerActioninTurn']) {
                     console.log('oo')
                     if (data['PlayerActioninTurn']['phrase'] != gameStatus) {
-                        if (xTurn && data['player1'] == currentUid) {
+                        if (xTurn && data['player1'] == currentUid ) {
                             setPoint(data['PlayerActioninTurn']['action'])
                             setGameStatus(data['PlayerActioninTurn']['phrase'])
                             return
                         }
-                        else if (!xTurn && data['player2'] == currentUid) {
+                        else if (!xTurn && data['player2'] == currentUid ) {
                             setPoint(data['PlayerActioninTurn']['action'])
                             setGameStatus(data['PlayerActioninTurn']['phrase'])
                             return
@@ -371,10 +372,10 @@ export default function TicTacToe(params: any) {
                 }
                 else {
 
-                    if (xTurn && data['player1'] == currentUid) {
+                    if (xTurn && data['player1'] == currentUid ) {
                         console.log('eiei')
                         update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
-                            turn: 'x',
+                        
                             action: 5,
                             phrase: 'Deciding',
                             card: inhandCard
@@ -385,7 +386,7 @@ export default function TicTacToe(params: any) {
                     }
                     else if (!xTurn && data['player2'] == currentUid) {
                         update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
-                            turn: 'o',
+                            
                             action: 5,
                             phrase: 'Deciding',
                             card: inhandCard
