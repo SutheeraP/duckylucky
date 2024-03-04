@@ -174,6 +174,24 @@ export default function TicTacToe(params: any) {
     type CardType = any
     const [inhandCard, setInhandCard] = useState<CardType[]>([]);
 
+    const boardFX = [
+        { id: 1, name: 'พายุร้อน', img: '/image/boardFX/boardFX1.svg', description: 'รีเซ็ตกระดาน'},
+        { id: 2, name: 'ความช่วยเหลือของเกรซมิลเลอร์', img: '/image/boardFX/boardFX2.svg', description: 'สลับสัญลักษณ์ทั้งหมดบนกระดาน'},
+        { id: 3, name: 'บัญชาจากราชีนีหงส์', img: '/image/boardFX/boardFX3.svg', description: 'เพิ่มค่าพลังการกระทำ 2 หน่วย ในตาถัดไป ให้กับผู้เล่นที่กาช่องนี้'},
+        { id: 4, name: 'ของขวัญจากมือระเบิด', img: '/image/boardFX/boardFX4.svg', description: 'สุ่มเกิดการระเบิด 3 ช่อง หลังจากนั้นช่องนั้นๆ จะกลายเป็นช่องว่าง'},
+        { id: 5, name: 'ธุรกิจของนายหน้า', img: '/image/boardFX/boardFX5.svg', description: 'ผู้เล่นที่ได้รับเอฟเฟคจะสามารถเลือก วางเขตก่อสร้างตรงไหนก็ได้จำนวน 2 ช่อง หรือ ยกเลิกได้'},
+        { id: 6, name: 'ลิขิตของเดวิส', img: '/image/boardFX/boardFX6.svg', description: 'ได้รับการ์ดนางฟ้า 1 ใบ'}
+    ]
+
+    const displayFX = [
+        '/image/boardFX/displayFX1.svg',
+        '/image/boardFX/displayFX2.svg',
+        '/image/boardFX/displayFX3.svg',
+        '/image/boardFX/displayFX4.svg',
+        '/image/boardFX/displayFX5.svg',
+        '/image/boardFX/displayFX6.svg'
+    ]
+
     const randomCard = () => { return Math.floor(Math.random() * 6) }
     // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
 
