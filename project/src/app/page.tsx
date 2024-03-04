@@ -53,23 +53,30 @@ export default function Home() {
   }
 
   const readData = (data: Record<string, unknown>) => {
-    Object.keys(data).forEach((key) => {
+    console.log(usernameList)
+    if (usernameList.length == 0) {
+      Object.keys(data).forEach((key) => {
 
-      let obj = data[key] as User
-      if(!usernameList.includes(obj.username)){
-        setUsernameList(prevList => [...prevList, obj.username])
-      } 
-      
-      if (username == "Loading..." && obj.email === emailAuth) {
-        setcurrentUid(key)
-        setEmail(obj.email)
-        setImg(obj.profile_img)
-        setUsername(obj.username)
+        let obj = data[key] as User
 
-        setEditIcon(obj.profile_img)
-        setEditName(obj.username)
-      }
-    });
+        if (usernameList.length == 0) {
+          if (!usernameList.includes(obj.username)) {
+            setUsernameList(prevList => [...prevList, obj.username])
+          }
+        }
+
+
+        if (username == "Loading..." && obj.email === emailAuth) {
+          setcurrentUid(key)
+          setEmail(obj.email)
+          setImg(obj.profile_img)
+          setUsername(obj.username)
+
+          setEditIcon(obj.profile_img)
+          setEditName(obj.username)
+        }
+      });
+    }
   }
 
   const readInvite = (data: Record<string, object>) => {
@@ -91,8 +98,11 @@ export default function Home() {
   });
 
   onValue(userListRef, (snapshot: any) => {
-    const data = snapshot.val();
-    readData(data)
+    if (username == "Loading...") {
+      const data = snapshot.val();
+      readData(data)
+    }
+
   });
 
   const removeInvite = () => {
@@ -104,7 +114,7 @@ export default function Home() {
     console.log(usernameList)
     // validate username
 
-    if (usernameList.includes(editName)) {
+    if (editName != username && usernameList.includes(editName)) {
       console.log('ซ้ำ')
       setFeedback('ชื่อผู้ใช้งานซ้ำ')
     }
@@ -113,6 +123,9 @@ export default function Home() {
         username: editName,
         profile_img: editIcon,
       });
+      console.log('ผ่าน')
+      // setUsernameList([])
+      setFeedback('')
       setShowEdit(false)
     }
 
@@ -120,7 +133,7 @@ export default function Home() {
 
   let clickIcon = (path: string) => {
     setEditIcon(path)
-    console.log(usernameList)
+    // console.log(usernameList)
   }
 
 
@@ -155,7 +168,7 @@ export default function Home() {
                       <button className="ring-2 ring-black rounded-lg bg-black text-white hover:bg-white hover:text-black py-2 px-6"
                         onClick={() => saveEditProfile()}>บันทึก</button>
                       <button className="ring-2 ring-black rounded-lg bg-black text-white hover:bg-white hover:text-black py-2 px-6"
-                        onClick={() => { setShowEdit(false) }}>ยกเลิก</button>
+                        onClick={() => { setShowEdit(false); setFeedback('') }}>ยกเลิก</button>
                     </div>
                   </div>
                 </div>
@@ -200,7 +213,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
                   <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
                     <div className="px-3 py-2">
-                      <button onClick={() => { setShowEdit(true) }} className="w-5 mr-2">
+                      <button onClick={() => { setShowEdit(true); console.log(usernameList) }} className="w-5 mr-2">
                         <ImageComp path='/image/icon/setting.svg' />
                       </button>
                       <button onClick={() => { setShowLogout(true) }} className="w-5">

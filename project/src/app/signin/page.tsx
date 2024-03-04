@@ -34,7 +34,7 @@ export default function Signin() {
         setTimeout(() => {
           signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })
           // router.push("/")
-        }, 1000)
+        }, 500)
       })
       .catch((error) => {
         setfeedback(error.message)

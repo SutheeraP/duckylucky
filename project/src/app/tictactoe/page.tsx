@@ -180,6 +180,7 @@ export default function TicTacToe(params: any) {
     const drawTwoCard = () => {
         const card1 = randomCard();
         const card2 = randomCard();
+        // สุ่มมาเพิ่ม
         setInhandCard([...inhandCard, card[card1], card[card2]]);
         // setXTurn(!xTurn)
         update(ref(db, `Matching/${roomId}`), {
@@ -197,6 +198,7 @@ export default function TicTacToe(params: any) {
             return
         }
     }
+
 
     const removeCard = () => {
         setInhandCard(prevArray => {
@@ -249,7 +251,7 @@ export default function TicTacToe(params: any) {
                     currentTurn: !xTurn
 
                 })
-                
+
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
                 })
@@ -269,7 +271,7 @@ export default function TicTacToe(params: any) {
                 })
             }
         }, 1000);
-        
+
         baseBoard()
 
         return () => clearTimeout(countdown);
@@ -348,7 +350,7 @@ export default function TicTacToe(params: any) {
     //     }
     // }
 
-    const updateAction = async() => {
+    const updateAction = async () => {
 
         const ActionRef = ref(db, `Matching/${roomId}/player`);
         await onValue(ActionRef, (snapshot: any) => {
@@ -358,12 +360,12 @@ export default function TicTacToe(params: any) {
                 if (data['PlayerActioninTurn']) {
                     console.log(xTurn)
                     if (data['PlayerActioninTurn']['phrase'] != gameStatus || data['PlayerActioninTurn']['action'] != point) {
-                        if (xTurn && data['player1'] == currentUid ) {
+                        if (xTurn && data['player1'] == currentUid) {
                             setPoint(data['PlayerActioninTurn']['action'])
                             setGameStatus(data['PlayerActioninTurn']['phrase'])
                             return
                         }
-                        else if (!xTurn && data['player2'] == currentUid ) {
+                        else if (!xTurn && data['player2'] == currentUid) {
                             setPoint(data['PlayerActioninTurn']['action'])
                             setGameStatus(data['PlayerActioninTurn']['phrase'])
                             return
@@ -372,10 +374,10 @@ export default function TicTacToe(params: any) {
                 }
                 else {
 
-                    if (xTurn && data['player1'] == currentUid ) {
+                    if (xTurn && data['player1'] == currentUid) {
                         // console.log('eiei')
                         update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
-                        
+
                             action: 5,
                             phrase: 'Deciding',
                             card: inhandCard
@@ -386,7 +388,7 @@ export default function TicTacToe(params: any) {
                     }
                     else if (!xTurn && data['player2'] == currentUid) {
                         update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
-                            
+
                             action: 5,
                             phrase: 'Deciding',
                             card: inhandCard
@@ -420,6 +422,8 @@ export default function TicTacToe(params: any) {
                     }
                 }
                 else {
+                    // ตรงนี้ทำครั้งเดียวแน่ ๆ 
+
                     update(ref(db, `Matching/${roomId}`), {
                         board: boardData
                     })
@@ -429,6 +433,29 @@ export default function TicTacToe(params: any) {
                     update(ref(db, `Matching/${roomId}`), {
                         currentTurn: true
                     })
+
+                    const cardX1 = randomCard();
+                    const cardX2 = randomCard();
+                    const cardXList = [1, cardX1, cardX2]
+
+                    const cardO1 = randomCard();
+                    const cardO2 = randomCard();
+                    const cardOList = [1, cardO1, cardO2]
+
+                    // ใส่ db
+                    update(ref(db, `Matching/${roomId}/card`), {
+                        player1: cardXList,
+                        player2: cardOList
+                    })
+
+                    // จับการ์ดใส่มือ
+                    if (x == currentUid) {
+                        setInhandCard(cardXList)
+                    }
+                    else if (o == currentUid) {
+                        setInhandCard(cardOList)
+                    }
+
                     // if (x == currentUid) {
                     //     update(ref(db, `Matching/${roomId}/player/player1`), {
                     //         action: 5
@@ -462,11 +489,30 @@ export default function TicTacToe(params: any) {
         }
     }
 
+
+    const updateCard = (data: Record<string, object>) => {
+        if (data) {
+            Object.keys(data).forEach((key) => {
+                console.log('key : ',key)
+            })
+        }
+    }
+
+    let roomid2 = roomId
+    const cardRef = ref(db, `Matching/${roomid2}/card`);
+    console.log(cardRef)
+    // มาแก้ไม่ให้เรียก ref ทุกวิ
+    // onValue(cardRef, (snapshot: any) => {
+    //     console.log('updatecard')
+    //     const data = snapshot.val();
+    //     updateCard(data)
+    //   });
+
     return (
         <div className='relative overflow-hidden'>
             <Background />
             <div className='container mx-auto relative z-10'>
-                <div id="time&point_sm" className="md:hidden flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
+                <div id="time&point_sm" className="lg:hidden flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
                     <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
                         {timeLeft}
                     </div>
@@ -488,7 +534,7 @@ export default function TicTacToe(params: any) {
                         </div>
                     </div>
                 </div>
-                <div id="time&point_md" className="hidden md:flex absolute w-fit h-full">
+                <div id="time&point_md" className="hidden lg:flex absolute w-fit h-full">
                     <div className="my-auto flex items-center">
                         <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
                             {timeLeft}
