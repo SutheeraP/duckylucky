@@ -20,6 +20,7 @@ export default function TicTacToe(params: any) {
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
     let x = ''
     let o = ''
+    let player = ''
     // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
 
@@ -66,7 +67,7 @@ export default function TicTacToe(params: any) {
     onValue(userListRef, (snapshot: any) => {
         const data = snapshot.val();
         readData(data)
-
+        player = data
     });
 
     interface BoardData {
@@ -156,6 +157,7 @@ export default function TicTacToe(params: any) {
 
     const setBoardDatabyBoard = (idx: number, value: any) => {
         setBoardData({ ...boardData, [idx]: value });
+        console.log(value)
 
     }
 
@@ -506,6 +508,12 @@ export default function TicTacToe(params: any) {
             return
         }
     }
+    // console.log(x, o)
+    // console.log('player is ',player[x].username)
+    // console.log(player[o])
+    // if (x&&o){console.log('condition true')}
+    // console.log('condition is ',xTurn && x && o)
+    console.log('test is ',xTurn && o == currentUid)
 
 
     const updateCard = (data: Record<string, object>) => {
@@ -530,15 +538,15 @@ export default function TicTacToe(params: any) {
         <div className='relative overflow-hidden'>
             <Background />
             <div className='container mx-auto relative z-10'>
-                <div id="time&point_sm" className="lg:hidden flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
-                    <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
+                <div id="time&point_sm" className="md:hidden flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
+                    <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
                         {timeLeft}
                     </div>
-                    <div className="w-48 h-16 pl-12 bg-white border -translate-x-8 border-black flex flex-col gap-1 rounded-lg justify-center">
+                    <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                         <div>
-                            {xTurn ? 'X Player' : 'O player'}
+                            { x && o ? (xTurn ? player[x].username : player[o].username) : ''}
                         </div>
-                        <div className="flex gap-1">
+                        <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)? `block` : `hidden`}`}>
                             {[...Array(point)].map((v, idx: number) => {
                                 return <div key={uuidv4()}>
                                     <Image src={'/image/point_full.svg'} alt="" width={16} height={16}></Image>
@@ -554,14 +562,14 @@ export default function TicTacToe(params: any) {
                 </div>
                 <div id="time&point_md" className="hidden lg:flex absolute w-fit h-full">
                     <div className="my-auto flex items-center">
-                        <div className="w-24 h-24 border border-black bg-white rounded-full flex justify-center items-center text-4xl z-10">
+                        <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
                             {timeLeft}
                         </div>
-                        <div className="w-48 h-16 pl-12 bg-white border -translate-x-8 border-black flex flex-col gap-1 rounded-lg justify-center">
+                        <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                             <div>
-                                {xTurn ? 'X Player' : 'O player'}
+                            { x && o ? (xTurn ? player[x].username : player[o].username) : ''}
                             </div>
-                            <div className="flex gap-1">
+                            <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `block` : `hidden`}`}>
                                 {[...Array(point)].map((v, idx: number) => {
                                     return <div key={uuidv4()}>
                                         <Image src={'/image/point_full.svg'} alt="" width={16} height={16}></Image>
@@ -599,6 +607,7 @@ export default function TicTacToe(params: any) {
                             x={x}
                             o={o}
                             currentUid={currentUid}
+                            player={player}
                         />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>
