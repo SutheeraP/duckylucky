@@ -15,7 +15,7 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid } = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player } = props;
 
     useEffect(() => {
         checkWinner()
@@ -26,7 +26,7 @@ const Board = (props: any) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
 
             if (!boardData[idx] && !won) {
-                let value = xTurn === true ? `/image/icon1.svg` : `/image/icon2.svg`;
+                let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
                 setBoardData(idx, value)
                 setXTurn()
             }
@@ -55,7 +55,7 @@ const Board = (props: any) => {
             {[...Array(16)].map((v, idx: number) => {
                 return <div key={idx} className={`${selectedCard === `` ? 'w-20 h-20' : 'w-12 h-12'} cursor-pointer relative flex justify-center`} onClick={gameStatus == 'Playing' ? () => { updateBoardData(idx) } : undefined}>
                     <div className="self-center text-2xl">
-                        <Image className={boardData[idx] == `` ? `hidden` : `block`} src={boardData[idx]} alt="" width={selectedCard === `` ? 50 : 30} height={selectedCard === `` ? 50 : 30} />
+                        <Image className={`${boardData[idx] == `` ? `hidden` : `block`} ${(x == currentUid && boardData[idx] == player[x].profile_img) || (o == currentUid && boardData[idx] == player[o].profile_img) ? `greyscale-0`:`grayscale`}`} src={boardData[idx]} alt="" width={selectedCard === `` ? 50 : 30} height={selectedCard === `` ? 50 : 30} />
                     </div>
                     <Image src={`/image/board/grid${idx + 1}.svg`} alt="" width={80} height={80} className="absolute top-0 left-0" />
                 </div>
