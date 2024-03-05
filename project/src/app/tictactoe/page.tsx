@@ -15,7 +15,7 @@ import Background from "../component/Background";
 import { start } from "repl";
 
 export default function TicTacToe(params: any) {
-
+    // console.log('auto repage')
     const router = useRouter()
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
     let x = ''
@@ -58,7 +58,7 @@ export default function TicTacToe(params: any) {
             let obj = data[key] as User
             if (!currentUid && obj.email === emailAuth) {
                 setCurrentUid(key)
-                console.log(key)
+                // console.log(key)
             }
         });
     }
@@ -164,7 +164,7 @@ export default function TicTacToe(params: any) {
     }
 
     const card = [
-        { id: 1, name: 'การ์ดนางฟ้า', point: 0, img: '/image/card/card1.svg', description: 'ป้องกันเอ็ฟเฟ็กส์ด้านลบ หรือการ์ดสกิลที่ฝั่งตรงข้ามใช้ใส่เราได้ โดยจะเป็นช่วงให้ใช้ทันทีที่ฝั่งตรงข้ามใช้สกิลใส่เรา' },
+        { id: 1, name: 'ป่อเป็ดตึ๊ง', point: 0, img: '/image/card/card1.svg', description: 'ป้องกันเอ็ฟเฟ็กส์ด้านลบ หรือการ์ดสกิลที่ฝั่งตรงข้ามใช้ใส่เราได้ โดยจะเป็นช่วงให้ใช้ทันทีที่ฝั่งตรงข้ามใช้สกิลใส่เรา' },
         { id: 2, name: 'ฉันขอปฏิเสธ', point: 1, img: '/image/card/card2.svg', description: 'ปฏิเสธผลกระทบที่เกิดขึ้นทั้งหมด' },
         { id: 3, name: 'วาจาประกาศิต', point: 2, img: '/image/card/card3.svg', description: 'สั่งผู้เล่นฝ่ายตรงข้ามสุ่มทิ้งการ์ด 1 ใบในมือ' },
         { id: 4, name: 'หัวขโมย', point: 2, img: '/image/card/card4.svg', description: 'ขโมยการ์ดจากฝั่งตรงข้าม 1 ใบแบบสุ่ม' },
@@ -173,14 +173,15 @@ export default function TicTacToe(params: any) {
     ]
     type CardType = any
     const [inhandCard, setInhandCard] = useState<CardType[]>([]);
+    let inhandCardX: CardType[] = [];
 
     const boardFX = [
-        { id: 1, name: 'พายุร้อน', img: '/image/boardFX/boardFX1.svg', description: 'รีเซ็ตกระดาน'},
-        { id: 2, name: 'ความช่วยเหลือของเกรซมิลเลอร์', img: '/image/boardFX/boardFX2.svg', description: 'สลับสัญลักษณ์ทั้งหมดบนกระดาน'},
-        { id: 3, name: 'บัญชาจากราชีนีหงส์', img: '/image/boardFX/boardFX3.svg', description: 'เพิ่มค่าพลังการกระทำ 2 หน่วย ในตาถัดไป ให้กับผู้เล่นที่กาช่องนี้'},
-        { id: 4, name: 'ของขวัญจากมือระเบิด', img: '/image/boardFX/boardFX4.svg', description: 'สุ่มเกิดการระเบิด 3 ช่อง หลังจากนั้นช่องนั้นๆ จะกลายเป็นช่องว่าง'},
-        { id: 5, name: 'ธุรกิจของนายหน้า', img: '/image/boardFX/boardFX5.svg', description: 'ผู้เล่นที่ได้รับเอฟเฟคจะสามารถเลือก วางเขตก่อสร้างตรงไหนก็ได้จำนวน 2 ช่อง หรือ ยกเลิกได้'},
-        { id: 6, name: 'ลิขิตของเดวิส', img: '/image/boardFX/boardFX6.svg', description: 'ได้รับการ์ดนางฟ้า 1 ใบ'}
+        { id: 1, name: 'พายุร้อน', img: '/image/boardFX/boardFX1.svg', description: 'รีเซ็ตกระดาน' },
+        { id: 2, name: 'ความช่วยเหลือของเกรซมิลเลอร์', img: '/image/boardFX/boardFX2.svg', description: 'สลับสัญลักษณ์ทั้งหมดบนกระดาน' },
+        { id: 3, name: 'บัญชาจากราชีนีหงส์', img: '/image/boardFX/boardFX3.svg', description: 'เพิ่มค่าพลังการกระทำ 2 หน่วย ในตาถัดไป ให้กับผู้เล่นที่กาช่องนี้' },
+        { id: 4, name: 'ของขวัญจากมือระเบิด', img: '/image/boardFX/boardFX4.svg', description: 'สุ่มเกิดการระเบิด 3 ช่อง หลังจากนั้นช่องนั้นๆ จะกลายเป็นช่องว่าง' },
+        { id: 5, name: 'ธุรกิจของนายหน้า', img: '/image/boardFX/boardFX5.svg', description: 'ผู้เล่นที่ได้รับเอฟเฟคจะสามารถเลือก วางเขตก่อสร้างตรงไหนก็ได้จำนวน 2 ช่อง หรือ ยกเลิกได้' },
+        { id: 6, name: 'ลิขิตของเดวิส', img: '/image/boardFX/boardFX6.svg', description: 'ได้รับการ์ดนางฟ้า 1 ใบ' }
     ]
 
     const displayFX = [
@@ -195,11 +196,19 @@ export default function TicTacToe(params: any) {
     const randomCard = () => { return Math.floor(Math.random() * 6) }
     // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
 
-    const drawTwoCard = () => {
+    const drawTwoCard = async () => {
         const card1 = randomCard();
         const card2 = randomCard();
         // สุ่มมาเพิ่ม
-        setInhandCard([...inhandCard, card[card1], card[card2]]);
+        if (x == currentUid) {
+            await addCard(card[card1], 'player1')
+            await addCard(card[card2], 'player1')
+        }
+        else if (o == currentUid) {
+            await addCard(card[card1], 'player2')
+            await addCard(card[card2], 'player2')
+        }
+        // setInhandCard([...inhandCard, card[card1], card[card2]]);
         // setXTurn(!xTurn)
         update(ref(db, `Matching/${roomId}`), {
             currentTurn: !xTurn
@@ -297,7 +306,64 @@ export default function TicTacToe(params: any) {
     }, [xTurn, timeLeft]);
 
 
+    const cardRef = ref(db, `Matching/${roomId}/card`);
+    // use effect นี้น่าจะใส่ onvalue ทุกอย่างได้ลย ไม่ชนกัน
+    useEffect(() => {
+        onValue(cardRef, (snapshot) => {
+            const data = snapshot.val();
+            console.log('doing card onavlue in use effect')
 
+            if (x == currentUid && data.player1) {
+                let card = data.player1 // ดึง card จาก DB
+                if (!Array.isArray(card)) {
+                    card = Object.values(card) // แปลงเป็น array ให้ถ้ามีตัวเดียวหรืออ๊อง 
+                }
+                card = card.filter(Boolean) // กรองบัค empty card
+                setInhandCard(card) // ยัดใส่ทือ
+            }
+            if (x == currentUid && !data.player1) {
+                setInhandCard([])
+            }
+
+            else if (o == currentUid && data.player2) {
+                let card = data.player2
+                if (!Array.isArray(card)) {
+                    card = Object.values(card)
+                }
+                card = card.filter(Boolean)
+                setInhandCard(card)
+            }
+            else if (o == currentUid && !data.player2) {
+                setInhandCard([])
+            }
+        });
+
+        console.log('something outside onvalue << ไม่เคยออกซ้ำเลย ฟิน')
+
+    }, currentUid); // มี uid แล้วรันครั้งแรก
+
+    const addCard = async (card: Object, target: string) => {
+        // ex. addcard(card[1], 'player1')
+        // ps. player 1 = x, player2 = o
+
+        const cardList = (await get(cardRef)).val()
+        let newSet // เซ็ตอัพเดต
+        if (cardList[target]) {
+            let currentCards = cardList[target] // เก็บ card ปจบ ถ้ามี
+            if (!Array.isArray(currentCards)) {
+                currentCards = Object.values(currentCards)  // แปลงเป็น array ให้ถ้ามีตัวเดียวหรืออ๊อง 
+            }
+            currentCards = currentCards.filter(Boolean) // กรองบัค card empty
+            newSet = [...currentCards, card] // เพิ่ม card
+        }
+        else {
+            newSet = [card]
+        }
+        // console.log('newset : ', newSet)
+        update(ref(db, `Matching/${roomId}/card`), {
+            [target]: newSet
+        })
+    }
 
     const updateBoard = async () => {
         const MatchRef = ref(db, `Matching/${roomId}/board`);
@@ -376,7 +442,7 @@ export default function TicTacToe(params: any) {
 
             if (data) {
                 if (data['PlayerActioninTurn']) {
-                    console.log(xTurn)
+                    // console.log('379: is x turn = ', xTurn)
                     if (data['PlayerActioninTurn']['phrase'] != gameStatus || data['PlayerActioninTurn']['action'] != point) {
                         if (xTurn && data['player1'] == currentUid) {
                             setPoint(data['PlayerActioninTurn']['action'])
@@ -427,9 +493,14 @@ export default function TicTacToe(params: any) {
         const waitingRef = ref(db, `Matching/${roomId}`);
         await onValue(waitingRef, (snapshot: any) => {
             const data = snapshot.val();
+
             if (data) {
+                // const cardX = data.card.player1
+                // console.log('cardX : ',cardX)
                 x = (data['player']['player1'])
                 o = (data['player']['player2'])
+
+
                 if (data['board'] != undefined && data['currentTurn'] != undefined) {
                     if (data['time'] != timeLeft) {
                         setTimeLeft(data['time'])
@@ -441,6 +512,7 @@ export default function TicTacToe(params: any) {
                 }
                 else {
                     // ตรงนี้ทำครั้งเดียวแน่ ๆ 
+                    console.log('initiate board')
 
                     update(ref(db, `Matching/${roomId}`), {
                         board: boardData
@@ -454,36 +526,14 @@ export default function TicTacToe(params: any) {
 
                     const cardX1 = randomCard();
                     const cardX2 = randomCard();
-                    const cardXList = [1, cardX1, cardX2]
-
                     const cardO1 = randomCard();
                     const cardO2 = randomCard();
-                    const cardOList = [1, cardO1, cardO2]
 
                     // ใส่ db
                     update(ref(db, `Matching/${roomId}/card`), {
-                        player1: cardXList,
-                        player2: cardOList
+                        player1: [card[0], card[cardX1], card[cardX2]],
+                        player2: [card[0], card[cardO1], card[cardO2]]
                     })
-
-                    // จับการ์ดใส่มือ
-                    if (x == currentUid) {
-                        setInhandCard(cardXList)
-                    }
-                    else if (o == currentUid) {
-                        setInhandCard(cardOList)
-                    }
-
-                    // if (x == currentUid) {
-                    //     update(ref(db, `Matching/${roomId}/player/player1`), {
-                    //         action: 5
-                    //     })
-                    // }
-                    // else if (o == currentUid) {
-                    //     update(ref(db, `Matching/${roomId}/player/player2`), {
-                    //         action: 5
-                    //     })
-                    // }
                 }
             }
             else {
@@ -511,14 +561,11 @@ export default function TicTacToe(params: any) {
     const updateCard = (data: Record<string, object>) => {
         if (data) {
             Object.keys(data).forEach((key) => {
-                console.log('key : ',key)
+                console.log('key : ', key)
             })
         }
     }
 
-    let roomid2 = roomId
-    const cardRef = ref(db, `Matching/${roomid2}/card`);
-    console.log(cardRef)
     // มาแก้ไม่ให้เรียก ref ทุกวิ
     // onValue(cardRef, (snapshot: any) => {
     //     console.log('updatecard')
@@ -628,6 +675,8 @@ export default function TicTacToe(params: any) {
                         </div> */}
                         {/* phase play ฬช้การ์ดหรือกา */}
                     </div>
+
+                    <div className="cursor-pointer" onClick={() => { addCard(card[1], 'player1') }}>test add card to X</div>
 
                     <div id="userCard" className={` w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
                         <CardLayout card={[...card]}
