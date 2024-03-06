@@ -163,8 +163,8 @@ export default function TicTacToe(params: any) {
 
     const setBoardDatabyBoard = (idx: number, value: any) => {
         setBoardData({ ...boardData, [idx]: value });
+        console.log(idx)
         console.log(value)
-
     }
 
     const setResultbyBoard = (string: string) => {
@@ -198,6 +198,24 @@ export default function TicTacToe(params: any) {
         '/image/boardFX/displayFX5.svg',
         '/image/boardFX/displayFX6.svg'
     ]
+
+    const randomBoard = () => { 
+        let numbers = [];
+        let numboard = [];
+        for (let i = 0; i <= 15; i++) {
+            numbers.push(i);
+        }
+        for (let i = 1; i <= 4; i++) {
+            const randomIndex = Math.floor(Math.random() * numbers.length);
+            const randomNumber = numbers[randomIndex];
+            numbers.splice(randomIndex, 1);
+            numboard.push(randomNumber)
+        }
+        // console.log(numboard)
+        return numboard;
+    }
+
+    // const boardhaveFX = [...randomBoard()]
 
     const randomCard = () => { return Math.floor(Math.random() * 6) }
     // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
@@ -497,12 +515,40 @@ export default function TicTacToe(params: any) {
 
     const btnClass = 'bg-black text-white rounded-lg ring-1 flex w-40 p-2 justify-center items-center cursor-pointer hover:bg-white hover:text-black hover:scale-105 hover:ring-black'
 
+    // const [boardHaveFX, setBoardHaveFX] = useState<number[]>([]);
+    // let boardHaveFX : number[] = []
+    // useEffect(() => {
+    //     // if (xTurn && x == currentUid){
+    //         console.log('randomboard is here ',randomBoard())
+    //         setBoardHaveFX(randomBoard());
+    //         console.log('boardHaveFX start here ', boardHaveFX)
+    //     // }
+    // }, [])
+
     const multiplayerState = async () => {
         const waitingRef = ref(db, `Matching/${roomId}`);
         await onValue(waitingRef, (snapshot: any) => {
             const data = snapshot.val();
 
             if (data) {
+                // let haveFX = false
+                // if (data['board']){
+                //     for (let i = 0 ; i < 16 ; i++){
+                //         // console.log('board ', i, ' is ',Object.values(data['board'])[i])
+                //         if (Object.values(data['board'])[i] != ''){
+                //             haveFX = true
+                //         }
+                //     }
+                //     if (!haveFX){
+                //         // let boardFX = randomBoard()
+                //         console.log('boardHaveFX is ', boardHaveFX)
+                //     }
+                //     else {
+
+                //     }
+                    
+                // }
+
                 // const cardX = data.card.player1
                 // console.log('cardX : ',cardX)
                 x = (data['player']['player1'])
@@ -519,8 +565,31 @@ export default function TicTacToe(params: any) {
                     }
                 }
                 else {
+                    // console.log(1)
+                    // console.log(2)
+                    // console.log(3)
+                    // console.log(4)
+                    // console.log(5)
+                    // console.log(6)
+                    // setBoardDatabyBoard(2, '/image/displayFX1.svg')
+                    // setBoardDatabyBoard(3, '/image/displayFX1.svg')
+                    // setBoardDatabyBoard(4, '/image/displayFX1.svg')
+                    // setBoardDatabyBoard(5, '/image/displayFX1.svg')
+                    // setBoardDatabyBoard(6, '/image/displayFX1.svg')
+                    // setBoardDatabyBoard(7, '/image/displayFX1.svg')
+                    // setBoardDatabyBoard(8, '/image/displayFX1.svg')
+                    // console.log(boardData)
+                    // setBoardDatabyBoard(9, '/image/displayFX1.svg')
                     // ตรงนี้ทำครั้งเดียวแน่ ๆ 
-                    console.log('initiate board')
+                    // console.log('initiate board')
+                    // if (xTurn && x == currentUid){
+                    //     let boardHaveFX:number[] = [...randomBoard()]
+                    //     for (let board of boardHaveFX){
+                    //         console.log('board is ', board)
+                    //         setBoardDatabyBoard(board, '/image/displayFX1.svg' );
+                    //         console.log(boardData)
+                    //     }
+                    // }
 
                     update(ref(db, `Matching/${roomId}`), {
                         board: boardData
@@ -542,6 +611,21 @@ export default function TicTacToe(params: any) {
                         player1: [card[0], card[cardX1], card[cardX2]],
                         player2: [card[0], card[cardO1], card[cardO2]]
                     })
+
+                    if (xTurn && x == currentUid){
+                        const boardHaveFX:number[] = [...randomBoard()]
+                        console.log('boardHaveFX is ',boardHaveFX)
+                        setBoardDatabyBoard(6, '/image/boardFX/boardFX1.svg' );
+                        // for (let board of boardHaveFX){
+                        //     console.log('board is ', board)
+                        //     setBoardDatabyBoard(board, '/image/boardFX/boardFX1.svg' );
+                        //     console.log('boardData is ',boardData)
+                        // }
+                        // setBoardDatabyBoard(2, '/image/displayFX/dusplayFX1.svg')
+                        update(ref(db, `Matching/${roomId}`), {
+                            board: boardData
+                        })
+                    }
                 }
             }
             else {
@@ -551,6 +635,7 @@ export default function TicTacToe(params: any) {
         })
     }
     multiplayerState()
+    console.log(boardData)
 
     const updateStatus = async () => {
         const MatchRef = ref(db, `Matching/${roomId}/player`);
