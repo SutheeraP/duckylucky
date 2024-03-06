@@ -38,6 +38,12 @@ export default function TicTacToe(params: any) {
     const [draw, setDraw] = useState(false)
     const [result, setResult] = useState("")
 
+    // for card
+    const [inhandCard, setInhandCard] = useState<CardType[]>([]);
+    const [cardX, setCardX] = useState<CardType[]>([]);
+    const [cardO, setCardO] = useState<CardType[]>([]);
+    const [cardEnemy, setCardEnemy] = useState<CardType[]>([]);
+
     const session = useSession({
         required: true,
         onUnauthenticated() {
@@ -174,8 +180,6 @@ export default function TicTacToe(params: any) {
         { id: 6, name: 'จงตาบอดไปซะ', point: 4, img: '/image/card/card6.svg', description: 'ทำให้ฝั่งตรงข้ามมองไม่เห็นสัญลักษณ์ว่าเป็นของใคร เห็นแค่ช่องไหนกาได้หรือไม่ได้ 1 รอบ' }
     ]
     type CardType = any
-    const [inhandCard, setInhandCard] = useState<CardType[]>([]);
-    let inhandCardX: CardType[] = [];
 
     const boardFX = [
         { id: 1, name: 'พายุร้อน', img: '/image/boardFX/boardFX1.svg', description: 'รีเซ็ตกระดาน' },
@@ -314,35 +318,54 @@ export default function TicTacToe(params: any) {
         onValue(cardRef, (snapshot) => {
             const data = snapshot.val();
             console.log('doing card onavlue in use effect')
-
-            if (x == currentUid && data.player1) {
-                let card = data.player1 // ดึง card จาก DB
-                if (!Array.isArray(card)) {
-                    card = Object.values(card) // แปลงเป็น array ให้ถ้ามีตัวเดียวหรืออ๊อง 
+            if (data) {
+                if (data.player1) {
+                    let card = data.player1 // ดึง card จาก DB
+                    if (!Array.isArray(card)) {
+                        card = Object.values(card) // แปลงเป็น array ให้ถ้ามีตัวเดียวหรืออ๊อง 
+                    }
+                    card = card.filter(Boolean) // กรองบัค empty card
+                    setCardX(card)
                 }
-                card = card.filter(Boolean) // กรองบัค empty card
-                setInhandCard(card) // ยัดใส่ทือ
+                else {
+                    setCardX([])
+                }
+
+                if (data.player2) {
+                    let card = data.player2 // ดึง card จาก DB
+                    if (!Array.isArray(card)) {
+                        card = Object.values(card) // แปลงเป็น array ให้ถ้ามีตัวเดียวหรืออ๊อง 
+                    }
+                    card = card.filter(Boolean) // กรองบัค empty card
+                    setCardO(card)
+                }
+                else {
+                    setCardO([])
+                }
             }
-            if (x == currentUid && !data.player1) {
-                setInhandCard([])
+            else {
+                setCardX([])
+                setCardO([])
             }
 
-            else if (o == currentUid && data.player2) {
-                let card = data.player2
-                if (!Array.isArray(card)) {
-                    card = Object.values(card)
-                }
-                card = card.filter(Boolean)
-                setInhandCard(card)
-            }
-            else if (o == currentUid && !data.player2) {
-                setInhandCard([])
-            }
         });
 
         console.log('something outside onvalue << ไม่เคยออกซ้ำเลย ฟิน')
 
     }, currentUid); // มี uid แล้วรันครั้งแรก
+
+    // update card ตามฝั่ง
+    useEffect(() => {
+        if (x == currentUid) {
+            setInhandCard(cardX)
+            setCardEnemy(cardO)
+        }
+        if (o == currentUid) {
+            setInhandCard(cardO)
+            setCardEnemy(cardX)
+        }
+    }, [cardX, cardO]);
+
 
     const addCard = async (card: Object, target: string) => {
         // ex. addcard(card[1], 'player1')
@@ -350,7 +373,7 @@ export default function TicTacToe(params: any) {
 
         const cardList = (await get(cardRef)).val()
         let newSet // เซ็ตอัพเดต
-        if (cardList[target]) {
+        if (cardList && cardList[target]) {
             let currentCards = cardList[target] // เก็บ card ปจบ ถ้ามี
             if (!Array.isArray(currentCards)) {
                 currentCards = Object.values(currentCards)  // แปลงเป็น array ให้ถ้ามีตัวเดียวหรืออ๊อง 
@@ -392,9 +415,6 @@ export default function TicTacToe(params: any) {
     }
     updateBoard()
 
-
-
-
     const baseBoard = async () => {
         // console.log(xTurn, x, currentUid)
         const MatchRef = ref(db, `Matching/${roomId}/board`);
@@ -421,20 +441,6 @@ export default function TicTacToe(params: any) {
         }
     }
 
-    // const baseAction = async () => {
-    //     const MatchRef = ref(db, `Matching/${roomId}/player`);
-    //     const act = (await get(MatchRef)).val()
-    //     if (!xTurn && x == currentUid) {
-    //         update(ref(db, `Matching/${roomId}/player/player1`), {
-    //             action: 5
-    //         })
-    //     }
-    //     else if (xTurn && o == currentUid) {
-    //         update(ref(db, `Matching/${roomId}/player/player2`), {
-    //             action: 5
-    //         })
-    //     }
-    // }
 
     const updateAction = async () => {
 
@@ -558,42 +564,21 @@ export default function TicTacToe(params: any) {
             return
         }
     }
-    // console.log(x, o)
-    // console.log('player is ',player[x].username)
-    // console.log(player[o])
-    // if (x&&o){console.log('condition true')}
-    // console.log('condition is ',xTurn && x && o)
-    console.log('test is ',xTurn && o == currentUid)
-
-
-    const updateCard = (data: Record<string, object>) => {
-        if (data) {
-            Object.keys(data).forEach((key) => {
-                console.log('key : ', key)
-            })
-        }
-    }
-
-    // มาแก้ไม่ให้เรียก ref ทุกวิ
-    // onValue(cardRef, (snapshot: any) => {
-    //     console.log('updatecard')
-    //     const data = snapshot.val();
-    //     updateCard(data)
-    //   });
+    console.log('test is ', xTurn && o == currentUid)
 
     return (
         <div className='relative overflow-hidden'>
             <Background />
             <div className='container mx-auto relative z-10'>
-                <div id="time&point_sm" className="md:hidden flex absolute top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
-                    <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
+                <div id="time&point_sm" className="lg:hidden flex absolute z-20 top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
+                    <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
                         {timeLeft}
                     </div>
-                    <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
+                    <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                         <div>
-                            { x && o ? (xTurn ? player[x].username : player[o].username) : ''}
+                            {x && o ? (xTurn ? player[x].username : player[o].username) : ''}
                         </div>
-                        <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)? `block` : `hidden`}`}>
+                        <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `block` : `hidden`}`}>
                             {[...Array(point)].map((v, idx: number) => {
                                 return <div key={uuidv4()}>
                                     <Image src={'/image/point_full.svg'} alt="" width={16} height={16}></Image>
@@ -607,14 +592,14 @@ export default function TicTacToe(params: any) {
                         </div>
                     </div>
                 </div>
-                <div id="time&point_md" className="hidden lg:flex absolute w-fit h-full">
+                <div id="time&point_md" className="hidden lg:flex absolute z-20 w-fit h-full">
                     <div className="my-auto flex items-center">
-                        <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
+                        <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
                             {timeLeft}
                         </div>
-                        <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid)?  `border-black bg-white text-black`:`border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
+                        <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                             <div>
-                            { x && o ? (xTurn ? player[x].username : player[o].username) : ''}
+                                {x && o ? (xTurn ? player[x].username : player[o].username) : ''}
                             </div>
                             <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `block` : `hidden`}`}>
                                 {[...Array(point)].map((v, idx: number) => {
@@ -633,8 +618,15 @@ export default function TicTacToe(params: any) {
                 </div>
 
                 <div className="flex flex-col justify-center items-center h-screen gap-4">
-                    <div id="enemyCard" className={` w-screen flex-none  ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
 
+                    <div id="enemyCard" className={` w-screen flex-none h-48 -translate-y-10`}>
+                        <div className="flex flex-col justify-center align-middle gap-4">
+                            <div id="userCardContainer" className="container mx-auto flex justify-center relative">
+                                {cardEnemy.map((card, index) => (
+                                    <Image key={index} src={'/image/card/cardBack.svg'} alt="" width={140} height={280} className={`relative -ml-46 left-23 border rounded-lg translate-y-4 border-white`} />
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex-grow flex flex-col align-middle gap-4 justify-evenly max-w-full px-10">
@@ -663,26 +655,15 @@ export default function TicTacToe(params: any) {
                                 inhandCard={[...inhandCard]} />
                         </div>
 
-                        {/* phase start เลือกจั่วหรือเล่น */}
                         <div className={`flex justify-between ${(gameStatus == 'Deciding') && ((xTurn && x == currentUid) || (!xTurn && o == currentUid)) ? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { drawTwoCard(); }}>จั่วการ์ด 2 ใบ</div>
                             <div className={`${btnClass}`} onClick={() => { setGameStatus('Playing'); updateStatus() }}>ใช้การ์ดและกา</div>
                         </div>
-                        {/* <div className={`flex justify-center ${(gameStatus == 'Deciding') && ((!xTurn && x != currentUid) || (xTurn && o != currentUid))? 'block' : 'hidden'}`}>
-                            <div className={` text-black p-2`}>รอผู้เล่นฝั่งตรงข้ามเล่นเสร็จก่อนนะ</div>
-                        </div> */}
-                        {/* phase start เลือกจั่วหรือเล่น */}
 
-                        {/* phase play ใช้การ์ดหรือกา */}
                         <div className={`flex justify-center ${gameStatus == 'Playing' && ((xTurn && x == currentUid) || (!xTurn && o == currentUid)) ? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
                             <div className={` text-black p-2 ${(selectedCard === ``) ? 'block' : 'hidden'}`}>เลือกใช้การ์ด หรือกาได้เลย แต่ถ้ากาจะจบเทิร์นนะ</div>
-                            {/* <div className={`${btnClass}`} onClick={() => { setGameStatus('mark') }}>จบการใช้การ์ด</div> */}
                         </div>
-                        {/* <div className={`flex justify-center ${gameStatus == 'mark' ? 'block' : 'hidden'}`}>
-                            <div className={` text-black p-2`}>กาสัญลักษณ์</div>
-                        </div> */}
-                        {/* phase play ฬช้การ์ดหรือกา */}
                     </div>
 
                     <div className="cursor-pointer" onClick={() => { addCard(card[1], 'player1') }}>test add card to X</div>
