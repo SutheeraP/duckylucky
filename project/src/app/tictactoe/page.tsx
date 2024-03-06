@@ -18,8 +18,8 @@ export default function TicTacToe(params: any) {
     // console.log('auto repage')
     const router = useRouter()
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
-    let x = ''
-    let o = ''
+    const [x, setX] = useState('');
+    const [o, setO] = useState('');
     let player = ''
     // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
@@ -199,7 +199,7 @@ export default function TicTacToe(params: any) {
         '/image/boardFX/displayFX6.svg'
     ]
 
-    const randomBoard = () => { 
+    const randomBoard = () => {
         let numbers = [];
         let numboard = [];
         for (let i = 0; i <= 15; i++) {
@@ -221,6 +221,7 @@ export default function TicTacToe(params: any) {
     // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
 
     const drawTwoCard = async () => {
+        // จั่ว 2 แล้วสั่่งจบเทิน
         const card1 = randomCard();
         const card2 = randomCard();
         // สุ่มมาเพิ่ม
@@ -250,14 +251,6 @@ export default function TicTacToe(params: any) {
         }
     }
 
-
-    const removeCard = () => {
-        setInhandCard(prevArray => {
-            return prevArray.filter((_, index) => index !== selectedCard);
-        });
-        resetSelectedCard()
-    }
-
     const [selectedCard, setSelectedCard] = useState<any>(``);
 
     const setSelectedCardbyCardLayout = (index: number) => {
@@ -277,25 +270,23 @@ export default function TicTacToe(params: any) {
     // useable ใช้ตอนทำคำสาปแม่มดน้ำเงิน (ห้ามใช้สกิล)
 
     const checkUseCard = () => {
+        // กดใช้แล้ว point พอ
         if (point >= inhandCard[selectedCard].point) {
             update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
                 action: point - inhandCard[selectedCard].point
             })
-            // setPoint(point - inhandCard[selectedCard].point)
-            removeCard()
-            console.log('used card')
+            if (x == currentUid) {
+                deleteCard(selectedCard, 'player1')
+            }
+            else if (o == currentUid) {
+                deleteCard(selectedCard, 'player2')
+            }
+            setSelectedCard('')
         }
     }
-    // useCard เป็น filter เวลาใช้สกิล เอาไว้เช็คว่าเป็นสกิลอะไรด้วย
-
-    // fix error ห้ามใช้ useCard ใน callback function
-    // const handleUseCard = () => {
-    //     setGameStatus('usecard');
-    //   };
 
 
     useEffect(() => {
-        // console.log('test')
         const countdown = setTimeout(() => {
             if (timeLeft === 0) {
                 update(ref(db, `Matching/${roomId}`), {
@@ -329,11 +320,76 @@ export default function TicTacToe(params: any) {
 
     }, [xTurn, timeLeft]);
 
-
+    const gameRef = ref(db, `Matching/${roomId}`);
     const cardRef = ref(db, `Matching/${roomId}/card`);
+    const turnRef = ref(db, `Matching/${roomId}/currentTurn`);
+    const timeRef = ref(db, `Matching/${roomId}/time`);
+    const boardRef = ref(db, `Matching/${roomId}/board`);
+
+
     // use effect นี้น่าจะใส่ onvalue ทุกอย่างได้ลย ไม่ชนกัน
     useEffect(() => {
+        // get x และ o เซ็ตครั้งเดียว
+        const getPlayer = async () => {
+            const data = (await get(gameRef)).val()
+            if (data) {
+                setX(data['player']['player1'])
+                setO(data['player']['player2'])
+            }
+            else {
+                router.push('/')
+            }
+
+        }
+        getPlayer()
+
+        // board listener
+        onValue(boardRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data == undefined) {
+                // เซ็ตเกมถ้ายังไม่มีบอด
+                update(ref(db, `Matching/${roomId}`), {
+                    board: boardData
+                })
+
+                // กำหนดเวลา 20
+                update(ref(db, `Matching/${roomId}`), {
+                    time: timeLeft
+                })
+
+                // เริ่มที่ x
+                update(ref(db, `Matching/${roomId}`), {
+                    currentTurn: true
+                })
+
+                const cardX1 = randomCard();
+                const cardX2 = randomCard();
+                const cardO1 = randomCard();
+                const cardO2 = randomCard();
+
+                // ใส่ db
+                update(ref(db, `Matching/${roomId}/card`), {
+                    player1: [card[0], card[cardX1], card[cardX2]],
+                    player2: [card[0], card[cardO1], card[cardO2]]
+                })
+            }
+        })
+
+        // turn listener
+        onValue(turnRef, (snapshot: any) => {
+            const data = snapshot.val();
+            setXTurn(data)
+        })
+
+        //time listener
+        onValue(timeRef, (snapshot: any) => {
+            const data = snapshot.val();
+            setTimeLeft(data)
+        })
+
+        // card listener
         onValue(cardRef, (snapshot) => {
+            // update all card when card change
             const data = snapshot.val();
             console.log('doing card onavlue in use effect')
             if (data) {
@@ -367,9 +423,6 @@ export default function TicTacToe(params: any) {
             }
 
         });
-
-        console.log('something outside onvalue << ไม่เคยออกซ้ำเลย ฟิน')
-
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
     // update card ตามฝั่ง
@@ -406,6 +459,26 @@ export default function TicTacToe(params: any) {
         update(ref(db, `Matching/${roomId}/card`), {
             [target]: newSet
         })
+    }
+
+    const deleteCard = async (cardIndex: number, target: string) => {
+        // ex. ลบกรา์ดที่กดใช้ = deleteCard(selectedCard, 'player1')
+        // ex. ลบการ์ดตำแหน่ง 0 = deleteCard(0, 'player1')
+
+        let newSet
+        // splice ต้องทำกับตัวเองเท่านั้น
+        if (target == 'player1') {
+            newSet = [...cardX]; // ก็อปกองเก่า
+            newSet.splice(cardIndex, 1) // ลบตาม index
+        }
+        else if (target == 'player2') {
+            newSet = [...cardO];
+            newSet.splice(cardIndex, 1)
+        }
+        update(ref(db, `Matching/${roomId}/card`), {
+            [target]: newSet
+        })
+
     }
 
     const updateBoard = async () => {
@@ -458,7 +531,6 @@ export default function TicTacToe(params: any) {
             }
         }
     }
-
 
     const updateAction = async () => {
 
@@ -525,117 +597,117 @@ export default function TicTacToe(params: any) {
     //     // }
     // }, [])
 
-    const multiplayerState = async () => {
-        const waitingRef = ref(db, `Matching/${roomId}`);
-        await onValue(waitingRef, (snapshot: any) => {
-            const data = snapshot.val();
+    // const multiplayerState = async () => {
+    //     const waitingRef = ref(db, `Matching/${roomId}`);
+    //     await onValue(waitingRef, (snapshot: any) => {
+    //         const data = snapshot.val();
 
-            if (data) {
-                // let haveFX = false
-                // if (data['board']){
-                //     for (let i = 0 ; i < 16 ; i++){
-                //         // console.log('board ', i, ' is ',Object.values(data['board'])[i])
-                //         if (Object.values(data['board'])[i] != ''){
-                //             haveFX = true
-                //         }
-                //     }
-                //     if (!haveFX){
-                //         // let boardFX = randomBoard()
-                //         console.log('boardHaveFX is ', boardHaveFX)
-                //     }
-                //     else {
+    //         if (data) {
+    //             // let haveFX = false
+    //             // if (data['board']){
+    //             //     for (let i = 0 ; i < 16 ; i++){
+    //             //         // console.log('board ', i, ' is ',Object.values(data['board'])[i])
+    //             //         if (Object.values(data['board'])[i] != ''){
+    //             //             haveFX = true
+    //             //         }
+    //             //     }
+    //             //     if (!haveFX){
+    //             //         // let boardFX = randomBoard()
+    //             //         console.log('boardHaveFX is ', boardHaveFX)
+    //             //     }
+    //             //     else {
 
-                //     }
-                    
-                // }
+    //             //     }
 
-                // const cardX = data.card.player1
-                // console.log('cardX : ',cardX)
-                x = (data['player']['player1'])
-                o = (data['player']['player2'])
+    //             // }
+
+    //             // const cardX = data.card.player1
+    //             // console.log('cardX : ',cardX)
+    //             x = (data['player']['player1'])
+    //             o = (data['player']['player2'])
 
 
-                if (data['board'] != undefined && data['currentTurn'] != undefined) {
-                    if (data['time'] != timeLeft) {
-                        setTimeLeft(data['time'])
-                    }
-                    if (data['currentTurn'] != xTurn) {
-                        // console.log(data['currentTurn'], xTurn)
-                        setXTurn(data['currentTurn'])
-                    }
-                }
-                else {
-                    // console.log(1)
-                    // console.log(2)
-                    // console.log(3)
-                    // console.log(4)
-                    // console.log(5)
-                    // console.log(6)
-                    // setBoardDatabyBoard(2, '/image/displayFX1.svg')
-                    // setBoardDatabyBoard(3, '/image/displayFX1.svg')
-                    // setBoardDatabyBoard(4, '/image/displayFX1.svg')
-                    // setBoardDatabyBoard(5, '/image/displayFX1.svg')
-                    // setBoardDatabyBoard(6, '/image/displayFX1.svg')
-                    // setBoardDatabyBoard(7, '/image/displayFX1.svg')
-                    // setBoardDatabyBoard(8, '/image/displayFX1.svg')
-                    // console.log(boardData)
-                    // setBoardDatabyBoard(9, '/image/displayFX1.svg')
-                    // ตรงนี้ทำครั้งเดียวแน่ ๆ 
-                    // console.log('initiate board')
-                    // if (xTurn && x == currentUid){
-                    //     let boardHaveFX:number[] = [...randomBoard()]
-                    //     for (let board of boardHaveFX){
-                    //         console.log('board is ', board)
-                    //         setBoardDatabyBoard(board, '/image/displayFX1.svg' );
-                    //         console.log(boardData)
-                    //     }
-                    // }
+    //             if (data['board'] != undefined && data['currentTurn'] != undefined) {
+    //                 if (data['time'] != timeLeft) {
+    //                     setTimeLeft(data['time'])
+    //                 }
+    //                 if (data['currentTurn'] != xTurn) {
+    //                     // console.log(data['currentTurn'], xTurn)
+    //                     setXTurn(data['currentTurn'])
+    //                 }
+    //             }
+    //             else {
+    //                 // console.log(1)
+    //                 // console.log(2)
+    //                 // console.log(3)
+    //                 // console.log(4)
+    //                 // console.log(5)
+    //                 // console.log(6)
+    //                 // setBoardDatabyBoard(2, '/image/displayFX1.svg')
+    //                 // setBoardDatabyBoard(3, '/image/displayFX1.svg')
+    //                 // setBoardDatabyBoard(4, '/image/displayFX1.svg')
+    //                 // setBoardDatabyBoard(5, '/image/displayFX1.svg')
+    //                 // setBoardDatabyBoard(6, '/image/displayFX1.svg')
+    //                 // setBoardDatabyBoard(7, '/image/displayFX1.svg')
+    //                 // setBoardDatabyBoard(8, '/image/displayFX1.svg')
+    //                 // console.log(boardData)
+    //                 // setBoardDatabyBoard(9, '/image/displayFX1.svg')
+    //                 // ตรงนี้ทำครั้งเดียวแน่ ๆ 
+    //                 // console.log('initiate board')
+    //                 // if (xTurn && x == currentUid){
+    //                 //     let boardHaveFX:number[] = [...randomBoard()]
+    //                 //     for (let board of boardHaveFX){
+    //                 //         console.log('board is ', board)
+    //                 //         setBoardDatabyBoard(board, '/image/displayFX1.svg' );
+    //                 //         console.log(boardData)
+    //                 //     }
+    //                 // }
 
-                    update(ref(db, `Matching/${roomId}`), {
-                        board: boardData
-                    })
-                    update(ref(db, `Matching/${roomId}`), {
-                        time: timeLeft
-                    })
-                    update(ref(db, `Matching/${roomId}`), {
-                        currentTurn: true
-                    })
+    //                 update(ref(db, `Matching/${roomId}`), {
+    //                     board: boardData
+    //                 })
+    //                 update(ref(db, `Matching/${roomId}`), {
+    //                     time: timeLeft
+    //                 })
+    //                 update(ref(db, `Matching/${roomId}`), {
+    //                     currentTurn: true
+    //                 })
 
-                    const cardX1 = randomCard();
-                    const cardX2 = randomCard();
-                    const cardO1 = randomCard();
-                    const cardO2 = randomCard();
+    //                 const cardX1 = randomCard();
+    //                 const cardX2 = randomCard();
+    //                 const cardO1 = randomCard();
+    //                 const cardO2 = randomCard();
 
-                    // ใส่ db
-                    update(ref(db, `Matching/${roomId}/card`), {
-                        player1: [card[0], card[cardX1], card[cardX2]],
-                        player2: [card[0], card[cardO1], card[cardO2]]
-                    })
+    //                 // ใส่ db
+    //                 update(ref(db, `Matching/${roomId}/card`), {
+    //                     player1: [card[0], card[cardX1], card[cardX2]],
+    //                     player2: [card[0], card[cardO1], card[cardO2]]
+    //                 })
 
-                    if (xTurn && x == currentUid){
-                        const boardHaveFX:number[] = [...randomBoard()]
-                        console.log('boardHaveFX is ',boardHaveFX)
-                        setBoardDatabyBoard(6, '/image/boardFX/boardFX1.svg' );
-                        // for (let board of boardHaveFX){
-                        //     console.log('board is ', board)
-                        //     setBoardDatabyBoard(board, '/image/boardFX/boardFX1.svg' );
-                        //     console.log('boardData is ',boardData)
-                        // }
-                        // setBoardDatabyBoard(2, '/image/displayFX/dusplayFX1.svg')
-                        update(ref(db, `Matching/${roomId}`), {
-                            board: boardData
-                        })
-                    }
-                }
-            }
-            else {
-                router.push('/')
-            }
+    //                 if (xTurn && x == currentUid) {
+    //                     const boardHaveFX: number[] = [...randomBoard()]
+    //                     console.log('boardHaveFX is ', boardHaveFX)
+    //                     setBoardDatabyBoard(6, '/image/boardFX/boardFX1.svg');
+    //                     // for (let board of boardHaveFX){
+    //                     //     console.log('board is ', board)
+    //                     //     setBoardDatabyBoard(board, '/image/boardFX/boardFX1.svg' );
+    //                     //     console.log('boardData is ',boardData)
+    //                     // }
+    //                     // setBoardDatabyBoard(2, '/image/displayFX/dusplayFX1.svg')
+    //                     update(ref(db, `Matching/${roomId}`), {
+    //                         board: boardData
+    //                     })
+    //                 }
+    //             }
+    //         }
+    //         else {
+    //             router.push('/')
+    //         }
 
-        })
-    }
-    multiplayerState()
-    console.log(boardData)
+    //     })
+    // }
+    // multiplayerState()
+    // console.log(boardData)
 
     const updateStatus = async () => {
         const MatchRef = ref(db, `Matching/${roomId}/player`);
@@ -649,7 +721,7 @@ export default function TicTacToe(params: any) {
             return
         }
     }
-    console.log('test is ', xTurn && o == currentUid)
+    // console.log('test is ', xTurn && o == currentUid)
 
     return (
         <div className='relative overflow-hidden'>
@@ -751,7 +823,8 @@ export default function TicTacToe(params: any) {
                         </div>
                     </div>
 
-                    <div className="cursor-pointer" onClick={() => { addCard(card[1], 'player1') }}>test add card to X</div>
+                    <div className="cursor-pointer" onClick={() => { addCard(card[4], 'player1') }}>test add card to X</div>
+                    <div className="cursor-pointer" onClick={() => { deleteCard(0, 'player1') }}>test delete 1 card X</div>
 
                     <div id="userCard" className={` w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
                         <CardLayout card={[...card]}
