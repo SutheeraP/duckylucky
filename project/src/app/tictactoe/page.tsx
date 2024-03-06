@@ -20,6 +20,7 @@ export default function TicTacToe(params: any) {
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
     const [x, setX] = useState('');
     const [o, setO] = useState('');
+    const [enemyId, setEnemyId] = useState('');
     let player = ''
     // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
@@ -272,7 +273,7 @@ export default function TicTacToe(params: any) {
     const checkUseCard = () => {
         // กดใช้แล้ว point พอ
         if (point >= inhandCard[selectedCard].point) {
-            update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
+            update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
                 action: point - inhandCard[selectedCard].point
             })
             if (x == currentUid) {
@@ -284,7 +285,6 @@ export default function TicTacToe(params: any) {
             setSelectedCard('')
         }
     }
-
 
     useEffect(() => {
         const countdown = setTimeout(() => {
@@ -325,6 +325,10 @@ export default function TicTacToe(params: any) {
     const turnRef = ref(db, `Matching/${roomId}/currentTurn`);
     const timeRef = ref(db, `Matching/${roomId}/time`);
     const boardRef = ref(db, `Matching/${roomId}/board`);
+    const effectRef = ref(db, `Matching/${roomId}/effect`);
+    const actionRef = ref(db, `Matching/${roomId}/player`);
+
+    // for check function
 
 
     // use effect นี้น่าจะใส่ onvalue ทุกอย่างได้ลย ไม่ชนกัน
@@ -378,7 +382,15 @@ export default function TicTacToe(params: any) {
         // turn listener
         onValue(turnRef, (snapshot: any) => {
             const data = snapshot.val();
-            setXTurn(data)
+
+            // สร้าง player action
+            update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
+                action: 5,
+                phrase: 'Deciding'
+            })
+
+            setXTurn(data) // update turn ในเกม
+            updateEffectTurn() // update turn ในเอฟเฟคที่ทำงานอยู่
         })
 
         //time listener
@@ -391,7 +403,6 @@ export default function TicTacToe(params: any) {
         onValue(cardRef, (snapshot) => {
             // update all card when card change
             const data = snapshot.val();
-            console.log('doing card onavlue in use effect')
             if (data) {
                 if (data.player1) {
                     let card = data.player1 // ดึง card จาก DB
@@ -423,6 +434,39 @@ export default function TicTacToe(params: any) {
             }
 
         });
+
+        onValue(actionRef, (snapshot: any) => {
+            const data = snapshot.val();
+            console.log('data action', data)
+            if (data) {
+                setGameStatus(data.PlayerActionInTurn.phrase)
+                if(!data.PlayerActionInTurn.action){
+                    setPoint(0)
+                }
+                else{
+                    setPoint(data.PlayerActionInTurn.action)
+                }
+            }
+        })
+
+        //effect listener
+        onValue(effectRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log('data effect found')
+                if (data.blockCard && data.blockCard.turn == 2 && currentUid == data.blockCard.target) {
+                    // ไม่ให้ใช้การ์ด
+                    console.log('update action 0')
+                    update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
+                        action: 0
+                    })
+                }
+                if (data.blockCard && data.blockCard.turn == 3) {
+                    remove(ref(db, `Matching/${roomId}/effect/blockCard`));
+                }
+            }
+
+        })
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
     // update card ตามฝั่ง
@@ -430,10 +474,12 @@ export default function TicTacToe(params: any) {
         if (x == currentUid) {
             setInhandCard(cardX)
             setCardEnemy(cardO)
+            setEnemyId(o)
         }
         if (o == currentUid) {
             setInhandCard(cardO)
             setCardEnemy(cardX)
+            setEnemyId(x)
         }
     }, [cardX, cardO]);
 
@@ -478,6 +524,27 @@ export default function TicTacToe(params: any) {
         update(ref(db, `Matching/${roomId}/card`), {
             [target]: newSet
         })
+
+    }
+
+    // การ์ดแม่มดน้ำเงิน
+    const blockCard = async () => {
+        update(ref(db, `Matching/${roomId}/effect/blockCard`), {
+            turn: 1,
+            target: enemyId
+        })
+    }
+
+    // ไว้ update turn ให้การ์ดที่ทำงานอยู่
+    const updateEffectTurn = async () => {
+        const data = (await get(effectRef)).val()
+        if (data) {
+            if (data.blockCard) {
+                update(ref(db, `Matching/${roomId}/effect/blockCard`), {
+                    turn: data.blockCard.turn + 1
+                })
+            }
+        }
 
     }
 
@@ -532,58 +599,51 @@ export default function TicTacToe(params: any) {
         }
     }
 
-    const updateAction = async () => {
+    // const updateAction = async () => {
 
-        const ActionRef = ref(db, `Matching/${roomId}/player`);
-        await onValue(ActionRef, (snapshot: any) => {
-            const data = snapshot.val();
+    //     const ActionRef = ref(db, `Matching/${roomId}/player`);
+    //     await onValue(ActionRef, (snapshot: any) => {
+    //         const data = snapshot.val();
 
-            if (data) {
-                if (data['PlayerActioninTurn']) {
-                    // console.log('379: is x turn = ', xTurn)
-                    if (data['PlayerActioninTurn']['phrase'] != gameStatus || data['PlayerActioninTurn']['action'] != point) {
-                        if (xTurn && data['player1'] == currentUid) {
-                            setPoint(data['PlayerActioninTurn']['action'])
-                            setGameStatus(data['PlayerActioninTurn']['phrase'])
-                            return
-                        }
-                        else if (!xTurn && data['player2'] == currentUid) {
-                            setPoint(data['PlayerActioninTurn']['action'])
-                            setGameStatus(data['PlayerActioninTurn']['phrase'])
-                            return
-                        }
-                    }
-                }
-                else {
+    //         if (data) {
+    //             if (data['PlayerActioninTurn']) {
+    //                 if (data['PlayerActioninTurn']['phrase'] != gameStatus || data['PlayerActioninTurn']['action'] != point) {
+    //                     if (xTurn && data['player1'] == currentUid) {
+    //                         setPoint(data['PlayerActioninTurn']['action'])
+    //                         setGameStatus(data['PlayerActioninTurn']['phrase'])
+    //                         return
+    //                     }
+    //                     else if (!xTurn && data['player2'] == currentUid) {
+    //                         setPoint(data['PlayerActioninTurn']['action'])
+    //                         setGameStatus(data['PlayerActioninTurn']['phrase'])
+    //                         return
+    //                     }
+    //                 }
+    //             }
+    //             else {
 
-                    if (xTurn && data['player1'] == currentUid) {
-                        // console.log('eiei')
-                        update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
+    //                 if (xTurn && data['player1'] == currentUid) {
+    //                     // console.log('eiei')
+    //                     update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
 
-                            action: 5,
-                            phrase: 'Deciding',
-                            card: inhandCard
-                        })
-                        setPoint(5)
-                        setGameStatus('Deciding')
-                        return
-                    }
-                    else if (!xTurn && data['player2'] == currentUid) {
-                        update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
+    //                         action: 5,
+    //                         phrase: 'Deciding'
+    //                     })
+    //                     return
+    //                 }
+    //                 else if (!xTurn && data['player2'] == currentUid) {
+    //                     update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), {
 
-                            action: 5,
-                            phrase: 'Deciding',
-                            card: inhandCard
-                        })
-                        setPoint(5)
-                        setGameStatus('Deciding')
-                        return
-                    }
-                }
-            }
-        });
-    }
-    updateAction()
+    //                         action: 5,
+    //                         phrase: 'Deciding'
+    //                     })
+    //                     return
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
+    // updateAction()
 
     const btnClass = 'bg-black text-white rounded-lg ring-1 flex w-40 p-2 justify-center items-center cursor-pointer hover:bg-white hover:text-black hover:scale-105 hover:ring-black'
 
@@ -710,14 +770,15 @@ export default function TicTacToe(params: any) {
     // console.log(boardData)
 
     const updateStatus = async () => {
+        // update เป็น playing
         const MatchRef = ref(db, `Matching/${roomId}/player`);
         const data = (await get(MatchRef)).val()
         if (xTurn && data['player1'] == currentUid) {
-            update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), { phrase: 'Playing' })
+            update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), { phrase: 'Playing' })
             return
         }
         else if (!xTurn && data['player2'] == currentUid) {
-            update(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`), { phrase: 'Playing' })
+            update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), { phrase: 'Playing' })
             return
         }
     }
@@ -819,12 +880,13 @@ export default function TicTacToe(params: any) {
 
                         <div className={`flex justify-center ${gameStatus == 'Playing' && ((xTurn && x == currentUid) || (!xTurn && o == currentUid)) ? 'block' : 'hidden'}`}>
                             <div className={`${btnClass} ${!(selectedCard === ``) ? 'block' : 'hidden'} ${!useable ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { checkUseCard() }}>ใช้การ์ด</div>
-                            <div className={` text-black p-2 ${(selectedCard === ``) ? 'block' : 'hidden'}`}>เลือกใช้การ์ด หรือกาได้เลย แต่ถ้ากาจะจบเทิร์นนะ</div>
+                            <div className={` text-black text-center p-2 ${(selectedCard === ``) ? 'block' : 'hidden'}`}>เลือกใช้การ์ด หรือกาได้เลย แต่ถ้ากาจะจบเทิร์นนะ</div>
                         </div>
                     </div>
 
                     <div className="cursor-pointer" onClick={() => { addCard(card[4], 'player1') }}>test add card to X</div>
-                    <div className="cursor-pointer" onClick={() => { deleteCard(0, 'player1') }}>test delete 1 card X</div>
+                    {/* <div className="cursor-pointer" onClick={() => { deleteCard(0, 'player1') }}>test delete 1 card X</div> */}
+                    <div className="cursor-pointer" onClick={() => { blockCard() }}>test function แม่มดน้ำเงิน</div>
 
                     <div id="userCard" className={` w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
                         <CardLayout card={[...card]}
@@ -835,6 +897,7 @@ export default function TicTacToe(params: any) {
                 </div>
             </div>
 
+            {/* ส่วนจบเกม */}
             <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
                 <div className="text-white font-bold text-3xl">{draw ? 'เสมอ' : !xTurn ? 'คุณชนะ !' : 'คุณแพ้ !'}</div>
                 <Image src="/image/icon1.svg" alt="" width={200} height={200} />
