@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
 import { getDatabase, ref, set, onValue, update, remove, child, get, push } from "firebase/database";
 import { db } from "../firebase";
+import ImageComp from "../component/ImageComp";
 import Image from "next/image"
 import Board from "./component/Board";
 import CardLayout from "./component/CardLayout";
@@ -18,14 +19,13 @@ export default function TicTacToe(params: any) {
     // console.log('auto repage')
     const router = useRouter()
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
-    
+
     // เก็บ default ต่าง ๆ
     const [x, setX] = useState('');
     const [o, setO] = useState('');
     const [enemyId, setEnemyId] = useState('');
     const [myPlayer, setMyPlayer] = useState('');
     const [enemyPlayer, setEnemyPlayer] = useState('');
-    let player = ''
 
     // แก้บัค 
 
@@ -54,6 +54,8 @@ export default function TicTacToe(params: any) {
 
     // for effect
     const [blinding, setBlinding] = useState(false)
+    const [showNotify, setShowNotify] = useState(false)
+    const [cardNotify, setCardNotify] = useState<any>(``)
 
     // for แสดง username
     // fix bug player[x]
@@ -91,7 +93,6 @@ export default function TicTacToe(params: any) {
     onValue(userListRef, (snapshot: any) => {
         const data = snapshot.val();
         readData(data)
-        player = data
     });
 
     interface BoardData {
@@ -256,6 +257,7 @@ export default function TicTacToe(params: any) {
 
     const checkUseCard = () => {
         // กดได้แปลว่า point พออยู่แล้ว
+        let thiscard = inhandCard[selectedCard]
 
         // update pont ใน db
         update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
@@ -263,10 +265,11 @@ export default function TicTacToe(params: any) {
         })
 
         //สั่ง notify ฝ่ายตรงข้าม
-
+        update(ref(db, `Matching/${roomId}/notify/${enemyId}`), {
+            card: thiscard.id
+        })
 
         //ใช้ คำสั่งการ์ด
-        let thiscard = inhandCard[selectedCard]
         if (thiscard.id == 1) {
             // ขอปฎิเสธ
         }
@@ -314,20 +317,9 @@ export default function TicTacToe(params: any) {
                     currentTurn: !xTurn
 
                 })
-
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
                 })
-                if (!xTurn && x == currentUid) {
-                    remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-                    return
-                }
-                if (xTurn && o == currentUid) {
-                    remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-                    return
-                }
-
-
             } else {
                 update(ref(db, `Matching/${roomId}`), {
                     time: timeLeft - 1
@@ -348,20 +340,20 @@ export default function TicTacToe(params: any) {
     const boardRef = ref(db, `Matching/${roomId}/board`);
     const effectRef = ref(db, `Matching/${roomId}/effect`);
     const actionRef = ref(db, `Matching/${roomId}/player`);
-
+    const notifyRef = ref(db, `Matching/${roomId}/notify`);
 
     // อดึงชื่อ/รูปเมื่ออัพเดต x,o
     useEffect(() => {
-         
-         const getUser= async () => {
+
+        const getUser = async () => {
             const data = (await get(userRef)).val()
             if (data) {
-                if(data[x]){
+                if (data[x]) {
                     console.log('founX')
                     setNameX(data[x]['username'])
                     setImgX(data[x]['profile_img'])
                 }
-                if(data[o]){
+                if (data[o]) {
                     console.log('founO')
                     setNameO(data[o]['username'])
                     setImgO(data[o]['profile_img'])
@@ -536,10 +528,23 @@ export default function TicTacToe(params: any) {
             const data = snapshot.val();
             if (data) { effectWork(data) }
         })
+
+        // notify listen
+        onValue(notifyRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) {
+                if (data[currentUid]) {
+                    if (data[currentUid]['card']) {
+                        notifyCard(data[currentUid]['card'])
+                    }
+                }
+            }
+        })
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
     // update card ตามฝั่ง
     useEffect(() => {
+        console.log('update card')
         if (x == currentUid) {
             setInhandCard(cardX)
             setCardEnemy(cardO)
@@ -555,6 +560,18 @@ export default function TicTacToe(params: any) {
             setEnemyPlayer('player1')
         }
     }, [cardX, cardO]);
+
+    const notifyCard = async (cardId: number) => {
+        // ขึ้นมา 3 วิแล้วหายไป
+        let thisCard = card.find(item => item.id == cardId);
+        setCardNotify(thisCard)
+        setShowNotify(true)
+
+        setTimeout(() => {
+            setShowNotify(false);
+            remove(ref(db, `Matching/${roomId}/notify/${currentUid}/card`));
+        }, 3000);
+    }
 
     const addCard = async (card: Object, target: string) => {
         // ex. addcard(card[1], 'player1')
@@ -736,6 +753,27 @@ export default function TicTacToe(params: any) {
     return (
         <div className='relative overflow-hidden'>
             <Background />
+
+            {showNotify ?
+                <div className="bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
+                    <div className="flex flex-col gap-4 items-center px-4">
+                        <div className="bg-white px-8 py-2 rounded-full font-bold w-fit text-xl">{x == currentUid? nameO : nameX} โจมตี !</div>
+                        <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] relative">
+                            <div className="border border-black rounded-lg">
+                                <ImageComp path={cardNotify.img} />
+                            </div>
+                            
+                            <div className="my-auto text-center px-2">
+                                <div className="font-bold mb-3 text-lg">{cardNotify.name}</div>
+                                <div>{cardNotify.description}</div>
+                            </div>
+                            <div className="absolute top-4 right-4 w-7 h-7 bg-black rounded-full text-white text-lg font-semibold flex justify-center items-center" onClick={() => {setShowNotify(false)}}>x</div>
+                        </div>
+                    </div>
+                </div> :
+                null}
+
+            {/* ส่วนหลัก */}
             <div className='container mx-auto relative z-10'>
                 <div id="time&point_sm" className="lg:hidden flex absolute z-20 top-14 inset-x-2/4 -translate-x-34 w-72 h-24 items-center">
                     <div className={`w-24 h-24 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} rounded-full flex justify-center items-center text-4xl z-10`}>
@@ -766,7 +804,7 @@ export default function TicTacToe(params: any) {
                         </div>
                         <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                             <div>
-                            {x && o ? (xTurn ? nameX : nameO) : ''}
+                                {x && o ? (xTurn ? nameX : nameO) : ''}
                             </div>
                             <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `block` : `hidden`}`}>
                                 {[...Array(point)].map((v, idx: number) => {
@@ -813,7 +851,6 @@ export default function TicTacToe(params: any) {
                             x={x}
                             o={o}
                             currentUid={currentUid}
-                            player={player}
                             imgX={imgX}
                             imgO={imgO}
 
@@ -844,10 +881,6 @@ export default function TicTacToe(params: any) {
                             <div className={` text-black text-center p-2 ${(selectedCard === ``) ? 'block' : 'hidden'}`}>เลือกใช้การ์ด หรือกาได้เลย แต่ถ้ากาจะจบเทิร์นนะ</div>
                         </div>
                     </div>
-
-                    <div className="cursor-pointer" onClick={() => { addCard(card[2], 'player1') }}>test add card to X</div>
-                    {/* <div className="cursor-pointer" onClick={() => { deleteCard(0, 'player1') }}>test delete 1 card X</div> */}
-                    <div className="cursor-pointer" onClick={() => { blind() }}>test function ตาบอด</div>
 
                     <div id="userCard" className={` w-screen flex-none ${!(selectedCard === ``) ? 'h-40' : 'h-48'}`}>
                         <CardLayout card={[...card]}
