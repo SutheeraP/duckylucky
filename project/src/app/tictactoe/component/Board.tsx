@@ -16,8 +16,7 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, updateBoard, 
-        roomId, db, blinding } = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard, swapXO, increaseActionPoint, bombRandomBoard, building, increaseAngelCard} = props;
 
     useEffect(() => {
         checkWinner()
@@ -29,7 +28,15 @@ const Board = (props: any) => {
             let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
             if (boardData[idx] != player[o].profile_img && boardData[idx] != player[x].profile_img && !won){
                 if (boardData[idx]){
-                    console.log('use boardFX')
+                    console.log('check value of board ', boardData[idx])
+                    resetBoard()
+                    // swapXO()
+                    // increaseActionPoint()
+                    // bombRandomBoard()
+                    // building()
+                    // increaseAngelCard()
+                    // console.log('check value of board ', boardData[idx])
+                    // console.log('use boardFX')
                 }
                 update(ref(db, `Matching/${roomId}/board`), {
                     [idx]: value
@@ -41,31 +48,6 @@ const Board = (props: any) => {
                     time: 20
                 })
             }
-            // if(boardData[idx] && boardData[idx] != (player[x].profile_img || player[x].profile_img)){
-            //     update(ref(db, `Matching/${roomId}/board`), {
-            //         [idx]: value
-            //     })
-            //     update(ref(db, `Matching/${roomId}`), {
-            //         currentTurn: !xTurn
-            //     })
-            //     update(ref(db, `Matching/${roomId}`), {
-            //         time: 20
-            //     })
-            //     console.log('test')
-            // }
-            // if (!boardData[idx] && !won) {
-            //     // let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
-            //     // กดแล้วอัพเดตช่องนั้นใน db & เปลี่ยน turn
-            //     update(ref(db, `Matching/${roomId}/board`), {
-            //         [idx]: value
-            //     })
-            //     update(ref(db, `Matching/${roomId}`), {
-            //         currentTurn: !xTurn
-            //     })
-            //     update(ref(db, `Matching/${roomId}`), {
-            //         time: 20
-            //     })
-            // }
         }
         
         checkWinner()

@@ -607,6 +607,39 @@ export default function TicTacToe(params: any) {
         })
     }
 
+    // FX พายุฤดูร้อน
+    const resetBoard = async () => {
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/resetBoard`),{
+            turn: 1,
+            taget: currentUid
+        })
+    }
+
+    // FX ความช่วยเหลือของเกรซมิลเลอร์
+    const swapXO = async () => {
+
+    }
+
+    // FX บัญชาจากราชินีหงส์
+    const increaseActionPoint = async () => {
+
+    }
+
+    // FX ของขวัญจากมือระเบิด
+    const bombRandomBoard = async () => {
+
+    }
+
+    // FX ธุรกิจของนายหน้า
+    const building = async () => {
+
+    }
+
+    // FX ลิขิตของเดวิส
+    const increaseAngelCard = async () => {
+
+    }
+
     // ไว้ update turn ให้การ์ดที่ทำงานอยู่
     const effectTurn = async () => {
         const data = (await get(effectRef)).val()
@@ -657,6 +690,28 @@ export default function TicTacToe(params: any) {
                         setBlinding(false) // กลับมาแดงผล
                         remove(ref(db, `Matching/${roomId}/effect/${p}/blind`));
                     }
+                }
+
+                // FX พายุฤดูร้อน
+                if (data[p]['resetBoard']) {
+                    const match = (get(ref(db, `Matching/${roomId}/board`)))
+                    console.log(match)
+                    console.log('resetBoard')
+                    for (let i = 0 ; i < 16 ; i++){
+                        console.log(i)
+                        // console.log(Object.values(match)[i])
+                        // if (Object.values(match)[i] == ('/image/displayFX/displayFX1.svg' || 
+                        // '/image/displayFX/displayFX2.svg' || 
+                        // '/image/displayFX/displayFX3.svg' || 
+                        // '/image/displayFX/displayFX4.svg' || 
+                        // '/image/displayFX/displayFX5.svg' || 
+                        // '/image/displayFX/displayFX6.svg')){
+                        //     // setBoardDatabyBoard(i, '')
+                        //     console.log('not FX')
+                        // }
+                        // else {console.log('this is FX')}
+                    }
+                    remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
                 }
             }
 
@@ -961,7 +1016,12 @@ export default function TicTacToe(params: any) {
                             roomId={roomId}
                             db={db}
                             blinding={blinding}
-
+                            resetBoard={resetBoard}
+                            swapXO={swapXO}
+                            increaseActionPoint={increaseActionPoint}
+                            bombRandomBoard={bombRandomBoard}
+                            building={building}
+                            increaseAngelCard={increaseAngelCard}
                         />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>
