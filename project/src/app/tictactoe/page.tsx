@@ -217,11 +217,23 @@ export default function TicTacToe(params: any) {
             numbers.splice(randomIndex, 1);
             numboard.push(randomNumber)
         }
-        // console.log(numboard)
         return numboard;
     }
 
-    // const boardhaveFX = [...randomBoard()]
+    const randomDisplayFX = () => { 
+        let numbers = [];
+        let numFX = [];
+        for (let i = 1; i <= 6; i++) {
+            numbers.push(i);
+        }
+        for (let i = 1; i <= 4; i++) {
+            const randomIndex = Math.floor(Math.random() * numbers.length);
+            const randomNumber = numbers[randomIndex];
+            numbers.splice(randomIndex, 1);
+            numFX.push(randomNumber)
+        }
+        return numFX;
+    }
 
     const randomCard = () => { return Math.floor(Math.random() * 6) }
     // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
@@ -336,6 +348,18 @@ export default function TicTacToe(params: any) {
 
     // รวมดัก onvalue
     useEffect(() => {
+        
+        // if(x == currentUid){
+        //     // console.log('')
+        //     const numBoard = [...randomBoard()]
+        //     console.log('numBoard is', numBoard)
+        //     for (let board of numBoard){
+        //         console.log('board is ',board)
+        //         setBoardDatabyBoard(board, '/image/displayFX/displayFX1.svg')
+        //         console.log('test board')
+        //     }
+        // }
+        
         // get x และ o เซ็ตครั้งเดียว
         const getPlayer = async () => {
             const data = (await get(gameRef)).val()
@@ -355,11 +379,45 @@ export default function TicTacToe(params: any) {
             const data = snapshot.val();
             if (data) {
                 setBoardData(data)
+                // console.log('init board')
             }
             else {
-                // เซ็ตเกมถ้ายังไม่มีบอด
+                // สร้าง init Board เพื่อมา setup ช่องพิเศษตอนเริ่มเกม
+                interface InitBoard {
+                    [key: string]: any;
+                }
+                let initBoard = {
+                    0:'',
+                    1:'',
+                    2:'',
+                    3:'',
+                    4:'',
+                    5:'',
+                    6:'',
+                    7:'',
+                    8:'',
+                    9:'',
+                    10:'',
+                    11:'',
+                    12:'',
+                    13:'',
+                    14:'',
+                    15:''
+                }
+
+                // random ค่าเพื่อหา board ที่จะมี FX และ รูปของ FX ที่จะเอามาแสดงผลแบบสุ่ม
+                const numBoard = [...randomBoard()]
+                const numDisplay = [...randomDisplayFX()]
+
+                // set ค่าของ initBoard ให้เป็นรูป FX ตามช่องที่สุ่มได้
+                initBoard[numBoard[0].toString()] = `/image/displayFX/displayFX${numDisplay[0]}.svg`
+                initBoard[numBoard[1].toString()] = `/image/displayFX/displayFX${numDisplay[1]}.svg`
+                initBoard[numBoard[2].toString()] = `/image/displayFX/displayFX${numDisplay[2]}.svg`
+                initBoard[numBoard[3].toString()] = `/image/displayFX/displayFX${numDisplay[3]}.svg`
+
+                // เซ็ตเกมตอนไม่ครั้งแรกที่เล่น ด้วย initBoard
                 update(ref(db, `Matching/${roomId}`), {
-                    board: boardData
+                    board: initBoard
                 })
 
                 // กำหนดเวลา 20
@@ -498,7 +556,7 @@ export default function TicTacToe(params: any) {
             }
 
         })
-    }, currentUid); // มี uid แล้วรันครั้งแรก
+    }, []); // มี uid แล้วรันครั้งแรก
 
     // update card ตามฝั่ง
     useEffect(() => {
