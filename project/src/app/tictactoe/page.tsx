@@ -18,14 +18,20 @@ export default function TicTacToe(params: any) {
     // console.log('auto repage')
     const router = useRouter()
     const [roomId, setRoomId] = useState(params['searchParams']['match'])
+    
+    // เก็บ default ต่าง ๆ
     const [x, setX] = useState('');
     const [o, setO] = useState('');
     const [enemyId, setEnemyId] = useState('');
     const [myPlayer, setMyPlayer] = useState('');
+    const [enemyPlayer, setEnemyPlayer] = useState('');
     let player = ''
+
+    // แก้บัค 
+
+
     // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
-
     const [gameStatus, setGameStatus] = useState<any>('Deciding')
     // start : เฟสแรกที่เลือกระหว่าง จั่ว2การ์ด กับ ใช้การ์ดและกา
     // play : เฟสเมื่อเือกใช้การ์ดหรือกา จะสามารถใช้การ์ดได้เรื่อยๆ และจะจบเทิร์นเมื่อกา
@@ -48,6 +54,13 @@ export default function TicTacToe(params: any) {
 
     // for effect
     const [blinding, setBlinding] = useState(false)
+
+    // for แสดง username
+    // fix bug player[x]
+    const [nameX, setNameX] = useState('');
+    const [nameO, setNameO] = useState('');
+    const [imgX, setImgX] = useState('');
+    const [imgO, setImgO] = useState('');
 
     const session = useSession({
         required: true,
@@ -103,42 +116,6 @@ export default function TicTacToe(params: any) {
         15: ``
     });
 
-    // const setXTurnbyBoard = () => {
-    //     // updateBoard()
-    //     // console.log(boardData)
-    //     // updateBoard()
-    //     console.log('push turn')
-    //     update(ref(db, `Matching/${roomId}`), {
-    //         currentTurn: !xTurn
-    // })
-    // update(ref(db, `Matching/${roomId}`), {
-    //     time: 20
-    // })
-    // setGameStatus('Deciding')
-    // setPoint(5)
-
-    // if (xTurn && x == currentUid) {
-    //     update(ref(db, `Matching/${roomId}`), {
-    //         currentTurn: !xTurn
-    //     })
-    //     update(ref(db, `Matching/${roomId}`), {
-    //         time: 20
-    //     })
-    //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-    //     return
-    // }
-    // if (!xTurn && o == currentUid) {
-    //     update(ref(db, `Matching/${roomId}`), {
-    //         currentTurn: !xTurn
-    //     })
-    //     update(ref(db, `Matching/${roomId}`), {
-    //         time: 20
-    //     })
-    //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-    //     return
-    // }
-    // }
-
     const resetbyBoard = () => {
         setXTurn(true)
         setBoardData({
@@ -182,12 +159,11 @@ export default function TicTacToe(params: any) {
     }
 
     const card = [
-        { id: 1, name: 'ป่อเป็ดตึ๊ง', point: 0, img: '/image/card/card1.svg', description: 'ป้องกันเอ็ฟเฟ็กส์ด้านลบ หรือการ์ดสกิลที่ฝั่งตรงข้ามใช้ใส่เราได้ โดยจะเป็นช่วงให้ใช้ทันทีที่ฝั่งตรงข้ามใช้สกิลใส่เรา' },
-        { id: 2, name: 'ฉันขอปฏิเสธ', point: 1, img: '/image/card/card2.svg', description: 'ปฏิเสธผลกระทบที่เกิดขึ้นทั้งหมด' },
-        { id: 3, name: 'วาจาประกาศิต', point: 2, img: '/image/card/card3.svg', description: 'สั่งผู้เล่นฝ่ายตรงข้ามสุ่มทิ้งการ์ด 1 ใบในมือ' },
-        { id: 4, name: 'หัวขโมย', point: 2, img: '/image/card/card4.svg', description: 'ขโมยการ์ดจากฝั่งตรงข้าม 1 ใบแบบสุ่ม' },
-        { id: 5, name: 'คำสาปของแม่มดน้ำเงิน', point: 2, img: '/image/card/card5.svg', description: 'ห้ามฝั่งตรงข้ามไม่ให้ใช้สกิลใดได้ 1 รอบ' },
-        { id: 6, name: 'จงตาบอดไปซะ', point: 4, img: '/image/card/card6.svg', description: 'ทำให้ฝั่งตรงข้ามมองไม่เห็นสัญลักษณ์ว่าเป็นของใคร เห็นแค่ช่องไหนกาได้หรือไม่ได้ 1 รอบ' }
+        { id: 1, name: 'ฉันขอปฏิเสธ', point: 1, img: '/image/card/card2.svg', description: 'ปฏิเสธผลกระทบที่เกิดขึ้นทั้งหมด' },
+        { id: 2, name: 'วาจาประกาศิต', point: 2, img: '/image/card/card3.svg', description: 'สั่งผู้เล่นฝ่ายตรงข้ามสุ่มทิ้งการ์ด 1 ใบในมือ' },
+        { id: 3, name: 'หัวขโมย', point: 2, img: '/image/card/card4.svg', description: 'ขโมยการ์ดจากฝั่งตรงข้าม 1 ใบแบบสุ่ม' },
+        { id: 4, name: 'คำสาปของแม่มดน้ำเงิน', point: 2, img: '/image/card/card5.svg', description: 'ห้ามฝั่งตรงข้ามไม่ให้ใช้สกิลใดได้ 1 รอบ' },
+        { id: 5, name: 'จงตาบอดไปซะ', point: 4, img: '/image/card/card6.svg', description: 'ทำให้ฝั่งตรงข้ามมองไม่เห็นสัญลักษณ์ว่าเป็นของใคร เห็นแค่ช่องไหนกาได้หรือไม่ได้ 1 รอบ' }
     ]
     type CardType = any
 
@@ -224,7 +200,7 @@ export default function TicTacToe(params: any) {
         return numboard;
     }
 
-    const randomDisplayFX = () => { 
+    const randomDisplayFX = () => {
         let numbers = [];
         let numFX = [];
         for (let i = 1; i <= 6; i++) {
@@ -239,24 +215,19 @@ export default function TicTacToe(params: any) {
         return numFX;
     }
 
-    const randomCard = () => { return Math.floor(Math.random() * 6) }
-    // random เลข 0-5 เพื่อเอาไปดึง card มาใส่ใน inhandcard
+    const randomCard = () => { return Math.floor(Math.random() * 5) }
+    // random เลข 0-4 เพื่อเอาไปดึง card มาใส่ใน inhandcard
 
     const drawTwoCard = async () => {
-        // จั่ว 2 แล้วสั่่งจบเทิน
+        // สุ่ม 2 ใบ
         const card1 = randomCard();
         const card2 = randomCard();
-        // สุ่มมาเพิ่ม
-        if (x == currentUid) {
-            await addCard(card[card1], 'player1')
-            await addCard(card[card2], 'player1')
-        }
-        else if (o == currentUid) {
-            await addCard(card[card1], 'player2')
-            await addCard(card[card2], 'player2')
-        }
-        // setInhandCard([...inhandCard, card[card1], card[card2]]);
-        // setXTurn(!xTurn)
+
+        // เพิ่ม
+        await addCard(card[card1], myPlayer)
+        await addCard(card[card2], myPlayer)
+
+        // จบเทิน
         update(ref(db, `Matching/${roomId}`), {
             currentTurn: !xTurn
         })
@@ -284,19 +255,55 @@ export default function TicTacToe(params: any) {
     // useable ใช้ตอนทำคำสาปแม่มดน้ำเงิน (ห้ามใช้สกิล)
 
     const checkUseCard = () => {
-        // กดใช้แล้ว point พอ
-        if (point >= inhandCard[selectedCard].point) {
-            update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
-                action: point - inhandCard[selectedCard].point
-            })
-            if (x == currentUid) {
-                deleteCard(selectedCard, 'player1')
-            }
-            else if (o == currentUid) {
-                deleteCard(selectedCard, 'player2')
-            }
-            setSelectedCard('')
+        // กดได้แปลว่า point พออยู่แล้ว
+
+        // update pont ใน db
+        update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
+            action: point - inhandCard[selectedCard].point
+        })
+
+        //สั่ง notify ฝ่ายตรงข้าม
+
+
+        //ใช้ คำสั่งการ์ด
+        let thiscard = inhandCard[selectedCard]
+        if (thiscard.id == 1) {
+            // ขอปฎิเสธ
         }
+
+        else if (thiscard.id == 2) {
+            // วาจาประกาศิต สุ่มลบฝั่งตรงข้าม 1 ใบ
+            let lenCard = cardEnemy.length
+            if (lenCard) {
+                let ranCard = Math.floor(Math.random() * lenCard) //สุ่มเลข index
+                deleteCard(ranCard, enemyPlayer)
+            }
+        }
+
+        else if (thiscard.id == 3) {
+            // หัวขโมย 1 ใบ
+            let lenCard = cardEnemy.length
+            if (lenCard) {
+                let ranCard = Math.floor(Math.random() * lenCard) //สุ่มเลข index
+                addCard(cardEnemy[ranCard], myPlayer)
+                deleteCard(ranCard, enemyPlayer)
+            }
+        }
+
+        else if (thiscard.id == 4) {
+            //  คำสาปของแม่มดน้ำเงิน
+            blockCard()
+        }
+        else if (thiscard.id == 5) {
+            // จงตาบอด
+            blind()
+        }
+
+        // ลบการ์ดใน db
+        deleteCard(selectedCard, myPlayer)
+
+        // รี selectCard
+        setSelectedCard('')
     }
 
     // time countdown
@@ -333,6 +340,7 @@ export default function TicTacToe(params: any) {
     }, [xTurn, timeLeft]);
 
     // all ref
+    const userRef = ref(db, `UserList`);
     const gameRef = ref(db, `Matching/${roomId}`);
     const cardRef = ref(db, `Matching/${roomId}/card`);
     const turnRef = ref(db, `Matching/${roomId}/currentTurn`);
@@ -341,12 +349,32 @@ export default function TicTacToe(params: any) {
     const effectRef = ref(db, `Matching/${roomId}/effect`);
     const actionRef = ref(db, `Matching/${roomId}/player`);
 
-    // for check function
 
+    // อดึงชื่อ/รูปเมื่ออัพเดต x,o
+    useEffect(() => {
+         
+         const getUser= async () => {
+            const data = (await get(userRef)).val()
+            if (data) {
+                if(data[x]){
+                    console.log('founX')
+                    setNameX(data[x]['username'])
+                    setImgX(data[x]['profile_img'])
+                }
+                if(data[o]){
+                    console.log('founO')
+                    setNameO(data[o]['username'])
+                    setImgO(data[o]['profile_img'])
+                }
+            }
+        }
+        getUser()
+
+    }, [x, o])
 
     // รวมดัก onvalue
     useEffect(() => {
-        
+        console.log('in user effect uid')
         // get x และ o เซ็ตครั้งเดียว
         const getPlayer = async () => {
             const data = (await get(gameRef)).val()
@@ -357,7 +385,6 @@ export default function TicTacToe(params: any) {
             else {
                 router.push('/')
             }
-
         }
         getPlayer()
 
@@ -370,26 +397,23 @@ export default function TicTacToe(params: any) {
             }
             else {
                 // สร้าง init Board เพื่อมา setup ช่องพิเศษตอนเริ่มเกม
-                interface InitBoard {
-                    [key: string]: any;
-                }
-                let initBoard = {
-                    0:'',
-                    1:'',
-                    2:'',
-                    3:'',
-                    4:'',
-                    5:'',
-                    6:'',
-                    7:'',
-                    8:'',
-                    9:'',
-                    10:'',
-                    11:'',
-                    12:'',
-                    13:'',
-                    14:'',
-                    15:''
+                let initBoard: { [key: string]: string } = {
+                    0: '',
+                    1: '',
+                    2: '',
+                    3: '',
+                    4: '',
+                    5: '',
+                    6: '',
+                    7: '',
+                    8: '',
+                    9: '',
+                    10: '',
+                    11: '',
+                    12: '',
+                    13: '',
+                    14: '',
+                    15: ''
                 }
 
                 // random ค่าเพื่อหา board ที่จะมี FX และ รูปของ FX ที่จะเอามาแสดงผลแบบสุ่ม
@@ -397,10 +421,9 @@ export default function TicTacToe(params: any) {
                 const numDisplay = [...randomDisplayFX()]
 
                 // set ค่าของ initBoard ให้เป็นรูป FX ตามช่องที่สุ่มได้
-                initBoard[numBoard[0].toString()] = `/image/displayFX/displayFX${numDisplay[0]}.svg`
-                initBoard[numBoard[1].toString()] = `/image/displayFX/displayFX${numDisplay[1]}.svg`
-                initBoard[numBoard[2].toString()] = `/image/displayFX/displayFX${numDisplay[2]}.svg`
-                initBoard[numBoard[3].toString()] = `/image/displayFX/displayFX${numDisplay[3]}.svg`
+                for (let i = 0; i < 4; i++) {
+                    initBoard[numBoard[i]] = `/image/displayFX/displayFX${numDisplay[i]}.svg`
+                }
 
                 // เซ็ตเกมตอนไม่ครั้งแรกที่เล่น ด้วย initBoard
                 update(ref(db, `Matching/${roomId}`), {
@@ -522,12 +545,14 @@ export default function TicTacToe(params: any) {
             setCardEnemy(cardO)
             setEnemyId(o)
             setMyPlayer('player1')
+            setEnemyPlayer('player2')
         }
         if (o == currentUid) {
             setInhandCard(cardO)
             setCardEnemy(cardX)
             setEnemyId(x)
             setMyPlayer('player2')
+            setEnemyPlayer('player1')
         }
     }, [cardX, cardO]);
 
@@ -535,8 +560,18 @@ export default function TicTacToe(params: any) {
         // ex. addcard(card[1], 'player1')
         // ps. player 1 = x, player2 = o
 
+        // ดึกจาก state ที่เซ้ตหลักอัพ = ช้าเกิน บายจ้า
+        // let newSet // เซ็ตอัพเดต
+        // if (target == 'player1') {
+        //     newSet = [...cardX, card]
+        // }
+        // else if (target == 'player2') {
+        //     newSet = [...cardO, card]
+        // }
+
         const cardList = (await get(cardRef)).val()
         let newSet // เซ็ตอัพเดต
+
         if (cardList && cardList[target]) {
             let currentCards = cardList[target] // เก็บ card ปจบ ถ้ามี
             if (!Array.isArray(currentCards)) {
@@ -548,7 +583,7 @@ export default function TicTacToe(params: any) {
         else {
             newSet = [card]
         }
-        // console.log('newset : ', newSet)
+
         update(ref(db, `Matching/${roomId}/card`), {
             [target]: newSet
         })
@@ -592,7 +627,7 @@ export default function TicTacToe(params: any) {
 
     // FX พายุฤดูร้อน
     const resetBoard = async () => {
-        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/resetBoard`),{
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/resetBoard`), {
             turn: 1,
             taget: currentUid
         })
@@ -666,14 +701,10 @@ export default function TicTacToe(params: any) {
 
                 // จงตาบอด ไม่ให้ดูสัญลักษณ์
                 if (data[p]['blind']) {
-                    console.log('found blind')
-                    console.log('uid', currentUid)
-                    console.log('target uid', data[p]['blind']['target'])
                     if (data[p]['blind']['turn'] >= 1 && currentUid == data[p]['blind']['target']) {
                         setBlinding(true)
                     }
                     if (data[p]['blind']['turn'] >= 3 && currentUid == data[p]['blind']['target']) {
-                        console.log('blind > 3')
                         setBlinding(false) // กลับมาแดงผล
                         remove(ref(db, `Matching/${roomId}/effect/${p}/blind`));
                     }
@@ -712,7 +743,7 @@ export default function TicTacToe(params: any) {
                     </div>
                     <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                         <div>
-                            {x && o ? (xTurn ? player[x].username : player[o].username) : ''}
+                            {x && o ? (xTurn ? nameX : nameO) : ''}
                         </div>
                         <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `block` : `hidden`}`}>
                             {[...Array(point)].map((v, idx: number) => {
@@ -735,7 +766,7 @@ export default function TicTacToe(params: any) {
                         </div>
                         <div className={`w-48 h-16 pl-12 border ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `border-black bg-white text-black` : `border-white bg-black text-white`} -translate-x-8 flex flex-col gap-1 rounded-lg justify-center`}>
                             <div>
-                                {x && o ? (xTurn ? player[x].username : player[o].username) : ''}
+                            {x && o ? (xTurn ? nameX : nameO) : ''}
                             </div>
                             <div className={`flex gap-1 ${(xTurn && x == currentUid) || (!xTurn && o == currentUid) ? `block` : `hidden`}`}>
                                 {[...Array(point)].map((v, idx: number) => {
@@ -783,7 +814,9 @@ export default function TicTacToe(params: any) {
                             o={o}
                             currentUid={currentUid}
                             player={player}
-                            
+                            imgX={imgX}
+                            imgO={imgO}
+
                             roomId={roomId}
                             db={db}
                             blinding={blinding}
@@ -812,7 +845,7 @@ export default function TicTacToe(params: any) {
                         </div>
                     </div>
 
-                    <div className="cursor-pointer" onClick={() => { addCard(card[4], 'player1') }}>test add card to X</div>
+                    <div className="cursor-pointer" onClick={() => { addCard(card[2], 'player1') }}>test add card to X</div>
                     {/* <div className="cursor-pointer" onClick={() => { deleteCard(0, 'player1') }}>test delete 1 card X</div> */}
                     <div className="cursor-pointer" onClick={() => { blind() }}>test function ตาบอด</div>
 

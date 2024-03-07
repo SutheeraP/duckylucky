@@ -16,7 +16,9 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard, swapXO, increaseActionPoint, bombRandomBoard, building, increaseAngelCard} = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, 
+        gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard, 
+        swapXO, increaseActionPoint, bombRandomBoard, building, increaseAngelCard, imgX, imgO} = props;
 
     useEffect(() => {
         checkWinner()
@@ -25,8 +27,8 @@ const Board = (props: any) => {
 
     const updateBoardData = (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
-            let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
-            if (boardData[idx] != player[o].profile_img && boardData[idx] != player[x].profile_img && !won){
+            let value = xTurn === true ? imgX : imgO;
+            if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
                 if (boardData[idx]){
                     console.log('check value of board ', boardData[idx])
                     resetBoard()
@@ -76,7 +78,7 @@ const Board = (props: any) => {
                     <div className="self-center text-2xl">
                         {/* ไม่มีข้อมูลมั้ย */}
                         <Image className={`${boardData[idx] == `` ? `hidden` : `block`} 
-                        ${(x == currentUid && boardData[idx] == player[x].profile_img) || (o == currentUid && boardData[idx] == player[o].profile_img) ? `greyscale-0`:`grayscale`}`} 
+                        ${(x == currentUid && boardData[idx] == imgX) || (o == currentUid && boardData[idx] == imgO) ? `greyscale-0`:`grayscale`}`} 
                         
                         src={`${blinding? '/image/icon/waitP2.svg' : boardData[idx]}`} 
                         alt="" 
