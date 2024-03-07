@@ -103,6 +103,7 @@ export default function TicTacToe(params: any) {
         // updateBoard()
         // console.log(boardData)
         // updateBoard()
+        console.log('push turn')
         update(ref(db, `Matching/${roomId}`), {
             currentTurn: !xTurn
         })
@@ -368,7 +369,7 @@ export default function TicTacToe(params: any) {
                     }
                 }
             }
-            else{
+            else {
                 // เซ็ตเกมถ้ายังไม่มีบอด
                 update(ref(db, `Matching/${roomId}`), {
                     board: boardData
@@ -384,12 +385,18 @@ export default function TicTacToe(params: any) {
                     currentTurn: true
                 })
 
+                // สร้าง action และ deciding
+                update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
+                    action: 5,
+                    phrase: 'Deciding'
+                })
+
                 const cardX1 = randomCard();
                 const cardX2 = randomCard();
                 const cardO1 = randomCard();
                 const cardO2 = randomCard();
 
-                // ใส่ db
+                // สร้าง card สามใบแรก
                 update(ref(db, `Matching/${roomId}/card`), {
                     player1: [card[0], card[cardX1], card[cardX2]],
                     player2: [card[0], card[cardO1], card[cardO2]]
@@ -401,7 +408,7 @@ export default function TicTacToe(params: any) {
         onValue(turnRef, (snapshot: any) => {
             const data = snapshot.val();
 
-            // สร้าง player action
+            // update player action
             update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
                 action: 5,
                 phrase: 'Deciding'
@@ -521,6 +528,14 @@ export default function TicTacToe(params: any) {
     }, [cardX, cardO]);
 
 
+    useEffect(() => {
+        update(ref(db, `Matching/${roomId}`), {
+            board: boardData
+        })
+        update(ref(db, `Matching/${roomId}`), {
+            currentTurn: !xTurn
+        })
+    }, [boardData]);
     const addCard = async (card: Object, target: string) => {
         // ex. addcard(card[1], 'player1')
         // ps. player 1 = x, player2 = o
