@@ -16,7 +16,8 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db } = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, updateBoard, 
+        roomId, db, blinding } = props;
 
     useEffect(() => {
         checkWinner()
@@ -64,7 +65,14 @@ const Board = (props: any) => {
             {[...Array(16)].map((v, idx: number) => {
                 return <div key={idx} className={`${selectedCard === `` ? 'w-20 h-20' : 'w-12 h-12'} cursor-pointer relative flex justify-center`} onClick={gameStatus == 'Playing' ? () => { updateBoardData(idx) } : undefined}>
                     <div className="self-center text-2xl">
-                        <Image className={`${boardData[idx] == `` ? `hidden` : `block`} ${(x == currentUid && boardData[idx] == player[x].profile_img) || (o == currentUid && boardData[idx] == player[o].profile_img) ? `greyscale-0`:`grayscale`}`} src={boardData[idx]} alt="" width={selectedCard === `` ? 50 : 30} height={selectedCard === `` ? 50 : 30} />
+                        {/* ไม่มีข้อมูลมั้ย */}
+                        <Image className={`${boardData[idx] == `` ? `hidden` : `block`} 
+                        ${(x == currentUid && boardData[idx] == player[x].profile_img) || (o == currentUid && boardData[idx] == player[o].profile_img) ? `greyscale-0`:`grayscale`}`} 
+                        
+                        src={`${blinding? '/image/icon/waitP2.svg' : boardData[idx]}`} 
+                        alt="" 
+                        width={selectedCard === `` ? 50 : 30} 
+                        height={selectedCard === `` ? 50 : 30} />
                     </div>
                     <Image src={`/image/board/grid${idx + 1}.svg`} alt="" width={80} height={80} className="absolute top-0 left-0" />
                 </div>

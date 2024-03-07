@@ -21,6 +21,7 @@ export default function TicTacToe(params: any) {
     const [x, setX] = useState('');
     const [o, setO] = useState('');
     const [enemyId, setEnemyId] = useState('');
+    const [myPlayer, setMyPlayer] = useState('');
     let player = ''
     // x กับ o คือ ตัว user ที่มาเล่น
     const [currentUid, setCurrentUid] = useState<any>()
@@ -44,6 +45,9 @@ export default function TicTacToe(params: any) {
     const [cardX, setCardX] = useState<CardType[]>([]);
     const [cardO, setCardO] = useState<CardType[]>([]);
     const [cardEnemy, setCardEnemy] = useState<CardType[]>([]);
+
+    // for effect
+    const [blinding, setBlinding] = useState(false)
 
     const session = useSession({
         required: true,
@@ -357,7 +361,6 @@ export default function TicTacToe(params: any) {
                 setBoardData(data)
             }
             else {
-                // เซ็ตเกมถ้ายังไม่มีบอด
                 update(ref(db, `Matching/${roomId}`), {
                     board: boardData
                 })
@@ -402,7 +405,7 @@ export default function TicTacToe(params: any) {
             })
 
             setXTurn(data) // update turn ในเกม
-            updateEffectTurn() // update turn ในเอฟเฟคที่ทำงานอยู่
+            effectTurn() // update turn ในเอฟเฟคที่ทำงานอยู่
         })
 
         //time listener
@@ -447,11 +450,13 @@ export default function TicTacToe(params: any) {
 
         });
 
+        // action listener
         onValue(actionRef, (snapshot: any) => {
             const data = snapshot.val();
-            // console.log('data action', data)
-            if (data) {
-                setGameStatus(data.PlayerActionInTurn.phrase)
+            if (data && data.PlayerActionInTurn) {
+                if (data.PlayerActionInTurn.phrase) {
+                    setGameStatus(data.PlayerActionInTurn.phrase)
+                }
                 if (!data.PlayerActionInTurn.action) {
                     setPoint(0)
                 }
@@ -464,39 +469,7 @@ export default function TicTacToe(params: any) {
         //effect listener
         onValue(effectRef, (snapshot: any) => {
             const data = snapshot.val();
-            if (data) {
-                console.log('data effect found')
-
-                //คำสาปแม่มด ห้ามใช้การ์ด
-                if (data.blockCard) {
-                    if (data.blockCard.turn == 2 && currentUid == data.blockCard.target) {
-                        // ปรับ point เปน 0
-                        update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
-                            action: 0
-                        })
-                    }
-                    if (data.blockCard.turn >= 3) {
-                        remove(ref(db, `Matching/${roomId}/effect/blockCard`));
-                    }
-                }
-
-                // จงตาบอด ไม่ให้ดูสัญลักษณ์
-                if (data.blind) {
-                    if (data.blind.turn >= 1 && currentUid == data.blind.target) {
-                        console.log('update action 0')
-                        update(ref(db, `Matching/${roomId}/effect/blind`), {
-                            //ปรับบอดเป็นสัญลักดียวกันหมด
-                        })
-                    }
-                    if (data.blind.turn >= 3) {
-                        update(ref(db, `Matching/${roomId}/effect/blind`), {
-                            //ให้กลับมาแสดงผล
-                        })
-                        remove(ref(db, `Matching/${roomId}/effect/blind`));
-                    }
-                }
-            }
-
+            if (data) { effectWork(data) }
         })
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
@@ -506,11 +479,13 @@ export default function TicTacToe(params: any) {
             setInhandCard(cardX)
             setCardEnemy(cardO)
             setEnemyId(o)
+            setMyPlayer('player1')
         }
         if (o == currentUid) {
             setInhandCard(cardO)
             setCardEnemy(cardX)
             setEnemyId(x)
+            setMyPlayer('player2')
         }
     }, [cardX, cardO]);
 
@@ -559,7 +534,7 @@ export default function TicTacToe(params: any) {
 
     // การ์ดแม่มดน้ำเงิน
     const blockCard = async () => {
-        update(ref(db, `Matching/${roomId}/effect/blockCard`), {
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/blockCard`), {
             turn: 1,
             target: enemyId
         })
@@ -567,42 +542,71 @@ export default function TicTacToe(params: any) {
 
     // การ์ดจงตาบอด
     const blind = async () => {
-        update(ref(db, `Matching/${roomId}/effect/blind`), {
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/blind`), {
             turn: 1,
             target: enemyId
         })
     }
 
     // ไว้ update turn ให้การ์ดที่ทำงานอยู่
-    const updateEffectTurn = async () => {
+    const effectTurn = async () => {
         const data = (await get(effectRef)).val()
+        let playerSet = ['player1', 'player2']
         if (data) {
-            if (data.blockCard) {
-                update(ref(db, `Matching/${roomId}/effect/blockCard`), {
-                    turn: data.blockCard.turn + 1
-                })
-            }
-            if (data.blind) {
-                update(ref(db, `Matching/${roomId}/effect/blind`), {
-                    turn: data.blind.turn + 1
-                })
-            }
+            playerSet.forEach(p => {
+                if (data[p]) {
+                    if (data[p]['blockCard']) {
+                        update(ref(db, `Matching/${roomId}/effect/${p}/blockCard`), {
+                            turn: data[p]['blockCard']['turn'] + 1
+                        })
+                    }
+                    if (data[p]['blind']) {
+                        update(ref(db, `Matching/${roomId}/effect/${p}/blind`), {
+                            turn: data[p]['blind']['turn'] + 1
+                        })
+                    }
+                }
+            });
         }
+    }
+
+    // ทำงาน effect ทุกอย่าง
+    const effectWork = async (data: any) => {
+        let player = ['player1', 'player2']
+        player.forEach(p => {
+            if (data[p]) {
+
+                // คำสาปแม่มด ห้ามใช้การ์ด
+                if (data[p]['blockCard']) {
+                    if (data[p]['blockCard']['turn'] == 2 && currentUid == data[p]['blockCard']['target']) {
+                        // ปรับ point เปน 0
+                        update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
+                            action: 0
+                        })
+                    }
+                    if (data[p]['blockCard']['turn'] >= 3) {
+                        remove(ref(db, `Matching/${roomId}/effect/${p}/blockCard`));
+                    }
+                }
+
+                // จงตาบอด ไม่ให้ดูสัญลักษณ์
+                if (data[p]['blind']) {
+                    if (data[p]['blind']['turn'] >= 1 && currentUid == data[p]['blind']['target']) {
+                        setBlinding(true)
+                    }
+                    if (data[p]['blind']['turn'] >= 3 && currentUid == data[p]['blind']['target']) {
+                        setBlinding(false) // กลับมาแดงผล
+                        remove(ref(db, `Matching/${roomId}/effect/${p}/blind`));
+                    }
+                }
+            }
+
+        })
+
 
     }
 
-    const updateBoard = async () => {
-        update(ref(db, `Matching/${roomId}`), {
-            board: boardData
-        })
-        update(ref(db, `Matching/${roomId}`), {
-            currentTurn: !xTurn
-        })
-        update(ref(db, `Matching/${roomId}`), {
-            time: 20
-        })
 
-    }
 
     // const updateBoard = async () => {
     //     // console.log(xTurn, x, currentUid)
@@ -884,7 +888,6 @@ export default function TicTacToe(params: any) {
                             boardData={boardData}
                             result={result}
                             // setXTurn={setXTurnbyBoard}
-                            updateBoard={updateBoard}
                             setWon={setWonbyBoard}
                             setDraw={setDrawbyBoard}
                             setBoardData={setBoardDatabyBoard}
@@ -898,6 +901,7 @@ export default function TicTacToe(params: any) {
                             player={player}
                             roomId={roomId}
                             db={db}
+                            blinding={blinding}
 
                         />
 
