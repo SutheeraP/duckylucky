@@ -27,10 +27,8 @@ const Board = (props: any) => {
 
             if (!boardData[idx] && !won) {
                 let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
-                // ใส่ตำแหน่งใหม่ทุกแันลงในบอด
+                // ใส่ตำแหน่งที่กดลงในบอด
                 setBoardData(idx, value)
-                // setXTurnbyBoard()
-                // setXTurn()
             }
         }
         

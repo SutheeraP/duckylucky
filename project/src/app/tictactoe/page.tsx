@@ -99,14 +99,14 @@ export default function TicTacToe(params: any) {
         15: ``
     });
 
-    const setXTurnbyBoard = () => {
-        // updateBoard()
-        // console.log(boardData)
-        // updateBoard()
-        console.log('push turn')
-        update(ref(db, `Matching/${roomId}`), {
-            currentTurn: !xTurn
-        })
+    // const setXTurnbyBoard = () => {
+    //     // updateBoard()
+    //     // console.log(boardData)
+    //     // updateBoard()
+    //     console.log('push turn')
+    //     update(ref(db, `Matching/${roomId}`), {
+    //         currentTurn: !xTurn
+        // })
         // update(ref(db, `Matching/${roomId}`), {
         //     time: 20
         // })
@@ -133,7 +133,7 @@ export default function TicTacToe(params: any) {
         //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
         //     return
         // }
-    }
+    // }
 
     const resetbyBoard = () => {
         setXTurn(true)
@@ -527,7 +527,7 @@ export default function TicTacToe(params: any) {
         }
     }, [cardX, cardO]);
 
-
+    // board change -> update to DB
     useEffect(() => {
         update(ref(db, `Matching/${roomId}`), {
             board: boardData
@@ -535,7 +535,11 @@ export default function TicTacToe(params: any) {
         update(ref(db, `Matching/${roomId}`), {
             currentTurn: !xTurn
         })
+        update(ref(db, `Matching/${roomId}`), {
+            time: 20
+        })
     }, [boardData]);
+
     const addCard = async (card: Object, target: string) => {
         // ex. addcard(card[1], 'player1')
         // ps. player 1 = x, player2 = o
@@ -638,30 +642,30 @@ export default function TicTacToe(params: any) {
     // }
     // updateBoard()
 
-    const updateBoard = async () => {
-        // console.log(xTurn, x, currentUid)
-        const MatchRef = ref(db, `Matching/${roomId}/board`);
-        const match = (await get(MatchRef)).val()
-        if (match) {
-            for (let i = 0; i < 16; i++) {
-                if (Object.values(match)[i] != Object.values(boardData)[i]) {
-                    if (xTurn != undefined && currentUid != undefined) {
+    // const updateBoard = async () => {
+    //     // console.log(xTurn, x, currentUid)
+    //     const MatchRef = ref(db, `Matching/${roomId}/board`);
+    //     const match = (await get(MatchRef)).val()
+    //     if (match) {
+    //         for (let i = 0; i < 16; i++) {
+    //             if (Object.values(match)[i] != Object.values(boardData)[i]) {
+    //                 if (xTurn != undefined && currentUid != undefined) {
 
-                        if (!xTurn && x == currentUid) {
-                            update(ref(db, `Matching/${roomId}`), {
-                                board: boardData
-                            })
-                        }
-                        else if (xTurn && o == currentUid) {
-                            update(ref(db, `Matching/${roomId}`), {
-                                board: boardData
-                            })
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                     if (!xTurn && x == currentUid) {
+    //                         update(ref(db, `Matching/${roomId}`), {
+    //                             board: boardData
+    //                         })
+    //                     }
+    //                     else if (xTurn && o == currentUid) {
+    //                         update(ref(db, `Matching/${roomId}`), {
+    //                             board: boardData
+    //                         })
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     // const updateAction = async () => {
 
@@ -917,7 +921,7 @@ export default function TicTacToe(params: any) {
                             draw={draw}
                             boardData={boardData}
                             result={result}
-                            setXTurn={setXTurnbyBoard}
+                            // setXTurn={setXTurnbyBoard}
                             setWon={setWonbyBoard}
                             setDraw={setDrawbyBoard}
                             setBoardData={setBoardDatabyBoard}
