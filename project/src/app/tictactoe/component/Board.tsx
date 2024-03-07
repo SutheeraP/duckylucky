@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { useEffect } from "react"
+import { ref, update } from "firebase/database";
 
 const WINNING_COMBO = [
     [0, 1, 2, 3],
@@ -15,7 +16,7 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, setXTurnbyBoard } = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db } = props;
 
     useEffect(() => {
         checkWinner()
@@ -24,11 +25,18 @@ const Board = (props: any) => {
 
     const updateBoardData = (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
-
             if (!boardData[idx] && !won) {
                 let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
-                // ใส่ตำแหน่งที่กดลงในบอด
-                setBoardData(idx, value)
+                // กดแล้วอัพเดตช่องนั้นใน db & เปลี่ยน turn
+                update(ref(db, `Matching/${roomId}/board`), {
+                    [idx]: value
+                })
+                update(ref(db, `Matching/${roomId}`), {
+                    currentTurn: !xTurn
+                })
+                update(ref(db, `Matching/${roomId}`), {
+                    time: 20
+                })
             }
         }
         

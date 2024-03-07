@@ -106,33 +106,33 @@ export default function TicTacToe(params: any) {
     //     console.log('push turn')
     //     update(ref(db, `Matching/${roomId}`), {
     //         currentTurn: !xTurn
-        // })
-        // update(ref(db, `Matching/${roomId}`), {
-        //     time: 20
-        // })
-        // setGameStatus('Deciding')
-        // setPoint(5)
+    // })
+    // update(ref(db, `Matching/${roomId}`), {
+    //     time: 20
+    // })
+    // setGameStatus('Deciding')
+    // setPoint(5)
 
-        // if (xTurn && x == currentUid) {
-        //     update(ref(db, `Matching/${roomId}`), {
-        //         currentTurn: !xTurn
-        //     })
-        //     update(ref(db, `Matching/${roomId}`), {
-        //         time: 20
-        //     })
-        //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-        //     return
-        // }
-        // if (!xTurn && o == currentUid) {
-        //     update(ref(db, `Matching/${roomId}`), {
-        //         currentTurn: !xTurn
-        //     })
-        //     update(ref(db, `Matching/${roomId}`), {
-        //         time: 20
-        //     })
-        //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-        //     return
-        // }
+    // if (xTurn && x == currentUid) {
+    //     update(ref(db, `Matching/${roomId}`), {
+    //         currentTurn: !xTurn
+    //     })
+    //     update(ref(db, `Matching/${roomId}`), {
+    //         time: 20
+    //     })
+    //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
+    //     return
+    // }
+    // if (!xTurn && o == currentUid) {
+    //     update(ref(db, `Matching/${roomId}`), {
+    //         currentTurn: !xTurn
+    //     })
+    //     update(ref(db, `Matching/${roomId}`), {
+    //         time: 20
+    //     })
+    //     remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
+    //     return
+    // }
     // }
 
     const resetbyBoard = () => {
@@ -171,7 +171,6 @@ export default function TicTacToe(params: any) {
         setBoardData({ ...boardData, [idx]: value });
         console.log(idx)
         console.log(value)
-
     }
 
     const setResultbyBoard = (string: string) => {
@@ -335,7 +334,7 @@ export default function TicTacToe(params: any) {
     // for check function
 
 
-    // use effect นี้น่าจะใส่ onvalue ทุกอย่างได้ลย ไม่ชนกัน
+    // รวมดัก onvalue
     useEffect(() => {
         // get x และ o เซ็ตครั้งเดียว
         const getPlayer = async () => {
@@ -355,19 +354,7 @@ export default function TicTacToe(params: any) {
         onValue(boardRef, (snapshot: any) => {
             const data = snapshot.val();
             if (data) {
-                for (let i = 0; i < 16; i++) {
-                    if (Object.values(data)[i] != Object.values(boardData)[i]) {
-                        if (xTurn != undefined && currentUid != undefined) {
-                            if (!xTurn && x != currentUid) {
-                                setBoardData(data)
-                            }
-                            else if (xTurn && o != currentUid) {
-                                setBoardData(data)
-                            }
-                        }
-                        return;
-                    }
-                }
+                setBoardData(data)
             }
             else {
                 // เซ็ตเกมถ้ายังไม่มีบอด
@@ -527,19 +514,6 @@ export default function TicTacToe(params: any) {
         }
     }, [cardX, cardO]);
 
-    // board change -> update to DB
-    useEffect(() => {
-        update(ref(db, `Matching/${roomId}`), {
-            board: boardData
-        })
-        update(ref(db, `Matching/${roomId}`), {
-            currentTurn: !xTurn
-        })
-        update(ref(db, `Matching/${roomId}`), {
-            time: 20
-        })
-    }, [boardData]);
-
     const addCard = async (card: Object, target: string) => {
         // ex. addcard(card[1], 'player1')
         // ps. player 1 = x, player2 = o
@@ -617,30 +591,18 @@ export default function TicTacToe(params: any) {
 
     }
 
-    // const updateBoard = async () => {
-    //     const MatchRef = ref(db, `Matching/${roomId}/board`);
-    //     const match = (await get(MatchRef)).val()
+    const updateBoard = async () => {
+        update(ref(db, `Matching/${roomId}`), {
+            board: boardData
+        })
+        update(ref(db, `Matching/${roomId}`), {
+            currentTurn: !xTurn
+        })
+        update(ref(db, `Matching/${roomId}`), {
+            time: 20
+        })
 
-    //     if (match) {
-    //         for (let i = 0; i < 16; i++) {
-    //             if (Object.values(match)[i] != Object.values(boardData)[i]) {
-    //                 if (xTurn != undefined && currentUid != undefined) {
-
-    //                     if (!xTurn && x != currentUid) {
-    //                         setBoardData(match)
-    //                     }
-    //                     else if (xTurn && o != currentUid) {
-    //                         setBoardData(match)
-    //                     }
-    //                 }
-
-    //                 return;
-    //             }
-    //         }
-    //     }
-
-    // }
-    // updateBoard()
+    }
 
     // const updateBoard = async () => {
     //     // console.log(xTurn, x, currentUid)
@@ -922,6 +884,7 @@ export default function TicTacToe(params: any) {
                             boardData={boardData}
                             result={result}
                             // setXTurn={setXTurnbyBoard}
+                            updateBoard={updateBoard}
                             setWon={setWonbyBoard}
                             setDraw={setDrawbyBoard}
                             setBoardData={setBoardDatabyBoard}
@@ -933,6 +896,9 @@ export default function TicTacToe(params: any) {
                             o={o}
                             currentUid={currentUid}
                             player={player}
+                            roomId={roomId}
+                            db={db}
+
                         />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>
