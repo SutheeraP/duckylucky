@@ -26,9 +26,11 @@ const Board = (props: any) => {
 
     const updateBoardData = (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
-            if (!boardData[idx] && !won) {
-                let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
-                // กดแล้วอัพเดตช่องนั้นใน db & เปลี่ยน turn
+            let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
+            if (boardData[idx] != player[o].profile_img && boardData[idx] != player[x].profile_img && !won){
+                if (boardData[idx]){
+                    console.log('use boardFX')
+                }
                 update(ref(db, `Matching/${roomId}/board`), {
                     [idx]: value
                 })
@@ -39,6 +41,31 @@ const Board = (props: any) => {
                     time: 20
                 })
             }
+            // if(boardData[idx] && boardData[idx] != (player[x].profile_img || player[x].profile_img)){
+            //     update(ref(db, `Matching/${roomId}/board`), {
+            //         [idx]: value
+            //     })
+            //     update(ref(db, `Matching/${roomId}`), {
+            //         currentTurn: !xTurn
+            //     })
+            //     update(ref(db, `Matching/${roomId}`), {
+            //         time: 20
+            //     })
+            //     console.log('test')
+            // }
+            // if (!boardData[idx] && !won) {
+            //     // let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
+            //     // กดแล้วอัพเดตช่องนั้นใน db & เปลี่ยน turn
+            //     update(ref(db, `Matching/${roomId}/board`), {
+            //         [idx]: value
+            //     })
+            //     update(ref(db, `Matching/${roomId}`), {
+            //         currentTurn: !xTurn
+            //     })
+            //     update(ref(db, `Matching/${roomId}`), {
+            //         time: 20
+            //     })
+            // }
         }
         
         checkWinner()
