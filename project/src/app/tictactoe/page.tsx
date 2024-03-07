@@ -263,14 +263,6 @@ export default function TicTacToe(params: any) {
         update(ref(db, `Matching/${roomId}`), {
             time: 20
         })
-        if (xTurn && x == currentUid) {
-            remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-            return
-        }
-        if (!xTurn && o == currentUid) {
-            remove(ref(db, `Matching/${roomId}/player/PlayerActioninTurn`));
-            return
-        }
     }
 
     const [selectedCard, setSelectedCard] = useState<any>(``);
@@ -307,6 +299,7 @@ export default function TicTacToe(params: any) {
         }
     }
 
+    // time countdown
     useEffect(() => {
         const countdown = setTimeout(() => {
             if (timeLeft === 0) {
@@ -339,6 +332,7 @@ export default function TicTacToe(params: any) {
 
     }, [xTurn, timeLeft]);
 
+    // all ref
     const gameRef = ref(db, `Matching/${roomId}`);
     const cardRef = ref(db, `Matching/${roomId}/card`);
     const turnRef = ref(db, `Matching/${roomId}/currentTurn`);
@@ -352,17 +346,6 @@ export default function TicTacToe(params: any) {
 
     // รวมดัก onvalue
     useEffect(() => {
-        
-        // if(x == currentUid){
-        //     // console.log('')
-        //     const numBoard = [...randomBoard()]
-        //     console.log('numBoard is', numBoard)
-        //     for (let board of numBoard){
-        //         console.log('board is ',board)
-        //         setBoardDatabyBoard(board, '/image/displayFX/displayFX1.svg')
-        //         console.log('test board')
-        //     }
-        // }
         
         // get x และ o เซ็ตครั้งเดียว
         const getPlayer = async () => {
@@ -530,7 +513,7 @@ export default function TicTacToe(params: any) {
             const data = snapshot.val();
             if (data) { effectWork(data) }
         })
-    }, []); // มี uid แล้วรันครั้งแรก
+    }, currentUid); // มี uid แล้วรันครั้งแรก
 
     // update card ตามฝั่ง
     useEffect(() => {
@@ -683,10 +666,14 @@ export default function TicTacToe(params: any) {
 
                 // จงตาบอด ไม่ให้ดูสัญลักษณ์
                 if (data[p]['blind']) {
+                    console.log('found blind')
+                    console.log('uid', currentUid)
+                    console.log('target uid', data[p]['blind']['target'])
                     if (data[p]['blind']['turn'] >= 1 && currentUid == data[p]['blind']['target']) {
                         setBlinding(true)
                     }
                     if (data[p]['blind']['turn'] >= 3 && currentUid == data[p]['blind']['target']) {
+                        console.log('blind > 3')
                         setBlinding(false) // กลับมาแดงผล
                         remove(ref(db, `Matching/${roomId}/effect/${p}/blind`));
                     }
