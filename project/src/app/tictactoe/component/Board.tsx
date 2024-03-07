@@ -15,7 +15,7 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player } = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, gameStatus, selectedCard, x, o, currentUid, player, setXTurnbyBoard } = props;
 
     useEffect(() => {
         checkWinner()
@@ -28,7 +28,8 @@ const Board = (props: any) => {
             if (!boardData[idx] && !won) {
                 let value = xTurn === true ? player[x].profile_img : player[o].profile_img;
                 setBoardData(idx, value)
-                setXTurn()
+                // setXTurnbyBoard()
+                // setXTurn()
             }
         }
         checkWinner()
