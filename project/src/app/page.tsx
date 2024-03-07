@@ -86,8 +86,10 @@ export default function Home() {
           let obj = data[key] as Inviter
           setInvite(obj.roomId)
           // console.log(obj)
+          return;
         }
-      });
+      }
+      );
     }
   }
 

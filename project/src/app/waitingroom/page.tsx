@@ -205,20 +205,32 @@ const Waiting = (prop: any) => {
 
                 }
             }
-            let thisRoom = `${intend}-${uuidv4()}`
-            setRoomId(thisRoom)
-            set(ref(db, `waitingRoom/${thisRoom}`), {
-                owner: `${currentUid}`
-            });
-            return;
+            if (intend == 'custom' || intend == 'challenger') {
+                let thisRoom = `${intend}-${uuidv4()}`
+                setRoomId(thisRoom)
+                set(ref(db, `waitingRoom/${thisRoom}`), {
+                    owner: `${currentUid}`
+                });
+                return;
+            }
+            else {
+                router.push('/')
+            }
+
         } else {
             let thisRoom = `${intend}-${uuidv4()}`
             await setRoomId(thisRoom)
-            set(ref(db, `waitingRoom/${thisRoom}`), {
-                owner: `${currentUid}`
-            });
-            console.log('eiei')
-            return;
+            if (intend == 'custom' || intend == 'challenge') {
+                let thisRoom = `${intend}-${uuidv4()}`
+                setRoomId(thisRoom)
+                set(ref(db, `waitingRoom/${thisRoom}`), {
+                    owner: `${currentUid}`
+                });
+                return;
+            }
+            else {
+                router.push('/')
+            }
 
         }
     };
