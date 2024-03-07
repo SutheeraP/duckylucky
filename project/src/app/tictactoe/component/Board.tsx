@@ -29,6 +29,15 @@ const Board = (props: any) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
+                update(ref(db, `Matching/${roomId}/board`), {
+                    [idx]: value
+                })
+                update(ref(db, `Matching/${roomId}`), {
+                    currentTurn: !xTurn
+                })
+                update(ref(db, `Matching/${roomId}`), {
+                    time: 20
+                })
                 if (boardData[idx]){
                     console.log('check value of board ', boardData[idx])
                     resetBoard()
@@ -40,15 +49,6 @@ const Board = (props: any) => {
                     // console.log('check value of board ', boardData[idx])
                     // console.log('use boardFX')
                 }
-                update(ref(db, `Matching/${roomId}/board`), {
-                    [idx]: value
-                })
-                update(ref(db, `Matching/${roomId}`), {
-                    currentTurn: !xTurn
-                })
-                update(ref(db, `Matching/${roomId}`), {
-                    time: 20
-                })
             }
         }
         

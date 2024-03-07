@@ -644,6 +644,7 @@ export default function TicTacToe(params: any) {
 
     // FX พายุฤดูร้อน
     const resetBoard = async () => {
+        console.log('callresetBoard')
         update(ref(db, `Matching/${roomId}/effect/${myPlayer}/resetBoard`), {
             turn: 1,
             taget: currentUid
@@ -699,6 +700,7 @@ export default function TicTacToe(params: any) {
 
     // ทำงาน effect ทุกอย่าง
     const effectWork = async (data: any) => {
+        const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
         let player = ['player1', 'player2']
         player.forEach(p => {
             if (data[p]) {
@@ -725,6 +727,26 @@ export default function TicTacToe(params: any) {
                         setBlinding(false) // กลับมาแดงผล
                         remove(ref(db, `Matching/${roomId}/effect/${p}/blind`));
                     }
+                }
+
+                // FX พายุฤดูร้อน
+                if (data[p]['resetBoard']) {
+                    for (let i = 0 ; i < 16 ; i++){
+                        console.log(i)
+                        if ((Object.values(dbBoard)[i] == '/image/displayFX/displayFX1.svg') || 
+                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX2.svg') || 
+                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX3.svg') || 
+                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX4.svg') || 
+                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX5.svg') || 
+                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX6.svg')){
+                        }
+                        else {
+                            update(ref(db, `Matching/${roomId}/board`), {
+                                [i]: ''
+                            })
+                        }
+                    }
+                    remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
                 }
             }
 
