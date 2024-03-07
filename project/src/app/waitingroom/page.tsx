@@ -190,7 +190,7 @@ const Waiting = (prop: any) => {
                         setRoomId(roomid)
                         return;
                     }
-                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomid.includes('custom') && intend != 'custom') {
+                    else if (!(info as any).challenger && (info as any).owner != currentUid && !roomid.includes('custom') && !intend.includes('custom')) {
                         const db = getDatabase();
                         update(ref(db, `waitingRoom/${roomid}`), {
                             challenger: `${currentUid}`
