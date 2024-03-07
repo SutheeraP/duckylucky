@@ -89,6 +89,7 @@ const Waiting = (prop: any) => {
                                         player1: data[room]['owner'],
                                         player2: data[room]['challenger']
                                     });
+                                    setCurrentUid('remove')
                                     remove(ref(db, `waitingRoom/${room}`));
                                     router.push(`/tictactoe?match=${room}`)
                                 }
@@ -138,23 +139,23 @@ const Waiting = (prop: any) => {
         email: string;
         profile_img: string;
         username: string;
-      }
+    }
 
     const readData = (data: Record<string, unknown>) => {
         Object.keys(data).forEach((key) => {
-          let obj = data[key] as User
-          if (p1username == "Loading..." && obj.email === emailAuth) {
-            setCurrentUid(key)
-            setP1Username(obj.username)
-            setP1Img(obj.profile_img)
-          }
+            let obj = data[key] as User
+            if (p1username == "Loading..." && obj.email === emailAuth) {
+                setCurrentUid(key)
+                setP1Username(obj.username)
+                setP1Img(obj.profile_img)
+            }
         });
-      }
+    }
 
-      onValue(userListRef, (snapshot: any) => {
+    onValue(userListRef, (snapshot: any) => {
         const data = snapshot.val();
         readData(data)
-      });
+    });
 
     // }, [])
 
@@ -201,6 +202,7 @@ const Waiting = (prop: any) => {
                         setRoomId(roomid)
                         return;
                     }
+
                 }
             }
             let thisRoom = `${intend}-${uuidv4()}`
@@ -211,22 +213,26 @@ const Waiting = (prop: any) => {
             return;
         } else {
             let thisRoom = `${intend}-${uuidv4()}`
-            setRoomId(thisRoom)
+            await setRoomId(thisRoom)
             set(ref(db, `waitingRoom/${thisRoom}`), {
                 owner: `${currentUid}`
             });
+            console.log('eiei')
             return;
+
         }
     };
 
     useEffect(() => {
-
         console.log(currentUid)
         if (currentUid && currentUid != 'remove') {
-            console.log('waiting...')
-            findWaitingRoom()
-            updateDataU()
-            console.log('finding another player...')
+            const countdown = setTimeout(() => {
+                console.log('waiting...')
+                findWaitingRoom()
+                updateDataU()
+                console.log('finding another player...')
+            }, 1000)
+            return () => clearTimeout(countdown);
         }
     }, [currentUid])
 
@@ -238,6 +244,7 @@ const Waiting = (prop: any) => {
         let rooms = null;
         let invites = null
         console.log("Exit")
+        await setCurrentUid('remove')
         await onValue(RoomRef, (snapshot: any) => {
             rooms = snapshot.val();
         });
