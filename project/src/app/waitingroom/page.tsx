@@ -205,7 +205,7 @@ const Waiting = (prop: any) => {
 
                 }
             }
-            if (intend == 'custom' || intend == 'challenger') {
+            if (intend == 'custom' || intend == 'challenge') {
                 let thisRoom = `${intend}-${uuidv4()}`
                 setRoomId(thisRoom)
                 set(ref(db, `waitingRoom/${thisRoom}`), {
