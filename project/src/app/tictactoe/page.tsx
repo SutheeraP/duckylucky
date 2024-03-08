@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useState, useEffect } from "react"
 import Background from "../component/Background";
 import { start } from "repl";
+import { WindSong } from "@next/font/google";
 
 export default function TicTacToe(params: any) {
     // console.log('auto repage')
@@ -345,17 +346,19 @@ export default function TicTacToe(params: any) {
     // time countdown
     useEffect(() => {
         const countdown = setTimeout(() => {
-            if (timeLeft === 0) {
-                update(ref(db, `Matching/${roomId}`), {
-                    currentTurn: !xTurn
-                })
-                update(ref(db, `Matching/${roomId}`), {
-                    time: 20
-                })
-            } else {
-                update(ref(db, `Matching/${roomId}`), {
-                    time: timeLeft - 1
-                })
+            if (winner == '') {
+                if (timeLeft === 0) {
+                    update(ref(db, `Matching/${roomId}`), {
+                        currentTurn: !xTurn
+                    })
+                    update(ref(db, `Matching/${roomId}`), {
+                        time: 20
+                    })
+                } else {
+                    update(ref(db, `Matching/${roomId}`), {
+                        time: timeLeft - 1
+                    })
+                }
             }
         }, 1000);
 
@@ -379,19 +382,33 @@ export default function TicTacToe(params: any) {
 
     // อดึงชื่อ/รูปเมื่ออัพเดต x,o
     useEffect(() => {
-
+        console.log('in use effect xo')
         const getUser = async () => {
             const data = (await get(userRef)).val()
             if (data) {
                 if (data[x]) {
-                    console.log('founX')
+                    // console.log('founX')
                     setNameX(data[x]['username'])
                     setImgX(data[x]['profile_img'])
                 }
                 if (data[o]) {
-                    console.log('founO')
+                    // console.log('founO')
                     setNameO(data[o]['username'])
                     setImgO(data[o]['profile_img'])
+                }
+
+
+                if (x == currentUid) {
+                    setEnemyId(o)
+                    setMyPlayer('player1')
+                    setEnemyPlayer('player2')
+                    console.log('set en id here')
+                }
+                else if (o == currentUid) {
+                    setEnemyId(x)
+                    setMyPlayer('player2')
+                    setEnemyPlayer('player1')
+                    console.log('set en id here')
                 }
             }
         }
@@ -592,14 +609,14 @@ export default function TicTacToe(params: any) {
             }
         })
 
-        //score listener มีการอัพเดตครั้งเดียว
+        //score listener 
         onValue(scoreRef, (snapshot: any) => {
             const data = snapshot.val();
             if (data) {
                 if (data[currentUid]) {
                     setMyScore(data[currentUid])
-                    setEnemyScore(data[enemyId])
                 }
+
             }
         })
 
@@ -618,16 +635,10 @@ export default function TicTacToe(params: any) {
         if (x == currentUid) {
             setInhandCard(cardX)
             setCardEnemy(cardO)
-            setEnemyId(o)
-            setMyPlayer('player1')
-            setEnemyPlayer('player2')
         }
         if (o == currentUid) {
             setInhandCard(cardO)
             setCardEnemy(cardX)
-            setEnemyId(x)
-            setMyPlayer('player2')
-            setEnemyPlayer('player1')
         }
     }, [cardX, cardO]);
 
@@ -658,15 +669,6 @@ export default function TicTacToe(params: any) {
     const addCard = async (card: Object, target: string) => {
         // ex. addcard(card[1], 'player1')
         // ps. player 1 = x, player2 = o
-
-        // ดึกจาก state ที่เซ้ตหลักอัพ = ช้าเกิน บายจ้า
-        // let newSet // เซ็ตอัพเดต
-        // if (target == 'player1') {
-        //     newSet = [...cardX, card]
-        // }
-        // else if (target == 'player2') {
-        //     newSet = [...cardO, card]
-        // }
 
         const cardList = (await get(cardRef)).val()
         let newSet // เซ็ตอัพเดต
@@ -995,7 +997,7 @@ export default function TicTacToe(params: any) {
                             swapXO={swapXO}
                             increaseActionPoint={increaseActionPoint}
                             bombRandomBoard={bombRandomBoard}
-                            
+
                         />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>

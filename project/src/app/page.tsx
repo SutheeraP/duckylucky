@@ -20,11 +20,15 @@ export default function Home() {
   })
 
   // base
+    const [currentUid, setcurrentUid] = useState("loading");
   const [status, setStatus] = useState('Loading...');
   const [email, setEmail] = useState("Loading...");
   const [username, setUsername] = useState("Loading...");
   const [img, setImg] = useState("/image/icon1.svg");
-  const [currentUid, setcurrentUid] = useState("loading");
+  const [score, setScore] = useState(0); // คะแนน
+  const [match, setMatch] = useState(0); // match ทั้งหมด
+  const [win, setWin] = useState(0); // ครั้งที่ชนะ
+
 
   // extension
   const [invite, setInvite] = useState('')
@@ -91,6 +95,9 @@ export default function Home() {
         setEmail(data.email)
         setImg(data.profile_img)
         setUsername(data.username)
+        setScore(data.score)
+        setMatch(data.match)
+        setWin(data.win)
 
         setEditIcon(data.profile_img)
         setEditName(data.username)
@@ -245,8 +252,8 @@ export default function Home() {
 
                         <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
                           <div className="text-4xl mb-3 font-medium">{username}</div>
-                          <div>อัตราชนะ <span className="text-primary">xx</span></div>
-                          <div>คะแนน <span className="text-primary">xx</span></div>
+                          <div>อัตราชนะ <span className="text-primary font-bold">xx</span></div>
+                          <div>คะแนน <span className="text-primary font-bold">{score}</span></div>
                         </div>
                       </div>
                     </div>

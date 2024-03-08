@@ -37,7 +37,7 @@ const Board = (props: any) => {
                     let effect = boardFX[effectOnBoard[0]]
                     
                     // ก็อบ listindex ที่จะเอาไปใช้เรียก boardFX มาแล้ว ตัดตัวหน้าออก
-                    let cuteffect =  [...effectOnBoard]
+                    let cuteffect = [...effectOnBoard]
                     cuteffect.shift()
 
                     // update ทับใน db
@@ -61,19 +61,19 @@ const Board = (props: any) => {
 
                     console.log(effect)
                     // เช็คว่าเป็น FX อะไร จาก id ของ effect
-                    if ( effect.id == '1'){
+                    if (effect.id == '1') {
                         console.log('พายุ')
-                        resetBoard() 
+                        resetBoard()
                     }
-                    if ( effect.id == '2'){
+                    if (effect.id == '2') {
                         console.log('เกรซ')
                         swapXO()
                     }
-                    if ( effect.id == '3'){
+                    if (effect.id == '3') {
                         console.log('ราชินี')
                         increaseActionPoint()
                     }
-                    if ( effect.id == '4'){
+                    if (effect.id == '4') {
                         console.log('ระเบิด')
                         bombRandomBoard()
                     }
@@ -115,6 +115,7 @@ const Board = (props: any) => {
 
     const userRef = ref(db, `UserList`);
     const scoreRef = ref(db, `Matching/${roomId}/score`);
+    const playerRef = ref(db, `Matching/${roomId}/player`);
     let idList = [currentUid, enemyId]
     const checkDraw = async () => {
         let check = Object.keys(boardData).every((v) => boardData[v])
@@ -122,10 +123,19 @@ const Board = (props: any) => {
             update(ref(db, `Matching/${roomId}`), {
                 winner: 'draw'
             })
-            update(ref(db, `Matching/${roomId}/score`), {
-                [currentUid]: myScore + 500,
-                [enemyId]: enemyScore + 500
+
+            //  บวกฝั่งละ 500
+            const data = (await get(userRef)).val()
+            const dataScore = (await get(scoreRef)).val()
+            idList.forEach(id => {
+                if (data[id]) {
+                    let oldScore = dataScore[id]
+                    update(ref(db, `Matching/${roomId}/score`), {
+                        [id]: oldScore + 500,
+                    })
+                }
             })
+
             updateUserData()
         }
     }
@@ -147,7 +157,7 @@ const Board = (props: any) => {
         })
     }
 
-    const updateUserData = async() =>{
+    const updateUserData = async () => {
         // update score game เข้า database ทั้ง 2 ผุ้เล่น
         const data = (await get(userRef)).val()
         const dataScore = (await get(scoreRef)).val()
@@ -155,22 +165,20 @@ const Board = (props: any) => {
             idList.forEach(id => {
                 if (data[id]) {
                     let newScore = dataScore[id]
-                    console.log('updareUserStat')
                     let oldScore = data[id]['score']
                     let oldMatch = data[id]['match']
-                    // let oldWin = data[id]['win']
-                    // console.log(oldScore, myScore)
 
                     update(ref(db, `UserList/${id}`), {
                         score: oldScore + newScore,
                         match: oldMatch + 1
                     })
+
                 }
             })
         }
     }
 
-    const updateWin = async() =>{
+    const updateWin = async () => {
         // update จำนวนชนะตัวเอง
         const data = (await get(userRef)).val()
         if (data) {
@@ -183,7 +191,7 @@ const Board = (props: any) => {
         }
     }
 
-    
+
 
     return (
         <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center ">
