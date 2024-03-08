@@ -15,7 +15,7 @@ import React, { useState } from "react";
 //   weight: ["200", "300", "400", "500", "600"],
 // });
 
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue, get } from "firebase/database";
 import Icon from "../component/ImageComp";
 import Background from "../component/Background";
 import ImageComp from "../component/ImageComp";
@@ -32,12 +32,11 @@ export default function Signup() {
   const [color, setcolor] = useState("text-red-600");
   const iconPath = ["/image/icon1.svg", "/image/icon2.svg", "/image/icon3.svg", "/image/icon4.svg", "/image/icon5.svg", "/image/icon6.svg"]
 
-  const checkPW = (value: string) => {
 
+  const checkPW = (value: string) => {
     const lowercaseRegex = /[a-z]/;
     const uppercaseRegex = /[A-Z]/;
     const numericRegex = /[0-9]/;
-    const nonAlphanumericRegex = /[^A-Za-z0-9]/;
     setPassword(value)
     if (!lowercaseRegex.test(value)) {
       setfeedback('รหัสผ่านขาดตัวอักษรพิมพ์เล็ก')
@@ -55,25 +54,40 @@ export default function Signup() {
       setfeedback('')
     }
   }
-  
 
-  const getUsernameList = async () => {
-    let usernameList: string[] = [];
-
-    const userListRef = ref(db, `UserList`);
-    await onValue(userListRef, (snapshot: any) => {
-      const data = snapshot.val();
+  const userRef = ref(db, `UserList`);
+  const getUser = async () => {
+    const data = (await get(userRef)).val()
+    setUsernameList([])
+    if (data) {
       Object.keys(data).forEach((key) => {
         usernameList.push(data[key].username)
       });
-    });
-    // console.log('after get : ', usernameList)
-    return usernameList
+    }
   }
 
+  // const getUsernameList = async () => {
+  //   let usernameList: string[] = [];
+
+
+  //   const userListRef = ref(db, `UserList`);
+  //   await onValue(userListRef, (snapshot: any) => {
+  //     const data = snapshot.val();
+  //     Object.keys(data).forEach((key) => {
+  //       usernameList.push(data[key].username)
+  //     });
+  //   });
+  //   // console.log('after get : ', usernameList)
+  //   return usernameList
+  // }
+  // getUsernameList(); // get
+
   async function signup() {
-    let usernameList = await getUsernameList();
+    await getUser()
+    console.log(usernameList)
+
     if (usernameList.includes(username)) {
+      console.log('uname', username)
       setfeedback('ชื่อผู้ใช้งานซ้ำ')
     }
     else if (password != password2) {
@@ -83,7 +97,7 @@ export default function Signup() {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           var user = userCredential.user;
-          console.log('user', user)
+          // console.log('user', user)
           setcolor('text-green-600')
           setfeedback('สมัครสมาชิกสำเร็จ')
           writeUserData(user.uid, username, email, icon)
@@ -94,7 +108,12 @@ export default function Signup() {
           }, 500)
         })
         .catch((error) => {
-          setfeedback(error.message)
+          if (error.message == 'Firebase: Error (auth/email-already-in-use).') {
+            setfeedback('Email มีผู้ใช้งานแล้ว')
+          }
+          else {
+            setfeedback(error.message)
+          }
         });
     }
     setcolor('text-red-600');
@@ -113,10 +132,8 @@ export default function Signup() {
 
   let clickIcon = (path: any) => {
     setIcon(path)
-    console.log(path)
   }
 
-  getUsernameList(); // get
 
   return (
     <div className=''>
@@ -179,13 +196,13 @@ export default function Signup() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <button
-                        className="disable:opacity-40 px-2 py-3 font-semibold  ring-1 ring-black bg-white rounded-md hover:bg-primary transition duration-200 ease-in-out"
+                        className="disable:opacity-40 px-2 py-2 bg-black text-white  rounded-md hover:bg-primary hover:scale-105 transition duration-200 ease-in-out"
                         onClick={() => router.push("/signin")}
                       >
                         เข้าสู่ระบบ
                       </button>
                       <button
-                        className="disabled:opacity-40 px-2 py-3 font-semibold bg-black text-white  rounded-md"
+                        className="disabled:opacity-40 px-2 py-2 bg-black text-white hover:bg-primary hover:scale-105 rounded-md transition duration-200 ease-in-out"
                         onClick={() => signup()}
                         disabled={!email || !password || !password2 || !username}
                       >

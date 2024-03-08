@@ -2,12 +2,12 @@
 import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { db } from "./firebase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Background from "./component/Background";
 import ImageComp from "./component/ImageComp";
 import { useRouter } from "next/navigation";
 
-import { getDatabase, ref, set, onValue, update, remove, child, get } from "firebase/database";
+import { ref, onValue, update, remove, get } from "firebase/database";
 
 export default function Home() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export default function Home() {
   const [email, setEmail] = useState("Loading...");
   const [username, setUsername] = useState("Loading...");
   const [img, setImg] = useState("/image/icon1.svg");
-  const [currentUid, setcurrentUid] = useState("Loading...");
+  const [currentUid, setcurrentUid] = useState("loading");
 
   // extension
   const [invite, setInvite] = useState('')
@@ -38,8 +38,63 @@ export default function Home() {
   const [color, setcolor] = useState("text-red-600");
 
   // data
-  const userListRef = ref(db, `UserList`);
-  const emailAuth = session?.data?.user?.email;
+
+  const userRef = ref(db, `UserList`);
+
+  // FOR ดึง username?
+  const getUsername = async () => {
+    const data = (await get(userRef)).val()
+    setUsernameList([])
+    if (data) {
+      Object.keys(data).forEach((key) => {
+        usernameList.push(data[key].username)
+      });
+    }
+  }
+
+  // ดึง userid ครั้งแรก
+  useEffect(() => {
+
+    const getUserId = async () => {
+      const data = (await get(userRef)).val()
+      if (data) {
+        Object.keys(data).forEach((key) => {
+          let obj = data[key] as User
+          if (obj.email == session?.data?.user?.email) {
+            setcurrentUid(key)
+          }
+        })
+      }
+    }
+    getUserId()
+
+  }, [session?.data?.user?.email])
+
+
+  // onvalue ปกติ
+  useEffect(() => {
+    // invite listener
+    const inviting = ref(db, `inviting`);
+    onValue(inviting, (snapshot: any) => {
+      const data = snapshot.val();
+      readInvite(data)
+    });
+
+    // user ตัวเอง listener
+    const myRef = ref(db, `UserList/${currentUid}`);
+    onValue(myRef, (snapshot: any) => {
+      const data = snapshot.val();
+      if (data) {
+        // console.log('found id in db')
+        setEmail(data.email)
+        setImg(data.profile_img)
+        setUsername(data.username)
+
+        setEditIcon(data.profile_img)
+        setEditName(data.username)
+      }
+    });
+  }, [currentUid])
 
   interface User {
     email: string;
@@ -50,33 +105,6 @@ export default function Home() {
   interface Inviter {
     inviter: string;
     roomId: string;
-  }
-
-  const readData = (data: Record<string, unknown>) => {
-    console.log(usernameList)
-    if (usernameList.length == 0) {
-      Object.keys(data).forEach((key) => {
-
-        let obj = data[key] as User
-
-        if (usernameList.length == 0) {
-          if (!usernameList.includes(obj.username)) {
-            setUsernameList(prevList => [...prevList, obj.username])
-          }
-        }
-
-
-        if (username == "Loading..." && obj.email === emailAuth) {
-          setcurrentUid(key)
-          setEmail(obj.email)
-          setImg(obj.profile_img)
-          setUsername(obj.username)
-
-          setEditIcon(obj.profile_img)
-          setEditName(obj.username)
-        }
-      });
-    }
   }
 
   const readInvite = (data: Record<string, object>) => {
@@ -93,31 +121,15 @@ export default function Home() {
     }
   }
 
-  const inviting = ref(db, `inviting`);
-  onValue(inviting, (snapshot: any) => {
-    const data = snapshot.val();
-    readInvite(data)
-  });
-
-  onValue(userListRef, (snapshot: any) => {
-    if (username == "Loading...") {
-      const data = snapshot.val();
-      readData(data)
-    }
-
-  });
-
   const removeInvite = () => {
     remove(ref(db, `inviting/${currentUid}`));
   }
 
-  const saveEditProfile = () => {
-    console.log(currentUid, editName, editIcon)
-    console.log(usernameList)
+  const saveEditProfile = async () => {
+    await getUsername()
     // validate username
-
     if (editName != username && usernameList.includes(editName)) {
-      console.log('ซ้ำ')
+      //เปลี่ยนชื่อ แล้วชื่อซ้ำ
       setFeedback('ชื่อผู้ใช้งานซ้ำ')
     }
     else {
@@ -125,8 +137,6 @@ export default function Home() {
         username: editName,
         profile_img: editIcon,
       });
-      console.log('ผ่าน')
-      // setUsernameList([])
       setFeedback('')
       setShowEdit(false)
     }
@@ -135,10 +145,7 @@ export default function Home() {
 
   let clickIcon = (path: string) => {
     setEditIcon(path)
-    // console.log(usernameList)
   }
-
-
 
   return (
     <>
@@ -215,7 +222,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
                   <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
                     <div className="px-3 py-2">
-                      <button onClick={() => { setShowEdit(true); console.log(usernameList) }} className="w-5 mr-2">
+                      <button onClick={() => { setShowEdit(true);}} className="w-5 mr-2">
                         <ImageComp path='/image/icon/setting.svg' />
                       </button>
                       <button onClick={() => { setShowLogout(true) }} className="w-5">
@@ -244,8 +251,8 @@ export default function Home() {
 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                  <button className='ring-2 ring-black rounded-lg bg-white py-2 md:py-4 text-center hover:scale-105' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
-                  <button className="ring-2 ring-black rounded-lg bg-white py-2 md:py-4 hover:scale-105" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
+                  <button className=' rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 text-center hover:scale-105' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
+                  <button className=" rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 hover:scale-105" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
                 </div>
               </div>
             </div>

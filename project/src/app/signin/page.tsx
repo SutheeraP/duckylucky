@@ -80,7 +80,7 @@ export default function Signin() {
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         name="signin"
-                        className="disabled:opacity-40 px-2 py-3 bg-black text-white font-semibold rounded-md hover:bg-primary transition duration-200 ease-in-out"
+                        className="disabled:opacity-40 px-2 py-2 bg-black text-white rounded-md hover:bg-primary hover:scale-105 transition duration-200 ease-in-out"
                         // onClick={() => signIn('credentials', {email, password, redirect: true, callbackUrl: '/'})}
                         onClick={() => signin()}
                       // disabled={!email || !password}
@@ -89,7 +89,7 @@ export default function Signin() {
                       </button>
                       <button
                         name="signup"
-                        className="px-2 py-3 ring-1 ring-black bg-white rounded-md font-semibold"
+                        className="px-2 py-2 bg-black text-white hover:bg-primary rounded-md hover:scale-105 transition duration-200 ease-in-out"
                         onClick={() => router.push("/signup")}
                       >
                         สมัครสมาชิก

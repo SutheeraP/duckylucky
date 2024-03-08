@@ -72,29 +72,27 @@ export default function TicTacToe(params: any) {
         },
     })
 
-    const userListRef = ref(db, `UserList`);
-    const emailAuth = session?.data?.user?.email;
+    // ดึง userid ครั้งแรก
+    useEffect(() => {
+        const getUserId = async () => {
+            const data = (await get(userRef)).val()
+            if (data) {
+                Object.keys(data).forEach((key) => {
+                    let obj = data[key] as User
+                    if (obj.email == session?.data?.user?.email) {
+                        setCurrentUid(key)
+                    }
+                })
+            }
+        }
+        getUserId()
+    }, [session?.data?.user?.email])
 
     interface User {
         email: string;
         profile_img: string;
         username: string;
     }
-
-    const readData = (data: Record<string, unknown>) => {
-        Object.keys(data).forEach((key) => {
-            let obj = data[key] as User
-            if (!currentUid && obj.email === emailAuth) {
-                setCurrentUid(key)
-                // console.log(key)
-            }
-        });
-    }
-
-    onValue(userListRef, (snapshot: any) => {
-        const data = snapshot.val();
-        readData(data)
-    });
 
     interface BoardData {
         [key: string]: any;
@@ -187,7 +185,7 @@ export default function TicTacToe(params: any) {
         '/image/boardFX/displayFX6.svg'
     ]
 
-    const randomBoard = (num:number) => {
+    const randomBoard = (num: number) => {
         let numbers = [];
         let numboard = [];
         for (let i = 0; i <= 15; i++) {
@@ -316,7 +314,6 @@ export default function TicTacToe(params: any) {
             if (timeLeft === 0) {
                 update(ref(db, `Matching/${roomId}`), {
                     currentTurn: !xTurn
-
                 })
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
@@ -648,14 +645,14 @@ export default function TicTacToe(params: any) {
     const resetBoard = async () => {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
         console.log('resetBoard')
-        for (let i = 0 ; i < 16 ; i++){
+        for (let i = 0; i < 16; i++) {
             console.log(i)
-            if ((Object.values(dbBoard)[i] == '/image/displayFX/displayFX1.svg') || 
-            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX2.svg') || 
-            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX3.svg') || 
-            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX4.svg') || 
-            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX5.svg') || 
-            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX6.svg')){
+            if ((Object.values(dbBoard)[i] == '/image/displayFX/displayFX1.svg') ||
+                (Object.values(dbBoard)[i] == '/image/displayFX/displayFX2.svg') ||
+                (Object.values(dbBoard)[i] == '/image/displayFX/displayFX3.svg') ||
+                (Object.values(dbBoard)[i] == '/image/displayFX/displayFX4.svg') ||
+                (Object.values(dbBoard)[i] == '/image/displayFX/displayFX5.svg') ||
+                (Object.values(dbBoard)[i] == '/image/displayFX/displayFX6.svg')) {
             }
             else {
                 update(ref(db, `Matching/${roomId}/board`), {
@@ -669,14 +666,14 @@ export default function TicTacToe(params: any) {
     const swapXO = async () => {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
         console.log('callswapXO')
-        for (let i = 0 ; i < 16 ; i++){
-            if (Object.values(dbBoard)[i] == imgX){
+        for (let i = 0; i < 16; i++) {
+            if (Object.values(dbBoard)[i] == imgX) {
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgO
                 })
                 console.log('x -> o')
             }
-            else if (Object.values(dbBoard)[i] == imgO){
+            else if (Object.values(dbBoard)[i] == imgO) {
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgX
                 })
@@ -697,14 +694,14 @@ export default function TicTacToe(params: any) {
     const bombRandomBoard = async () => {
         console.log('callbomb')
         let bomb = randomBoard(3)
-        console.log('bomb is ',bomb)
-        for (let i = 0 ; i < 16 ; i++){
+        console.log('bomb is ', bomb)
+        for (let i = 0; i < 16; i++) {
             if (i == bomb[0] || i == bomb[1] || i == bomb[2]) {
                 console.log(i)
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: ''
                 })
-            }    
+            }
         }
     }
 
@@ -749,7 +746,7 @@ export default function TicTacToe(params: any) {
     // ทำงาน effect ทุกอย่าง
     const effectWork = async (data: any) => {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
-        const userList =  get(ref(db, `UserList`))
+        const userList = get(ref(db, `UserList`))
         const XandO = (await get(ref(db, `Matching/${roomId}/player`))).val()
         // console.log(userList)
         let player = ['player1', 'player2']
@@ -794,7 +791,7 @@ export default function TicTacToe(params: any) {
                         remove(ref(db, `Matching/${roomId}/effect/${p}/increaseActionPoint`));
                     }
                 }
-                
+
 
             }
 
@@ -827,17 +824,17 @@ export default function TicTacToe(params: any) {
             {showNotify ?
                 <div className="bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
                     <div className="flex flex-col gap-4 items-center px-4">
-                        <div className="bg-white px-8 py-2 rounded-full font-bold w-fit text-xl">{x == currentUid? nameO : nameX} โจมตี !</div>
+                        <div className="bg-white px-8 py-2 rounded-full font-bold w-fit text-xl">{x == currentUid ? nameO : nameX} โจมตี !</div>
                         <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] relative">
                             <div className="border border-black rounded-lg">
                                 <ImageComp path={cardNotify.img} />
                             </div>
-                            
+
                             <div className="my-auto text-center px-2">
                                 <div className="font-bold mb-3 text-lg">{cardNotify.name}</div>
                                 <div>{cardNotify.description}</div>
                             </div>
-                            <div className="absolute top-4 right-4 w-7 h-7 bg-black rounded-full text-white text-lg font-semibold flex justify-center items-center" onClick={() => {setShowNotify(false)}}>x</div>
+                            <div className="absolute top-4 right-4 w-7 h-7 bg-black rounded-full text-white text-lg font-semibold flex justify-center items-center" onClick={() => { setShowNotify(false) }}>x</div>
                         </div>
                     </div>
                 </div> :
