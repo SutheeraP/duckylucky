@@ -70,6 +70,7 @@ export default function TicTacToe(params: any) {
     const [boardFXNotify, setBoardFXNotify] = useState<any>(``)
 
     // for start everyturn
+    const [showStartTurn, setShowStartTurn] = useState(false)
 
     // for แสดง username
     // fix bug player[x]
@@ -520,6 +521,8 @@ export default function TicTacToe(params: any) {
         // turn listener
         onValue(turnRef, (snapshot: any) => {
             const data = snapshot.val();
+            console.log('turnref is ',data)
+            console.log('x is ',x)
 
             // update player action
             setMaxPoint(5)
@@ -530,6 +533,8 @@ export default function TicTacToe(params: any) {
 
             setXTurn(data) // update turn ในเกม
             effectTurn() // update turn ในเอฟเฟคที่ทำงานอยู่
+
+            notifyStartTurn()
         })
 
         //time listener
@@ -666,6 +671,20 @@ export default function TicTacToe(params: any) {
             setShowBoardFXNotify(false);
             remove(ref(db, `Matching/${roomId}/notify/${currentUid}/boardFX`));
         }, 3000);
+    }
+
+    const notifyStartTurn = async () => {
+        // ขึ้นมา 1 วิแล้วหายไป
+        console.log('xTurn ' ,xTurn)
+        console.log('currentUid', currentUid)
+        console.log('x', x)
+        console.log('o', o)
+        if ((xTurn && currentUid == x) || (!xTurn && currentUid == o)) {
+            setShowStartTurn(true);
+        }
+        setTimeout(() => {
+            setShowStartTurn(false);
+        }, 1000);
     }
 
     const addCard = async (card: Object, target: string) => {
@@ -886,6 +905,19 @@ export default function TicTacToe(params: any) {
         <div className='relative overflow-hidden'>
             <Background />
 
+            {showStartTurn? 
+                <div className="flex justify-center items-center w-screen z-30 h-screen absolute top-0">
+                    <div className="w-screen flex flex-row justify-center items-center gap-2">
+                        <div className="translate-y-4"><Image src={'/image/sword_L.svg'} alt="" width={50} height={16}></Image></div>
+                        <div className="w-52">
+                            <div className="text-white font-bold text-2xl absolute text-center font-outline-6">ถึงตาของคุณแล้ว !</div>
+                            <div className="text-white font-bold text-2xl absolute text-center">ถึงตาของคุณแล้ว !</div>
+                        </div>
+                        <div className="translate-y-4"><Image src={'/image/sword_R.svg'} alt="" width={50} height={16}></Image></div>
+                    </div>
+                </div>
+                :null}
+
             {showNotify ?
                 <div className="bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
                     <div className="flex flex-col gap-4 items-center px-4">
@@ -904,6 +936,7 @@ export default function TicTacToe(params: any) {
                     </div>
                 </div> :
                 null}
+
             {showBoardFXNotify? <NotifyBoardFX boardFXNotify={boardFXNotify}/>:null}
 
             {/* ส่วนหลัก */}

@@ -17,7 +17,7 @@ const NotifyBoardFX = (props:any) => {
                         <Image src={`${boardFXNotify.img}`} alt=""  width={240} height={280}/>
                     </div>
                     <div className="flex justify-center -translate-y-8">
-                        <div className={`text-white font-bold md:text-3xl py-2 px-4 rounded-lg font-outline-12 absolute text-center`}>
+                        <div className={`text-white font-bold md:text-3xl py-2 px-4 rounded-lg font-outline-6 absolute text-center`}>
                             {boardFXNotify.name}
                         </div> 
                         <div className={`text-white font-bold md:text-3xl py-2 px-4 rounded-lg absolute text-center`}>
