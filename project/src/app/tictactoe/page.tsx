@@ -28,6 +28,7 @@ export default function TicTacToe(params: any) {
     const [myPlayer, setMyPlayer] = useState('');
     const [enemyPlayer, setEnemyPlayer] = useState('');
     const [myScore, setMyScore] = useState(0);
+    const [effectOnBoard, setEffectOnBoard] = useState(''); 
 
     // แก้บัค 
 
@@ -205,13 +206,28 @@ export default function TicTacToe(params: any) {
         return numboard;
     }
 
-    const randomDisplayFX = () => {
+    const randomDisplayFX = (num: number) => {
         let numbers = [];
-        let numFX = [];
+        let numdisplayFX = [];
         for (let i = 1; i <= 6; i++) {
             numbers.push(i);
         }
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= num; i++) {
+            const randomIndex = Math.floor(Math.random() * numbers.length);
+            const randomNumber = numbers[randomIndex];
+            numbers.splice(randomIndex, 1);
+            numdisplayFX.push(randomNumber)
+        }
+        return numdisplayFX;
+    }
+
+    const randomFX = (num: number) => {
+        let numbers = [];
+        let numFX = [];
+        for (let i = 0; i < 4; i++) {
+            numbers.push(i);
+        }
+        for (let i = 1; i <= num; i++) {
             const randomIndex = Math.floor(Math.random() * numbers.length);
             const randomNumber = numbers[randomIndex];
             numbers.splice(randomIndex, 1);
@@ -374,6 +390,18 @@ export default function TicTacToe(params: any) {
 
     }, [x, o])
 
+    // เก็บค่า ลำดับของ fx ที่จะทำงานเมื่อกาช่องพิเศษ
+    const getEffectOnBoard = async () => {
+        const data = (await get(ref(db, `Matching/${roomId}/effectonboard`))).val()
+        console.log(data)
+        if (data) {
+            setEffectOnBoard(data)
+        }
+        else {
+            router.push('/')
+        }
+    }
+
     // รวมดัก onvalue
     useEffect(() => {
         console.log('in user effect uid')
@@ -420,7 +448,8 @@ export default function TicTacToe(params: any) {
 
                 // random ค่าเพื่อหา board ที่จะมี FX และ รูปของ FX ที่จะเอามาแสดงผลแบบสุ่ม
                 const numBoard = [...randomBoard(3)]
-                const numDisplay = [...randomDisplayFX()]
+                const numDisplay = [...randomDisplayFX(3)]
+                const effectonboard = [...randomFX(3)]
 
                 // set ค่าของ initBoard ให้เป็นรูป FX ตามช่องที่สุ่มได้
                 for (let i = 0; i < 4; i++) {
@@ -430,6 +459,11 @@ export default function TicTacToe(params: any) {
                 // เซ็ตเกมตอนไม่ครั้งแรกที่เล่น ด้วย initBoard
                 update(ref(db, `Matching/${roomId}`), {
                     board: initBoard
+                })
+
+                // set ค่า FX เป็นลำดับ
+                update(ref(db, `Matching/${roomId}`), {
+                    effectonboard: effectonboard
                 })
 
                 // กำหนดเวลา 20
