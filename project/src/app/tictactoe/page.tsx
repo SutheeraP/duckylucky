@@ -9,6 +9,7 @@ import Image from "next/image"
 import Board from "./component/Board";
 import CardLayout from "./component/CardLayout";
 import ModalCard from "./component/MadalCard";
+import ModalFX from "./component/ModalFX";
 import { v4 as uuidv4 } from 'uuid';
 
 import { useState, useEffect } from "react"
@@ -456,6 +457,7 @@ export default function TicTacToe(params: any) {
             const data = snapshot.val();
 
             // update player action
+            setMaxPoint(5)
             update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
                 action: 5,
                 phrase: 'Deciding'
@@ -661,7 +663,6 @@ export default function TicTacToe(params: any) {
                 })
             }
         }
-        remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
     }
 
     // FX ความช่วยเหลือของเกรซมิลเลอร์
@@ -687,7 +688,7 @@ export default function TicTacToe(params: any) {
     // FX บัญชาจากราชินีหงส์
     const increaseActionPoint = async () => {
         update(ref(db, `Matching/${roomId}/effect/${myPlayer}/increaseActionPoint`), {
-            turn: 3,
+            turn: 1,
             target: currentUid
         })
     }
@@ -735,6 +736,11 @@ export default function TicTacToe(params: any) {
                             turn: data[p]['blind']['turn'] + 1
                         })
                     }
+                    if (data[p]['increaseActionPoint']) {
+                        update(ref(db, `Matching/${roomId}/effect/${p}/increaseActionPoint`), {
+                            turn: data[p]['increaseActionPoint']['turn'] + 1
+                        })
+                    }
                 }
             });
         }
@@ -779,7 +785,7 @@ export default function TicTacToe(params: any) {
                 // FX บัญชาจากราชินีหงส์
                 if (data[p]['increaseActionPoint']) {
                     console.log('increaseActionPoint')
-                    if (data[p]['increaseActionPoint']['turn'] == 3 && currentUid == data[p]['increaseActionPoint']['target']) {
+                    if (data[p]['increaseActionPoint']['turn'] == 3) {
                         console.log('set action to 7')
                         setMaxPoint(7)
                         update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
@@ -953,6 +959,8 @@ export default function TicTacToe(params: any) {
                     </div>
                 </div>
             </div>
+
+            {/* <ModalFX /> */}
 
             {/* ส่วนจบเกม */}
             <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>

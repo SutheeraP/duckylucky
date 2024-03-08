@@ -25,12 +25,20 @@ const Board = (props: any) => {
         checkDraw()
     }, [boardData])
 
-    const updateBoardData = (idx: number) => {
+    const updateBoardData = async(idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
-                
-                
+                if (boardData[idx]){
+                    console.log('check value of board ', boardData[idx])
+                    // resetBoard()
+                    // swapXO()
+                    await increaseActionPoint()
+                    // bombRandomBoard()
+                    // building()
+                    // console.log('check value of board ', boardData[idx])
+                    // console.log('use boardFX')
+                }
                 update(ref(db, `Matching/${roomId}/board`), {
                     [idx]: value
                 })
@@ -40,16 +48,16 @@ const Board = (props: any) => {
                 update(ref(db, `Matching/${roomId}`), {
                     time: 20
                 })
-                if (boardData[idx]){
-                    console.log('check value of board ', boardData[idx])
-                    // resetBoard()
-                    // swapXO()
-                    increaseActionPoint()
-                    // bombRandomBoard()
-                    // building()
-                    // console.log('check value of board ', boardData[idx])
-                    // console.log('use boardFX')
-                }
+                // if (boardData[idx]){
+                //     console.log('check value of board ', boardData[idx])
+                //     // resetBoard()
+                //     // swapXO()
+                //     increaseActionPoint()
+                //     // bombRandomBoard()
+                //     // building()
+                //     // console.log('check value of board ', boardData[idx])
+                //     // console.log('use boardFX')
+                // }
             }
         }
         
