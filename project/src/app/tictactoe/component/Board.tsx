@@ -18,17 +18,30 @@ const WINNING_COMBO = [
 const Board = (props: any) => {
     const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, 
         gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard, 
-        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO} = props;
+        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore} = props;
 
     useEffect(() => {
         checkWinner()
         checkDraw()
     }, [boardData])
 
-    const updateBoardData = (idx: number) => {
+    const updateBoardData = async(idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
+
+                //เพิ่ม local แล้วเชคก่อน
+                boardData[idx] = value
+                await checkWinner()
+                await checkDraw()
+
+                // บวกแต้มลงช่องพิเศษ
+                if (boardData[idx].includes('display')) {
+                    update(ref(db, `Matching/${roomId}/score`), {
+                        [currentUid]: myScore + 200
+                    })
+                }
+
                 if (boardData[idx]){
                     console.log('check value of board ', boardData[idx])
                     // resetBoard()
@@ -60,20 +73,25 @@ const Board = (props: any) => {
                 // }
             }
         }
-        
-        checkWinner()
     }
 
-    const checkDraw = () => {
+    const checkDraw = async() => {
         let check = Object.keys(boardData).every((v) => boardData[v])
-        setDraw(check)
+        if(check){
+            update(ref(db, `Matching/${roomId}`), {
+                winner: 'draw'
+            })
+        }
+        // setDraw(check)
     }
 
-    const checkWinner = () => {
+    const checkWinner = async() => {
         WINNING_COMBO.map((bd) => {
             const [a, b, c, d] = bd
             if (boardData[a] && boardData[a] == boardData[b] && boardData[b] == boardData[c] && boardData[c] == boardData[d]) {
-                setWon(true)
+                update(ref(db, `Matching/${roomId}`), {
+                    winner: currentUid
+                })
                 return
             }
             setResult(!xTurn ? 'คุณชนะ !' : 'คุณแพ้ !')

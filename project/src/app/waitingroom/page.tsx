@@ -86,9 +86,15 @@ const Waiting = (prop: any) => {
                                 if (counter == 0) {
                                     clearInterval(interval);
                                     const db = getDatabase();
+                                    let id1 = data[room]['owner']
+                                    let id2 = data[room]['challenger']
                                     update(ref(db, `Matching/${room}/player`), {
-                                        player1: data[room]['owner'],
-                                        player2: data[room]['challenger']
+                                        player1: id1,
+                                        player2: id2
+                                    });
+                                    update(ref(db, `Matching/${room}/score`), {
+                                        id1: 0,
+                                        id2: 0
                                     });
                                     setCurrentUid('remove')
                                     remove(ref(db, `waitingRoom/${room}`));

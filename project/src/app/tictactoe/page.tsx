@@ -27,6 +27,7 @@ export default function TicTacToe(params: any) {
     const [enemyId, setEnemyId] = useState('');
     const [myPlayer, setMyPlayer] = useState('');
     const [enemyPlayer, setEnemyPlayer] = useState('');
+    const [myScore, setMyScore] = useState(0);
 
     // แก้บัค 
 
@@ -140,13 +141,13 @@ export default function TicTacToe(params: any) {
         setDraw(false)
     }
 
-    const setWonbyBoard = (bool: boolean) => {
-        setWon(bool)
-    }
+    // const setWonbyBoard = (bool: boolean) => {
+    //     setWon(bool)
+    // }
 
-    const setDrawbyBoard = (bool: boolean) => {
-        setDraw(bool)
-    }
+    // const setDrawbyBoard = (bool: boolean) => {
+    //     setDraw(bool)
+    // }
 
     const setBoardDatabyBoard = (idx: number, value: any) => {
         setBoardData({ ...boardData, [idx]: value });
@@ -268,6 +269,11 @@ export default function TicTacToe(params: any) {
             card: thiscard.id
         })
 
+        //เพิ่มคะแนนใช้การ์ด
+        update(ref(db, `Matching/${roomId}/score`), {
+            [currentUid]: myScore + thiscard.point * 50
+        })
+
         //ใช้ คำสั่งการ์ด
         if (thiscard.id == 1) {
             // ขอปฎิเสธ
@@ -339,6 +345,8 @@ export default function TicTacToe(params: any) {
     const effectRef = ref(db, `Matching/${roomId}/effect`);
     const actionRef = ref(db, `Matching/${roomId}/player`);
     const notifyRef = ref(db, `Matching/${roomId}/notify`);
+    const scoreRef = ref(db, `Matching/${roomId}/score`);
+    const winnerRef = ref(db, `Matching/${roomId}/winner`);
 
     // อดึงชื่อ/รูปเมื่ออัพเดต x,o
     useEffect(() => {
@@ -443,8 +451,8 @@ export default function TicTacToe(params: any) {
 
                 // สร้าง card สามใบแรก
                 update(ref(db, `Matching/${roomId}/card`), {
-                    player1: [card[0], card[cardX1], card[cardX2]],
-                    player2: [card[0], card[cardO1], card[cardO2]]
+                    player1: [card[cardX1], card[cardX2]],
+                    player2: [card[cardO1], card[cardO2]]
                 })
             }
         })
@@ -538,6 +546,16 @@ export default function TicTacToe(params: any) {
                     }
                 }
             }
+        })
+
+        //score listener
+        onValue(scoreRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) { 
+                if(data[currentUid]){
+                    setMyScore(data[currentUid])
+                }
+             }
         })
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
@@ -825,7 +843,7 @@ export default function TicTacToe(params: any) {
                 <div className="bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
                     <div className="flex flex-col gap-4 items-center px-4">
                         <div className="bg-white px-8 py-2 rounded-full font-bold w-fit text-xl">{x == currentUid ? nameO : nameX} โจมตี !</div>
-                        <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] relative">
+                        <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] w-[200px] relative">
                             <div className="border border-black rounded-lg">
                                 <ImageComp path={cardNotify.img} />
                             </div>
@@ -908,8 +926,8 @@ export default function TicTacToe(params: any) {
                             boardData={boardData}
                             result={result}
                             // setXTurn={setXTurnbyBoard}
-                            setWon={setWonbyBoard}
-                            setDraw={setDrawbyBoard}
+                            // setWon={setWonbyBoard}
+                            // setDraw={setDrawbyBoard}
                             setBoardData={setBoardDatabyBoard}
                             setResult={setResultbyBoard}
                             reset={resetbyBoard}
@@ -920,6 +938,7 @@ export default function TicTacToe(params: any) {
                             currentUid={currentUid}
                             imgX={imgX}
                             imgO={imgO}
+                            myScore={myScore}
 
                             roomId={roomId}
                             db={db}
@@ -938,7 +957,7 @@ export default function TicTacToe(params: any) {
                         </div>
 
                         <div className={`flex justify-between ${(gameStatus == 'Deciding') && ((xTurn && x == currentUid) || (!xTurn && o == currentUid)) ? 'block' : 'hidden'}`}>
-                            <div className={`${btnClass} ${inhandCard.length >= 5 ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { drawTwoCard(); }}>จั่วการ์ด 2 ใบ</div>
+                            <div className={`${btnClass} ${inhandCard.length >= 3 ? 'pointer-events-none opacity-50' : ''}`} onClick={() => { drawTwoCard(); }}>จั่วการ์ด 2 ใบ</div>
                             <div className={`${btnClass}`} onClick={() => { setGameStatus('Playing'); updateStatus() }}>ใช้การ์ดและกา</div>
                         </div>
 
