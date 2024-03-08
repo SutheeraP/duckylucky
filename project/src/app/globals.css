@@ -9,6 +9,15 @@
   .font-outline-4 {
     -webkit-text-stroke: 4px black;
   }
+  .font-outline-6 {
+    -webkit-text-stroke: 6px black;
+  }
+  .font-outline-8 {
+    -webkit-text-stroke: 8px black;
+  }
+  .font-outline-12 {
+    -webkit-text-stroke: 12px black;
+  }
 }
 
 /* @font-face {
