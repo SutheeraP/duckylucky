@@ -45,6 +45,11 @@ const Board = (props: any) => {
                         effectonboard: cuteffect
                     })
 
+                    // สั่ง notify ด้วย id
+                    update(ref(db, `Matching/${roomId}/notify/${enemyId}`), {
+                        boardFX: effect.id
+                    })
+
                     // เช็คว่าเป็น FX อะไร จาก id ของ effect
                     if ( effect.id == '1'){
                         console.log('พายุ')

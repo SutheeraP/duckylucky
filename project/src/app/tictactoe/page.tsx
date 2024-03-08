@@ -595,6 +595,9 @@ export default function TicTacToe(params: any) {
                     if (data[currentUid]['card']) {
                         notifyCard(data[currentUid]['card'])
                     }
+                    if (data[currentUid]['boardFX']) {
+                        // notifyBoardFX(data[boardFX])
+                    }
                 }
             }
         })
@@ -781,11 +784,6 @@ export default function TicTacToe(params: any) {
                 })
             }
         }
-    }
-
-    // FX ธุรกิจของนายหน้า
-    const building = async () => {
-
     }
 
     // ไว้ update turn ให้การ์ดที่ทำงานอยู่
@@ -1002,7 +1000,6 @@ export default function TicTacToe(params: any) {
                             swapXO={swapXO}
                             increaseActionPoint={increaseActionPoint}
                             bombRandomBoard={bombRandomBoard}
-                            building={building}
                             
                         />
 
