@@ -28,6 +28,7 @@ export default function TicTacToe(params: any) {
     const [myPlayer, setMyPlayer] = useState('');
     const [enemyPlayer, setEnemyPlayer] = useState('');
     const [myScore, setMyScore] = useState(0);
+    const [enemyScore, setEnemyScore] = useState(0);
     const [effectOnBoard, setEffectOnBoard] = useState(''); 
 
     // แก้บัค 
@@ -254,6 +255,9 @@ export default function TicTacToe(params: any) {
         })
         update(ref(db, `Matching/${roomId}`), {
             time: 20
+        })
+        update(ref(db, `Matching/${roomId}/score`), {
+            [currentUid]: myScore + 30
         })
     }
 
@@ -592,6 +596,7 @@ export default function TicTacToe(params: any) {
             if (data) {
                 if (data[currentUid]) {
                     setMyScore(data[currentUid])
+                    setEnemyScore(data[enemyId])
                 }
             }
         })
@@ -601,7 +606,6 @@ export default function TicTacToe(params: any) {
             const data = snapshot.val();
             if (data) {
                 setWinner(data)
-                updateStat() // เพิ่มคะแนน จำนวนเกมที่เล่นของ userList
             }
         })
     }, currentUid); // มี uid แล้วรันครั้งแรก
@@ -775,12 +779,6 @@ export default function TicTacToe(params: any) {
 
     }
 
-    // FX ลิขิตของเดวิส ตัด
-    // const increaseAngelCard = async () => {
-    //     console.log('angel')
-    //     addCard(0, myPlayer)
-    // }
-
     // ไว้ update turn ให้การ์ดที่ทำงานอยู่
     const effectTurn = async () => {
         const data = (await get(effectRef)).val()
@@ -856,10 +854,7 @@ export default function TicTacToe(params: any) {
                         remove(ref(db, `Matching/${roomId}/effect/${p}/increaseActionPoint`));
                     }
                 }
-
-
             }
-
         })
 
 
@@ -878,28 +873,6 @@ export default function TicTacToe(params: any) {
         else if (!xTurn && data['player2'] == currentUid) {
             update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), { phrase: 'Playing' })
             return
-        }
-    }
-    
-    const updateStat = async () => {
-        const data = (await get(userRef)).val()
-        if (data) {
-            if (data[currentUid]) {
-                let oldScore = data[currentUid]['score']
-                let oldMatch = data[currentUid]['match']
-                let oldWin = data[currentUid]['win']
-
-                update(ref(db, `UserList/${currentUid}`), {
-                    score: oldScore + myScore,
-                    match: oldMatch + 1
-                })
-
-                if (winner == currentUid) {
-                    update(ref(db, `UserList/${currentUid}`), {
-                        win: oldWin + 1
-                    })
-                }
-            }
         }
     }
 
@@ -1008,6 +981,8 @@ export default function TicTacToe(params: any) {
                             imgX={imgX}
                             imgO={imgO}
                             myScore={myScore}
+                            enemyScore={enemyScore}
+                            enemyId={enemyId}
 
                             roomId={roomId}
                             db={db}

@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { useEffect } from "react"
-import { ref, update } from "firebase/database";
+import { ref, update, get } from "firebase/database";
 
 const WINNING_COMBO = [
     [0, 1, 2, 3],
@@ -18,7 +18,7 @@ const WINNING_COMBO = [
 const Board = (props: any) => {
     const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset,
         gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard,
-        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore } = props;
+        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore, enemyId, enemyScore } = props;
 
     const updateBoardData = async (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
@@ -77,12 +77,20 @@ const Board = (props: any) => {
         }
     }
 
+    const userRef = ref(db, `UserList`);
+    const scoreRef = ref(db, `Matching/${roomId}/score`);
+    let idList = [currentUid, enemyId]
     const checkDraw = async () => {
         let check = Object.keys(boardData).every((v) => boardData[v])
         if (check) {
             update(ref(db, `Matching/${roomId}`), {
                 winner: 'draw'
             })
+            update(ref(db, `Matching/${roomId}/score`), {
+                [currentUid]: myScore + 500,
+                [enemyId]: enemyScore + 500
+            })
+            updateUserData()
         }
     }
 
@@ -96,10 +104,50 @@ const Board = (props: any) => {
                 update(ref(db, `Matching/${roomId}`), {
                     winner: currentUid
                 })
+                updateUserData()
+                updateWin()
                 return
             }
         })
     }
+
+    const updateUserData = async() =>{
+        // update score game เข้า database ทั้ง 2 ผุ้เล่น
+        const data = (await get(userRef)).val()
+        const dataScore = (await get(scoreRef)).val()
+        if (data) {
+            idList.forEach(id => {
+                if (data[id]) {
+                    let newScore = dataScore[id]
+                    console.log('updareUserStat')
+                    let oldScore = data[id]['score']
+                    let oldMatch = data[id]['match']
+                    // let oldWin = data[id]['win']
+                    // console.log(oldScore, myScore)
+
+                    update(ref(db, `UserList/${id}`), {
+                        score: oldScore + newScore,
+                        match: oldMatch + 1
+                    })
+                }
+            })
+        }
+    }
+
+    const updateWin = async() =>{
+        // update จำนวนชนะตัวเอง
+        const data = (await get(userRef)).val()
+        if (data) {
+            if (data[currentUid]) {
+                let oldWin = data[currentUid]['win']
+                update(ref(db, `UserList/${currentUid}`), {
+                    win: oldWin + 1
+                })
+            }
+        }
+    }
+
+    
 
     return (
         <div className="grid grid-cols-4 grid-rows-4 gap-2 self-center ">
