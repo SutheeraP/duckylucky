@@ -14,6 +14,7 @@ import ImageComp from "../component/ImageComp";
 
 
 const Waiting = (prop: any) => {
+    const [status, setStatus] = useState('Loading...');
     const [p1username, setP1Username] = useState("Loading...");
     const [p1img, setP1Img] = useState("/image/icon1.svg");
     const [p2username, setP2Username] = useState("waiting...");
@@ -214,12 +215,13 @@ const Waiting = (prop: any) => {
                 return;
             }
             else {
-                router.push('/')
+                setStatus(`ไม่ใครอยู่เลย กำลังนำคุณกลับหน้าจอหลัก..`)
+                setTimeout(() => {
+                    router.push('/')
+                }, 5000) 
             }
 
         } else {
-            let thisRoom = `${intend}-${uuidv4()}`
-            await setRoomId(thisRoom)
             if (intend == 'custom' || intend == 'challenge') {
                 let thisRoom = `${intend}-${uuidv4()}`
                 setRoomId(thisRoom)
@@ -229,7 +231,12 @@ const Waiting = (prop: any) => {
                 return;
             }
             else {
-                router.push('/')
+    
+                setStatus(`ไม่ใครอยู่เลย กำลังนำคุณกลับหน้าจอหลัก..`)
+                setTimeout(() => {
+                    router.push('/')
+                }, 1000)  
+                
             }
 
         }
@@ -304,52 +311,57 @@ const Waiting = (prop: any) => {
 
     return (
         <>
-            <div className="min-h-screen relative overflow-hidden flex flex-col">
-                <Background />
-                {showReady ?
-                    // <div className="absolute h-full w-full flex z-20 bg-[#0005]">
-                    //     <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
-                    //         <div className="text-center text-xl">พร้อมมั้ย ?</div>
-                    //         <div className="grid grid-cols-2 gap-8">
-                    //             <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                    //                 onClick={() => { }}>พร้อม</button>
-                    //             <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
-                    //                 onClick={() => { }}>ไม่พร้อม</button>
+            {roomId ?
+                <div className="min-h-screen relative overflow-hidden flex flex-col">
+                    <Background />
+                    {showReady ?
+                        // <div className="absolute h-full w-full flex z-20 bg-[#0005]">
+                        //     <div className=" m-auto bg-white ring-2 ring-black p-10 rounded-lg grid gap-8">
+                        //         <div className="text-center text-xl">พร้อมมั้ย ?</div>
+                        //         <div className="grid grid-cols-2 gap-8">
+                        //             <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                        //                 onClick={() => { }}>พร้อม</button>
+                        //             <button className="ring-2 ring-black rounded-lg bg-white py-2 px-6"
+                        //                 onClick={() => { }}>ไม่พร้อม</button>
 
-                    //         </div>
-                    //     </div>
-                    // </div> 
-                    ''
-                    : ''
-                }
-                <div className="container px-4 relative mx-auto">
-                    <button type="button" id='button' className="mt-12 px-3 py-1 bg-white ring-1 ring-black rounded-md" onClick={() => { removeCurrent() }}>
-                        <div className="flex">
-                            <span className="w-3 my-auto mr-2"><ImageComp path="/image/icon/back.svg" /></span>
-                            ย้อนกลับ</div>
-                    </button>
-                </div>
+                        //         </div>
+                        //     </div>
+                        // </div> 
+                        ''
+                        : ''
+                    }
+                    <div className="container px-4 relative mx-auto">
+                        <button type="button" id='button' className="mt-12 px-3 py-1 bg-white ring-1 ring-black rounded-md" onClick={() => { removeCurrent() }}>
+                            <div className="flex">
+                                <span className="w-3 my-auto mr-2"><ImageComp path="/image/icon/back.svg" /></span>
+                                ย้อนกลับ</div>
+                        </button>
+                    </div>
 
-                <div className="container px-4 relative mx-auto my-auto">
+                    <div className="container px-4 relative mx-auto my-auto">
 
-                    <div id="content" className="grid md:grid-cols-12 gap-8">
-                        <div id="player1" className="w-3/5 mx-auto md:col-span-5">
-                            <ImageComp path={p1img} />
-                            <div className="text-center text-3xl mt-3">{p1username}</div>
-                        </div>
-                        <div id="vs" className="text-5xl text-center md:col-span-2 my-auto font-semibold">
-                            {centerText}
-                        </div>
-                        <div id="player2" className="w-3/5 mx-auto md:col-span-5">
-                            <ImageComp path={p2img} />
-                            {intend == 'custom' && !showReady ? <Invitation props={{ currentUid, roomId }} /> : <div className="text-center text-3xl mt-3">{p2username}</div>}
+                        <div id="content" className="grid md:grid-cols-12 gap-8">
+                            <div id="player1" className="w-3/5 mx-auto md:col-span-5">
+                                <ImageComp path={p1img} />
+                                <div className="text-center text-3xl mt-3">{p1username}</div>
+                            </div>
+                            <div id="vs" className="text-5xl text-center md:col-span-2 my-auto font-semibold">
+                                {centerText}
+                            </div>
+                            <div id="player2" className="w-3/5 mx-auto md:col-span-5">
+                                <ImageComp path={p2img} />
+                                {intend == 'custom' && !showReady ? <Invitation props={{ currentUid, roomId }} /> : <div className="text-center text-3xl mt-3">{p2username}</div>}
+                            </div>
                         </div>
                     </div>
+
                 </div>
-
-            </div>
-
-
+                :
+                <div className="h-screen w-full flex justify-center items-center">
+                    <div className="p-4 text-4xl">{status}</div>
+                    <span className=""><ImageComp path={'/image/icon/Spinner-0.8s-200px.gif'} /></span>
+                </div>
+            }
         </>
     )
 }
