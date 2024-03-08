@@ -83,14 +83,15 @@ export default function Signup() {
   // getUsernameList(); // get
 
   async function signup() {
-    await getUser()
+    // await getUser()
     console.log(usernameList)
 
     if (usernameList.includes(username)) {
       console.log('uname', username)
       setfeedback('ชื่อผู้ใช้งานซ้ำ')
     }
-    else if (password != password2) {
+    else 
+    if (password != password2) {
       setfeedback('รหัสผ่านไม่สอดคล้องกัน')
     }
     else {
@@ -126,7 +127,10 @@ export default function Signup() {
     set(ref(db, `UserList/${userId}`), {
       username: name,
       email: email,
-      profile_img: imageUrl
+      profile_img: imageUrl,
+      score: 0,
+      match: 0,
+      win: 0
     });
   }
 

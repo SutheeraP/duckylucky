@@ -94,6 +94,9 @@ export default function TicTacToe(params: any) {
         email: string;
         profile_img: string;
         username: string;
+        score: number;
+        match: number;
+        win: number;
     }
 
     interface BoardData {
@@ -549,22 +552,23 @@ export default function TicTacToe(params: any) {
             }
         })
 
-        //score listener
+        //score listener มีการอัพเดตครั้งเดียว
         onValue(scoreRef, (snapshot: any) => {
             const data = snapshot.val();
-            if (data) { 
-                if(data[currentUid]){
+            if (data) {
+                if (data[currentUid]) {
                     setMyScore(data[currentUid])
                 }
-             }
+            }
         })
 
         //winner listener
         onValue(winnerRef, (snapshot: any) => {
             const data = snapshot.val();
-            if (data) { 
+            if (data) {
                 setWinner(data)
-             }
+                updateStat() // เพิ่มคะแนน จำนวนเกมที่เล่นของ userList
+            }
         })
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
@@ -842,7 +846,29 @@ export default function TicTacToe(params: any) {
             return
         }
     }
-    // console.log('test is ', xTurn && o == currentUid)
+    
+    const updateStat = async () => {
+        const data = (await get(userRef)).val()
+        if (data) {
+            if (data[currentUid]) {
+                let oldScore = data[currentUid]['score']
+                let oldMatch = data[currentUid]['match']
+                let oldWin = data[currentUid]['win']
+
+                update(ref(db, `UserList/${currentUid}`), {
+                    score: oldScore + myScore,
+                    match: oldMatch + 1
+                })
+
+                if (winner == currentUid) {
+                    update(ref(db, `UserList/${currentUid}`), {
+                        win: oldWin + 1
+                    })
+                }
+            }
+        }
+    }
+
 
     return (
         <div className='relative overflow-hidden'>
@@ -990,13 +1016,13 @@ export default function TicTacToe(params: any) {
             {/* ส่วนจบเกม */}
             <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(winner != '') ? 'flex' : 'hidden'}`}>
                 <div className="text-white font-bold text-3xl">{(winner == 'draw') ? 'เสมอ' : (winner == currentUid) ? 'คุณชนะ !' : 'คุณแพ้ !'}</div>
-                <Image src={(x == currentUid)? imgX : imgO} alt="" width={200} height={200} />
+                <Image src={(x == currentUid) ? imgX : imgO} alt="" width={200} height={200} />
                 <div className={`flex flex-row ${draw || xTurn ? 'gap-28 translate-y-6' : 'gap-28 -translate-y-2'} absolute`}>
                     <Image src={!(winner == 'draw' || winner == currentUid) ? '/image/lose_Lwing.svg' : '/image/win_Lwing.svg'} alt="" width={120} height={120} />
                     <Image src={!(winner == 'draw' || winner == currentUid) ? '/image/lose_Rwing.svg' : '/image/win_Rwing.svg'} alt="" width={120} height={120} />
                 </div>
                 <div className="flex flex-col justify-center text-center transform -translate-y-8">
-                    <div className="bg-black text-white font-bold text-md rounded-xl w-40 h-auto flex justify-center p-1 ">{(x == currentUid)? nameX : nameO}</div>
+                    <div className="bg-black text-white font-bold text-md rounded-xl w-40 h-auto flex justify-center p-1 ">{(x == currentUid) ? nameX : nameO}</div>
                     <div className="text-white text-sm transform">{myScore} คะแนน</div>
                 </div>
                 <div className="bg-white text-black text-sm rounded-md w-36 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black" onClick={() => { router.push(`/`); }}>กลับหน้าหลัก</div>

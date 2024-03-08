@@ -11,6 +11,7 @@ import { ref, onValue, update, remove, get } from "firebase/database";
 
 export default function Home() {
   const router = useRouter()
+  
   const session = useSession({
     required: true,
     onUnauthenticated() {
@@ -101,7 +102,10 @@ export default function Home() {
     email: string;
     profile_img: string;
     username: string;
-  }
+    score: number;
+    match: number;
+    win: number;
+}
 
   interface Inviter {
     inviter: string;

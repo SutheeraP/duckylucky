@@ -146,6 +146,9 @@ const Waiting = (prop: any) => {
         email: string;
         profile_img: string;
         username: string;
+        score: number;
+        match: number;
+        win: number;
     }
 
     const readData = (data: Record<string, unknown>) => {

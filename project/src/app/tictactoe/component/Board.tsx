@@ -90,11 +90,11 @@ const Board = (props: any) => {
         WINNING_COMBO.map((bd) => {
             const [a, b, c, d] = bd
             if (boardData[a] && boardData[a] == boardData[b] && boardData[b] == boardData[c] && boardData[c] == boardData[d]) {
-                update(ref(db, `Matching/${roomId}`), {
-                    winner: currentUid
-                })
                 update(ref(db, `Matching/${roomId}/score`), {
                     [currentUid]: myScore + 1000
+                })
+                update(ref(db, `Matching/${roomId}`), {
+                    winner: currentUid
                 })
                 return
             }
