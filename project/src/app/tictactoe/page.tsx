@@ -58,6 +58,7 @@ export default function TicTacToe(params: any) {
     const [blinding, setBlinding] = useState(false)
     const [showNotify, setShowNotify] = useState(false)
     const [cardNotify, setCardNotify] = useState<any>(``)
+    const [winner, setWinner] = useState('');
 
     // for แสดง username
     // fix bug player[x]
@@ -557,6 +558,14 @@ export default function TicTacToe(params: any) {
                 }
              }
         })
+
+        //winner listener
+        onValue(winnerRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) { 
+                setWinner(data)
+             }
+        })
     }, currentUid); // มี uid แล้วรันครั้งแรก
 
     // update card ตามฝั่ง
@@ -801,7 +810,7 @@ export default function TicTacToe(params: any) {
                 if (data[p]['increaseActionPoint']) {
                     console.log('increaseActionPoint')
                     if (data[p]['increaseActionPoint']['turn'] == 3) {
-                        console.log('set action to 7')
+                        // console.log('set action to 7')
                         setMaxPoint(7)
                         update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
                             action: 7
@@ -843,7 +852,7 @@ export default function TicTacToe(params: any) {
                 <div className="bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
                     <div className="flex flex-col gap-4 items-center px-4">
                         <div className="bg-white px-8 py-2 rounded-full font-bold w-fit text-xl">{x == currentUid ? nameO : nameX} โจมตี !</div>
-                        <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] w-[200px] relative">
+                        <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] w-[350px] relative">
                             <div className="border border-black rounded-lg">
                                 <ImageComp path={cardNotify.img} />
                             </div>
@@ -979,18 +988,18 @@ export default function TicTacToe(params: any) {
             {/* <ModalFX /> */}
 
             {/* ส่วนจบเกม */}
-            <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(won || draw) ? 'flex' : 'hidden'}`}>
-                <div className="text-white font-bold text-3xl">{draw ? 'เสมอ' : !xTurn ? 'คุณชนะ !' : 'คุณแพ้ !'}</div>
-                <Image src="/image/icon1.svg" alt="" width={200} height={200} />
+            <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(winner != '') ? 'flex' : 'hidden'}`}>
+                <div className="text-white font-bold text-3xl">{(winner == 'draw') ? 'เสมอ' : (winner == currentUid) ? 'คุณชนะ !' : 'คุณแพ้ !'}</div>
+                <Image src={(x == currentUid)? imgX : imgO} alt="" width={200} height={200} />
                 <div className={`flex flex-row ${draw || xTurn ? 'gap-28 translate-y-6' : 'gap-28 -translate-y-2'} absolute`}>
-                    <Image src={draw || xTurn ? '/image/lose_Lwing.svg' : '/image/win_Lwing.svg'} alt="" width={120} height={120} />
-                    <Image src={draw || xTurn ? '/image/lose_Rwing.svg' : '/image/win_Rwing.svg'} alt="" width={120} height={120} />
+                    <Image src={!(winner == 'draw' || winner == currentUid) ? '/image/lose_Lwing.svg' : '/image/win_Lwing.svg'} alt="" width={120} height={120} />
+                    <Image src={!(winner == 'draw' || winner == currentUid) ? '/image/lose_Rwing.svg' : '/image/win_Rwing.svg'} alt="" width={120} height={120} />
                 </div>
                 <div className="flex flex-col justify-center text-center transform -translate-y-8">
-                    <div className="bg-black text-white font-bold text-md rounded-xl w-40 h-auto flex justify-center p-1 ">DavisS</div>
-                    <div className="text-white text-sm transform">543 คะแนน</div>
+                    <div className="bg-black text-white font-bold text-md rounded-xl w-40 h-auto flex justify-center p-1 ">{(x == currentUid)? nameX : nameO}</div>
+                    <div className="text-white text-sm transform">{myScore} คะแนน</div>
                 </div>
-                <div className="bg-white text-black text-sm rounded-md w-36 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black" onClick={() => { router.push(`/`); resetbyBoard }}>กลับหน้าหลัก</div>
+                <div className="bg-white text-black text-sm rounded-md w-36 flex justify-center items-center p-2 mt-10 border-solid border-2 border-black" onClick={() => { router.push(`/`); }}>กลับหน้าหลัก</div>
             </div>
         </div>
     )

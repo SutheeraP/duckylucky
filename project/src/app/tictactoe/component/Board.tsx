@@ -16,33 +16,35 @@ const WINNING_COMBO = [
 ]
 
 const Board = (props: any) => {
-    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, 
-        gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard, 
-        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore} = props;
+    const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset,
+        gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard,
+        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore } = props;
 
-    useEffect(() => {
-        checkWinner()
-        checkDraw()
-    }, [boardData])
-
-    const updateBoardData = async(idx: number) => {
+    const updateBoardData = async (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
-            if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
+            if (boardData[idx] != imgO && boardData[idx] != imgX && !won) {
+                // ลงช่องพิเศษ + 200
+                if (boardData[idx].includes('display')) {
+                    console.log('in special')
+                    update(ref(db, `Matching/${roomId}/score`), {
+                        [currentUid]: myScore + 200
+                    })
+                }
+                else {
+                    // ธรรมดา +20
+                    update(ref(db, `Matching/${roomId}/score`), {
+                        [currentUid]: myScore + 20
+                    })
+                }
 
                 //เพิ่ม local แล้วเชคก่อน
                 boardData[idx] = value
                 await checkWinner()
                 await checkDraw()
 
-                // บวกแต้มลงช่องพิเศษ
-                if (boardData[idx].includes('display')) {
-                    update(ref(db, `Matching/${roomId}/score`), {
-                        [currentUid]: myScore + 200
-                    })
-                }
 
-                if (boardData[idx]){
+                if (boardData[idx]) {
                     console.log('check value of board ', boardData[idx])
                     // resetBoard()
                     // swapXO()
@@ -75,26 +77,27 @@ const Board = (props: any) => {
         }
     }
 
-    const checkDraw = async() => {
+    const checkDraw = async () => {
         let check = Object.keys(boardData).every((v) => boardData[v])
-        if(check){
+        if (check) {
             update(ref(db, `Matching/${roomId}`), {
                 winner: 'draw'
             })
         }
-        // setDraw(check)
     }
 
-    const checkWinner = async() => {
+    const checkWinner = async () => {
         WINNING_COMBO.map((bd) => {
             const [a, b, c, d] = bd
             if (boardData[a] && boardData[a] == boardData[b] && boardData[b] == boardData[c] && boardData[c] == boardData[d]) {
                 update(ref(db, `Matching/${roomId}`), {
                     winner: currentUid
                 })
+                update(ref(db, `Matching/${roomId}/score`), {
+                    [currentUid]: myScore + 1000
+                })
                 return
             }
-            setResult(!xTurn ? 'คุณชนะ !' : 'คุณแพ้ !')
         })
     }
 
@@ -105,12 +108,12 @@ const Board = (props: any) => {
                     <div className="self-center text-2xl">
                         {/* ไม่มีข้อมูลมั้ย */}
                         <Image className={`${boardData[idx] == `` ? `hidden` : `block`} 
-                        ${(x == currentUid && boardData[idx] == imgX) || (o == currentUid && boardData[idx] == imgO) ? `greyscale-0`:`grayscale`}`} 
-                        
-                        src={`${blinding? (boardData[idx].includes('display') ? boardData[idx] : '/image/icon/waitP2.svg') : boardData[idx]}`} 
-                        alt="" 
-                        width={selectedCard === `` ? 50 : 30} 
-                        height={selectedCard === `` ? 50 : 30} />
+                        ${(x == currentUid && boardData[idx] == imgX) || (o == currentUid && boardData[idx] == imgO) ? `greyscale-0` : `grayscale`}`}
+
+                            src={`${blinding ? (boardData[idx].includes('display') ? boardData[idx] : '/image/icon/waitP2.svg') : boardData[idx]}`}
+                            alt=""
+                            width={selectedCard === `` ? 50 : 30}
+                            height={selectedCard === `` ? 50 : 30} />
                     </div>
                     <Image src={`/image/board/grid${idx + 1}.svg`} alt="" width={80} height={80} className="absolute top-0 left-0" />
                 </div>

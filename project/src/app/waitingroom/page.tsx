@@ -93,8 +93,8 @@ const Waiting = (prop: any) => {
                                         player2: id2
                                     });
                                     update(ref(db, `Matching/${room}/score`), {
-                                        id1: 0,
-                                        id2: 0
+                                        [id1]: 0,
+                                        [id2]: 0
                                     });
                                     setCurrentUid('remove')
                                     remove(ref(db, `waitingRoom/${room}`));
