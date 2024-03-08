@@ -29,7 +29,9 @@ export default function TicTacToe(params: any) {
     const [enemyPlayer, setEnemyPlayer] = useState('');
     const [myScore, setMyScore] = useState(0);
     const [enemyScore, setEnemyScore] = useState(0);
-    const [effectOnBoard, setEffectOnBoard] = useState(''); 
+
+    // เก็บ index ของ object boardFX
+    const [effectOnBoard, setEffectOnBoard] = useState('');
 
     // แก้บัค 
 
@@ -179,8 +181,6 @@ export default function TicTacToe(params: any) {
         { id: 2, name: 'ความช่วยเหลือของเกรซมิลเลอร์', img: '/image/boardFX/boardFX2.svg', description: 'สลับสัญลักษณ์ทั้งหมดบนกระดาน' },
         { id: 3, name: 'บัญชาจากราชีนีหงส์', img: '/image/boardFX/boardFX3.svg', description: 'เพิ่มค่าพลังการกระทำ 2 หน่วย ในตาถัดไป ให้กับผู้เล่นที่กาช่องนี้' },
         { id: 4, name: 'ของขวัญจากมือระเบิด', img: '/image/boardFX/boardFX4.svg', description: 'สุ่มเกิดการระเบิด 3 ช่อง หลังจากนั้นช่องนั้นๆ จะกลายเป็นช่องว่าง' },
-        { id: 5, name: 'ธุรกิจของนายหน้า', img: '/image/boardFX/boardFX5.svg', description: 'ผู้เล่นที่ได้รับเอฟเฟคจะสามารถเลือก วางเขตก่อสร้างตรงไหนก็ได้จำนวน 2 ช่อง หรือ ยกเลิกได้' },
-        { id: 6, name: 'ลิขิตของเดวิส', img: '/image/boardFX/boardFX6.svg', description: 'ได้รับการ์ดนางฟ้า 1 ใบ' }
     ]
 
     const displayFX = [
@@ -371,6 +371,7 @@ export default function TicTacToe(params: any) {
     const notifyRef = ref(db, `Matching/${roomId}/notify`);
     const scoreRef = ref(db, `Matching/${roomId}/score`);
     const winnerRef = ref(db, `Matching/${roomId}/winner`);
+    const effectonboardRef = ref(db, `Matching/${roomId}/effectonboard`);
 
     // อดึงชื่อ/รูปเมื่ออัพเดต x,o
     useEffect(() => {
@@ -395,16 +396,18 @@ export default function TicTacToe(params: any) {
     }, [x, o])
 
     // เก็บค่า ลำดับของ fx ที่จะทำงานเมื่อกาช่องพิเศษ
-    const getEffectOnBoard = async () => {
-        const data = (await get(ref(db, `Matching/${roomId}/effectonboard`))).val()
-        console.log(data)
-        if (data) {
-            setEffectOnBoard(data)
-        }
-        else {
-            router.push('/')
-        }
-    }
+    // const getEffectOnBoard = async () => {
+    //     const data = (await get(ref(db, `Matching/${roomId}/effectonboard`))).val()
+    //     console.log('data is ',data)
+    //     if (data) {
+    //         setEffectOnBoard(data)
+    //     }
+    //     else {
+    //         router.push('/')
+    //     }
+    //     return effectOnBoard
+    // }
+    // getEffectOnBoard()
 
     // รวมดัก onvalue
     useEffect(() => {
@@ -497,6 +500,12 @@ export default function TicTacToe(params: any) {
                     player2: [card[cardO1], card[cardO2]]
                 })
             }
+        })
+
+        onValue(effectonboardRef, (snapshot: any) => {
+            const data = snapshot.val();
+            console.log(data)
+            setEffectOnBoard(data)
         })
 
         // turn listener
@@ -983,6 +992,8 @@ export default function TicTacToe(params: any) {
                             myScore={myScore}
                             enemyScore={enemyScore}
                             enemyId={enemyId}
+                            effectOnBoard={effectOnBoard}
+                            boardFX={boardFX}
 
                             roomId={roomId}
                             db={db}
@@ -992,6 +1003,7 @@ export default function TicTacToe(params: any) {
                             increaseActionPoint={increaseActionPoint}
                             bombRandomBoard={bombRandomBoard}
                             building={building}
+                            
                         />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>

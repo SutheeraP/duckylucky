@@ -18,11 +18,16 @@ const WINNING_COMBO = [
 const Board = (props: any) => {
     const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset,
         gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard,
-        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore, enemyId, enemyScore } = props;
+        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore, enemyId, enemyScore, effectOnBoard, boardFX } = props;
 
     const updateBoardData = async (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
+
+            // เรียก boardFX จาก listindex ตัวที่ 0 ซึ่งเก็บ index ที่จะใช้เรียก boardFX
+            let effect = boardFX[effectOnBoard[0]]
+
+            console.log(effect)
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won) {
                 // ลงช่องพิเศษ + 200
                 if (boardData[idx].includes('display')) {
@@ -30,6 +35,33 @@ const Board = (props: any) => {
                     update(ref(db, `Matching/${roomId}/score`), {
                         [currentUid]: myScore + 200
                     })
+
+                    // ก็อบ listindex ที่จะเอาไปใช้เรียก boardFX มาแล้ว ตัดตัวหน้าออก
+                    let cuteffect =  [...effectOnBoard]
+                    cuteffect.shift()
+
+                    // update ทับใน db
+                    update(ref(db, `Matching/${roomId}`), {
+                        effectonboard: cuteffect
+                    })
+
+                    // เช็คว่าเป็น FX อะไร จาก id ของ effect
+                    if ( effect.id == '1'){
+                        console.log('พายุ')
+                        resetBoard() 
+                    }
+                    if ( effect.id == '2'){
+                        console.log('เกรซ')
+                        swapXO()
+                    }
+                    if ( effect.id == '3'){
+                        console.log('ราชินี')
+                        increaseActionPoint()
+                    }
+                    if ( effect.id == '4'){
+                        console.log('ระเบิด')
+                        bombRandomBoard()
+                    }
                 }
                 else {
                     // ธรรมดา +20
@@ -43,17 +75,6 @@ const Board = (props: any) => {
                 await checkWinner()
                 await checkDraw()
 
-
-                if (boardData[idx]) {
-                    console.log('check value of board ', boardData[idx])
-                    // resetBoard()
-                    // swapXO()
-                    increaseActionPoint()
-                    // bombRandomBoard()
-                    // building()
-                    // console.log('check value of board ', boardData[idx])
-                    // console.log('use boardFX')
-                }
                 update(ref(db, `Matching/${roomId}/board`), {
                     [idx]: value
                 })
