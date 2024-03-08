@@ -8,10 +8,11 @@ import ImageComp from "./component/ImageComp";
 import { useRouter } from "next/navigation";
 
 import { ref, onValue, update, remove, get } from "firebase/database";
+import Tutorial from "./component/Tutorial";
 
 export default function Home() {
   const router = useRouter()
-  
+
   const session = useSession({
     required: true,
     onUnauthenticated() {
@@ -20,7 +21,7 @@ export default function Home() {
   })
 
   // base
-    const [currentUid, setcurrentUid] = useState("loading");
+  const [currentUid, setcurrentUid] = useState("loading");
   const [status, setStatus] = useState('Loading...');
   const [email, setEmail] = useState("Loading...");
   const [username, setUsername] = useState("Loading...");
@@ -33,13 +34,16 @@ export default function Home() {
   // extension
   const [invite, setInvite] = useState('')
   const [showLogout, setShowLogout] = useState(false)
+  const [showEdit, setShowEdit] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+
 
   // for edit profile
   const [editIcon, setEditIcon] = useState("/image/icon1.svg");
   const [editName, setEditName] = useState("ชื่อผู้ใช้งานใหม่");
   const [feedback, setFeedback] = useState('');
   const [usernameList, setUsernameList] = useState<string[]>([]);
-  const [showEdit, setShowEdit] = useState(false);
+
   const iconPath = ["/image/icon1.svg", "/image/icon2.svg", "/image/icon3.svg", "/image/icon4.svg", "/image/icon5.svg", "/image/icon6.svg"]
   const [color, setcolor] = useState("text-red-600");
 
@@ -58,7 +62,7 @@ export default function Home() {
     }
   }
 
-  // ดึง userid ครั้งแรก
+  // // ดึง userid ครั้งแรก
   useEffect(() => {
 
     const getUserId = async () => {
@@ -103,6 +107,9 @@ export default function Home() {
         setEditName(data.username)
       }
     });
+
+    // show tutorial ครั้งแรก
+    setShowTutorial(true)
   }, [currentUid])
 
   interface User {
@@ -112,7 +119,7 @@ export default function Home() {
     score: number;
     match: number;
     win: number;
-}
+  }
 
   interface Inviter {
     inviter: string;
@@ -165,6 +172,12 @@ export default function Home() {
         <div className=''>
           <main className="min-h-screen items-center relative overflow-hidden">
             <Background />
+
+            {showTutorial ?
+              <Tutorial
+                setShowTutorial={setShowTutorial}
+              /> : null
+            }
 
             {showEdit ?
               <div className="absolute h-full w-full flex z-20 bg-[#0005]">
@@ -234,10 +247,16 @@ export default function Home() {
                 <div className="">
                   <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
                     <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
-                      <div className="px-3 py-2">
-                        <button onClick={() => { setShowEdit(true); }} className="w-5 mr-2">
-                          <ImageComp path='/image/icon/setting.svg' />
-                        </button>
+                      <div className="px-3 py-2 w-full flex justify-between">
+                        <div>
+                          <button onClick={() => { setShowEdit(true); }} className="w-5 mr-2">
+                            <ImageComp path='/image/icon/setting.svg' />
+                          </button>
+                          <button onClick={() => { setShowTutorial(true); }} className="w-5 mr-2">
+                            <ImageComp path='/image/icon/tu.svg' />
+                          </button>
+                        </div>
+
                         <button onClick={() => { setShowLogout(true) }} className="w-5">
                           <ImageComp path='/image/icon/logout.svg' />
                         </button>
@@ -264,8 +283,8 @@ export default function Home() {
 
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                    <button className=' rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 text-center hover:scale-105' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
-                    <button className=" rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 hover:scale-105" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
+                    <button className=' rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 text-center hover:scale-105 transition duration-200 ease-in-out' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
+                    <button className=" rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 hover:scale-105 transition duration-200 ease-in-out" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
                   </div>
                 </div>
               </div>
