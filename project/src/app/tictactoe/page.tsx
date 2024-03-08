@@ -9,7 +9,7 @@ import Image from "next/image"
 import Board from "./component/Board";
 import CardLayout from "./component/CardLayout";
 import ModalCard from "./component/MadalCard";
-import ModalFX from "./component/ModalFX";
+import NotifyBoardFX from "./component/NotifyBoardFX";
 import { v4 as uuidv4 } from 'uuid';
 
 import { useState, useEffect } from "react"
@@ -63,6 +63,10 @@ export default function TicTacToe(params: any) {
     const [showNotify, setShowNotify] = useState(false)
     const [cardNotify, setCardNotify] = useState<any>(``)
     const [winner, setWinner] = useState('');
+
+    // for boardFX
+    const [showBoardFXNotify, setShowBoardFXNotify] = useState(false)
+    const [boardFXNotify, setBoardFXNotify] = useState<any>(``)
 
     // for แสดง username
     // fix bug player[x]
@@ -395,20 +399,6 @@ export default function TicTacToe(params: any) {
 
     }, [x, o])
 
-    // เก็บค่า ลำดับของ fx ที่จะทำงานเมื่อกาช่องพิเศษ
-    // const getEffectOnBoard = async () => {
-    //     const data = (await get(ref(db, `Matching/${roomId}/effectonboard`))).val()
-    //     console.log('data is ',data)
-    //     if (data) {
-    //         setEffectOnBoard(data)
-    //     }
-    //     else {
-    //         router.push('/')
-    //     }
-    //     return effectOnBoard
-    // }
-    // getEffectOnBoard()
-
     // รวมดัก onvalue
     useEffect(() => {
         console.log('in user effect uid')
@@ -596,7 +586,7 @@ export default function TicTacToe(params: any) {
                         notifyCard(data[currentUid]['card'])
                     }
                     if (data[currentUid]['boardFX']) {
-                        // notifyBoardFX(data[boardFX])
+                        notifyBoardFX(data[currentUid]['boardFX'])
                     }
                 }
             }
@@ -650,6 +640,18 @@ export default function TicTacToe(params: any) {
         setTimeout(() => {
             setShowNotify(false);
             remove(ref(db, `Matching/${roomId}/notify/${currentUid}/card`));
+        }, 3000);
+    }
+
+    const notifyBoardFX = async (boardFXId: number) => {
+        // ขึ้นมา 3 วิแล้วหายไป
+        let thisBoardFX = boardFX.find(item => item.id == boardFXId);
+        setBoardFXNotify(thisBoardFX)
+        setShowBoardFXNotify(true)
+
+        setTimeout(() => {
+            setShowBoardFXNotify(false);
+            remove(ref(db, `Matching/${roomId}/notify/${currentUid}/boardFX`));
         }, 3000);
     }
 
@@ -725,9 +727,7 @@ export default function TicTacToe(params: any) {
     // FX พายุฤดูร้อน
     const resetBoard = async () => {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
-        console.log('resetBoard')
         for (let i = 0; i < 16; i++) {
-            console.log(i)
             if ((Object.values(dbBoard)[i] == '/image/displayFX/displayFX1.svg') ||
                 (Object.values(dbBoard)[i] == '/image/displayFX/displayFX2.svg') ||
                 (Object.values(dbBoard)[i] == '/image/displayFX/displayFX3.svg') ||
@@ -746,19 +746,16 @@ export default function TicTacToe(params: any) {
     // FX ความช่วยเหลือของเกรซมิลเลอร์
     const swapXO = async () => {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
-        console.log('callswapXO')
         for (let i = 0; i < 16; i++) {
             if (Object.values(dbBoard)[i] == imgX) {
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgO
                 })
-                console.log('x -> o')
             }
             else if (Object.values(dbBoard)[i] == imgO) {
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgX
                 })
-                console.log('o -> x')
             }
         }
     }
@@ -773,12 +770,9 @@ export default function TicTacToe(params: any) {
 
     // FX ของขวัญจากมือระเบิด
     const bombRandomBoard = async () => {
-        console.log('callbomb')
         let bomb = randomBoard(3)
-        console.log('bomb is ', bomb)
         for (let i = 0; i < 16; i++) {
             if (i == bomb[0] || i == bomb[1] || i == bomb[2]) {
-                console.log(i)
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: ''
                 })
@@ -906,6 +900,7 @@ export default function TicTacToe(params: any) {
                     </div>
                 </div> :
                 null}
+            {showBoardFXNotify? <NotifyBoardFX boardFXNotify={boardFXNotify}/>:null}
 
             {/* ส่วนหลัก */}
             <div className='container mx-auto relative z-10'>
@@ -1028,8 +1023,6 @@ export default function TicTacToe(params: any) {
                     </div>
                 </div>
             </div>
-
-            {/* <ModalFX /> */}
 
             {/* ส่วนจบเกม */}
             <div className={` bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center ${(winner != '') ? 'flex' : 'hidden'}`}>

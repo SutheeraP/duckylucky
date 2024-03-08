@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { useEffect } from "react"
-import { ref, update, get } from "firebase/database";
+import { ref, update, get, remove } from "firebase/database";
 
 const WINNING_COMBO = [
     [0, 1, 2, 3],
@@ -24,10 +24,6 @@ const Board = (props: any) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
 
-            // เรียก boardFX จาก listindex ตัวที่ 0 ซึ่งเก็บ index ที่จะใช้เรียก boardFX
-            let effect = boardFX[effectOnBoard[0]]
-
-            console.log(effect)
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won) {
                 // ลงช่องพิเศษ + 200
                 if (boardData[idx].includes('display')) {
@@ -36,20 +32,34 @@ const Board = (props: any) => {
                         [currentUid]: myScore + 200
                     })
 
+                    
+                    // เรียก boardFX จาก listindex ตัวที่ 0 ซึ่งเก็บ index ที่จะใช้เรียก boardFX
+                    let effect = boardFX[effectOnBoard[0]]
+                    
                     // ก็อบ listindex ที่จะเอาไปใช้เรียก boardFX มาแล้ว ตัดตัวหน้าออก
                     let cuteffect =  [...effectOnBoard]
                     cuteffect.shift()
 
                     // update ทับใน db
-                    update(ref(db, `Matching/${roomId}`), {
-                        effectonboard: cuteffect
-                    })
+                    if (cuteffect) {
+                        update(ref(db, `Matching/${roomId}`), {
+                            effectonboard: cuteffect
+                        })
+                    }
+                    else {
+                        remove(ref(db, `Matching/${roomId}/effectonboard`))
+                    }
+                    
 
                     // สั่ง notify ด้วย id
+                    update(ref(db, `Matching/${roomId}/notify/${currentUid}`), {
+                        boardFX: effect.id
+                    })
                     update(ref(db, `Matching/${roomId}/notify/${enemyId}`), {
                         boardFX: effect.id
                     })
 
+                    console.log(effect)
                     // เช็คว่าเป็น FX อะไร จาก id ของ effect
                     if ( effect.id == '1'){
                         console.log('พายุ')
