@@ -29,6 +29,8 @@ const Board = (props: any) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
+                
+                
                 update(ref(db, `Matching/${roomId}/board`), {
                     [idx]: value
                 })
@@ -79,7 +81,7 @@ const Board = (props: any) => {
                         <Image className={`${boardData[idx] == `` ? `hidden` : `block`} 
                         ${(x == currentUid && boardData[idx] == imgX) || (o == currentUid && boardData[idx] == imgO) ? `greyscale-0`:`grayscale`}`} 
                         
-                        src={`${blinding? '/image/icon/waitP2.svg' : boardData[idx]}`} 
+                        src={`${blinding? (boardData[idx].includes('display') ? boardData[idx] : '/image/icon/waitP2.svg') : boardData[idx]}`} 
                         alt="" 
                         width={selectedCard === `` ? 50 : 30} 
                         height={selectedCard === `` ? 50 : 30} />
