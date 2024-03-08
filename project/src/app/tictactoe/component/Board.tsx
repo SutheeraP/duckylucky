@@ -40,10 +40,10 @@ const Board = (props: any) => {
                 })
                 if (boardData[idx]){
                     console.log('check value of board ', boardData[idx])
-                    resetBoard()
+                    // resetBoard()
                     // swapXO()
                     // increaseActionPoint()
-                    // bombRandomBoard()
+                    bombRandomBoard()
                     // building()
                     // increaseAngelCard()
                     // console.log('check value of board ', boardData[idx])

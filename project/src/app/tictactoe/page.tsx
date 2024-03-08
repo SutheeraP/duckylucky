@@ -186,13 +186,13 @@ export default function TicTacToe(params: any) {
         '/image/boardFX/displayFX6.svg'
     ]
 
-    const randomBoard = () => {
+    const randomBoard = (num:number) => {
         let numbers = [];
         let numboard = [];
         for (let i = 0; i <= 15; i++) {
             numbers.push(i);
         }
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= num; i++) {
             const randomIndex = Math.floor(Math.random() * numbers.length);
             const randomNumber = numbers[randomIndex];
             numbers.splice(randomIndex, 1);
@@ -409,7 +409,7 @@ export default function TicTacToe(params: any) {
                 }
 
                 // random ค่าเพื่อหา board ที่จะมี FX และ รูปของ FX ที่จะเอามาแสดงผลแบบสุ่ม
-                const numBoard = [...randomBoard()]
+                const numBoard = [...randomBoard(4)]
                 const numDisplay = [...randomDisplayFX()]
 
                 // set ค่าของ initBoard ให้เป็นรูป FX ตามช่องที่สุ่มได้
@@ -644,16 +644,19 @@ export default function TicTacToe(params: any) {
 
     // FX พายุฤดูร้อน
     const resetBoard = async () => {
-        console.log('callresetBoard')
         update(ref(db, `Matching/${roomId}/effect/${myPlayer}/resetBoard`), {
             turn: 1,
-            taget: currentUid
+            target: currentUid
         })
     }
 
     // FX ความช่วยเหลือของเกรซมิลเลอร์
     const swapXO = async () => {
-
+        console.log('callswapXO')
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/swapXO`), {
+            turn: 1,
+            target: enemyId
+        })
     }
 
     // FX บัญชาจากราชินีหงส์
@@ -663,7 +666,10 @@ export default function TicTacToe(params: any) {
 
     // FX ของขวัญจากมือระเบิด
     const bombRandomBoard = async () => {
-
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/bombRandomBoard`), {
+            turn: 1,
+            target: currentUid
+        })
     }
 
     // FX ธุรกิจของนายหน้า
@@ -701,7 +707,12 @@ export default function TicTacToe(params: any) {
     // ทำงาน effect ทุกอย่าง
     const effectWork = async (data: any) => {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
+        const userList =  get(ref(db, `UserList`))
+        const XandO = (await get(ref(db, `Matching/${roomId}/player`))).val()
+        // console.log(userList)
         let player = ['player1', 'player2']
+        // console.log(imgX)
+        // console.log(imgO)
         player.forEach(p => {
             if (data[p]) {
 
@@ -747,6 +758,49 @@ export default function TicTacToe(params: any) {
                         }
                     }
                     remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
+                }
+
+                // FX ความช่วยเหลือเกรซ
+                if (data[p]['swapXO']) {
+                    // let Xplayer = Object.values(userList)[1]
+                    // let Oplayer = Object.values(userList)[2]
+                    // console.log('swapXO')
+                    // console.log(currentUid)
+                    // console.log(userList)
+                    // console.log('me', Object.values(userList))
+                    // console.log('me', Object.values(XandO)[1])
+                    // console.log('enemy', data[p]['swapXO']['target'])
+                    // for (let i = 0 ; i < 16 ; i++){
+                    //     console.log(i)
+                    //     if (Object.values(dbBoard)[i] == Object.values(userList)[currentUid]){
+                    //         update(ref(db, `Matching/${roomId}/board`), {
+                    //             [i]: imgO
+                    //         })
+                    //         console.log('x -> o')
+                    //     }
+                    //     else if (Object.values(dbBoard)[i] == Object.values(userList)[data[p]['swapXO']['target']]){
+                    //         update(ref(db, `Matching/${roomId}/board`), {
+                    //             [i]: imgX
+                    //         })
+                    //         console.log('o -> x')
+                    //     }
+                    // }
+                    remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
+                }
+
+                // FX ของขวัญจากมือระเบิด
+                if (data[p]['bombRandomBoard']) {
+                    let board = randomBoard(3)
+                    console.log(board)
+                    for (let i = 0 ; i < 16 ; i++){
+                        if (i == board[0] || i == board[1] || i == board[2]) {
+                            console.log(i)
+                            update(ref(db, `Matching/${roomId}/board`), {
+                                [i]: ''
+                            })
+                        }    
+                    }
+                    remove(ref(db, `Matching/${roomId}/effect/${p}/bombRandomBoard`));
                 }
             }
 
