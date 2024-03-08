@@ -21,6 +21,7 @@ const config: Config = {
       colors: {
         primary: '#EAA800',
         secondary: '#EAA800',
+        grayFX: '#D9D9D9'
       },
       // fontFamily: {
       //   'Mali': ['Mali', 'sans-serif'],

@@ -407,7 +407,7 @@ export default function TicTacToe(params: any) {
                 }
 
                 // random ค่าเพื่อหา board ที่จะมี FX และ รูปของ FX ที่จะเอามาแสดงผลแบบสุ่ม
-                const numBoard = [...randomBoard(4)]
+                const numBoard = [...randomBoard(3)]
                 const numDisplay = [...randomDisplayFX()]
 
                 // set ค่าของ initBoard ให้เป็นรูป FX ตามช่องที่สุ่มได้

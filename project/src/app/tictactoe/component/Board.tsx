@@ -25,7 +25,7 @@ const Board = (props: any) => {
         checkDraw()
     }, [boardData])
 
-    const updateBoardData = async(idx: number) => {
+    const updateBoardData = (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
             let value = xTurn === true ? imgX : imgO;
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won){
@@ -33,7 +33,7 @@ const Board = (props: any) => {
                     console.log('check value of board ', boardData[idx])
                     // resetBoard()
                     // swapXO()
-                    await increaseActionPoint()
+                    increaseActionPoint()
                     // bombRandomBoard()
                     // building()
                     // console.log('check value of board ', boardData[idx])
