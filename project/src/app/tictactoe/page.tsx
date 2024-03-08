@@ -69,6 +69,8 @@ export default function TicTacToe(params: any) {
     const [showBoardFXNotify, setShowBoardFXNotify] = useState(false)
     const [boardFXNotify, setBoardFXNotify] = useState<any>(``)
 
+    // for start everyturn
+
     // for แสดง username
     // fix bug player[x]
     const [nameX, setNameX] = useState('');

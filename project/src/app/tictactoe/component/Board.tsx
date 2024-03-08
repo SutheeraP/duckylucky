@@ -200,7 +200,7 @@ const Board = (props: any) => {
                     <div className="self-center text-2xl">
                         {/* ไม่มีข้อมูลมั้ย */}
                         <Image className={`${boardData[idx] == `` ? `hidden` : `block`} 
-                        ${(x == currentUid && boardData[idx] == imgX) || (o == currentUid && boardData[idx] == imgO) ? `greyscale-0` : `grayscale`}`}
+                        ${(x == currentUid && boardData[idx] != imgO) || (o == currentUid && boardData[idx] != imgX) ? `greyscale-0` : `grayscale`}`}
 
                             src={`${blinding ? (boardData[idx].includes('display') ? boardData[idx] : '/image/icon/waitP2.svg') : boardData[idx]}`}
                             alt=""
