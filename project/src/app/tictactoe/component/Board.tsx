@@ -18,7 +18,7 @@ const WINNING_COMBO = [
 const Board = (props: any) => {
     const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset, 
         gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard, 
-        swapXO, increaseActionPoint, bombRandomBoard, building, increaseAngelCard, imgX, imgO} = props;
+        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO} = props;
 
     useEffect(() => {
         checkWinner()
@@ -42,10 +42,9 @@ const Board = (props: any) => {
                     console.log('check value of board ', boardData[idx])
                     // resetBoard()
                     // swapXO()
-                    // increaseActionPoint()
-                    bombRandomBoard()
+                    increaseActionPoint()
+                    // bombRandomBoard()
                     // building()
-                    // increaseAngelCard()
                     // console.log('check value of board ', boardData[idx])
                     // console.log('use boardFX')
                 }

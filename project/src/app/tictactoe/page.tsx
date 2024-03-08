@@ -669,7 +669,6 @@ export default function TicTacToe(params: any) {
         const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
         console.log('callswapXO')
         for (let i = 0 ; i < 16 ; i++){
-            console.log(i)
             if (Object.values(dbBoard)[i] == imgX){
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgO
@@ -687,7 +686,10 @@ export default function TicTacToe(params: any) {
 
     // FX บัญชาจากราชินีหงส์
     const increaseActionPoint = async () => {
-
+        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/increaseActionPoint`), {
+            turn: 3,
+            target: currentUid
+        })
     }
 
     // FX ของขวัญจากมือระเบิด
@@ -710,10 +712,11 @@ export default function TicTacToe(params: any) {
 
     }
 
-    // FX ลิขิตของเดวิส
-    const increaseAngelCard = async () => {
-
-    }
+    // FX ลิขิตของเดวิส ตัด
+    // const increaseAngelCard = async () => {
+    //     console.log('angel')
+    //     addCard(0, myPlayer)
+    // }
 
     // ไว้ update turn ให้การ์ดที่ทำงานอยู่
     const effectTurn = async () => {
@@ -772,6 +775,20 @@ export default function TicTacToe(params: any) {
                         remove(ref(db, `Matching/${roomId}/effect/${p}/blind`));
                     }
                 }
+
+                // FX บัญชาจากราชินีหงส์
+                if (data[p]['increaseActionPoint']) {
+                    console.log('increaseActionPoint')
+                    if (data[p]['increaseActionPoint']['turn'] == 3 && currentUid == data[p]['increaseActionPoint']['target']) {
+                        console.log('set action to 7')
+                        setMaxPoint(7)
+                        update(ref(db, `Matching/${roomId}/player/PlayerActionInTurn`), {
+                            action: 7
+                        })
+                        remove(ref(db, `Matching/${roomId}/effect/${p}/increaseActionPoint`));
+                    }
+                }
+                
 
             }
 
@@ -909,7 +926,6 @@ export default function TicTacToe(params: any) {
                             increaseActionPoint={increaseActionPoint}
                             bombRandomBoard={bombRandomBoard}
                             building={building}
-                            increaseAngelCard={increaseAngelCard}
                         />
 
                         <div className={`max-w-lg ${!(selectedCard === ``) ? 'block' : 'hidden'} `}>
