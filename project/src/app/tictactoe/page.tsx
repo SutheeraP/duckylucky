@@ -644,19 +644,45 @@ export default function TicTacToe(params: any) {
 
     // FX พายุฤดูร้อน
     const resetBoard = async () => {
-        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/resetBoard`), {
-            turn: 1,
-            target: currentUid
-        })
+        const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
+        console.log('resetBoard')
+        for (let i = 0 ; i < 16 ; i++){
+            console.log(i)
+            if ((Object.values(dbBoard)[i] == '/image/displayFX/displayFX1.svg') || 
+            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX2.svg') || 
+            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX3.svg') || 
+            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX4.svg') || 
+            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX5.svg') || 
+            (Object.values(dbBoard)[i] == '/image/displayFX/displayFX6.svg')){
+            }
+            else {
+                update(ref(db, `Matching/${roomId}/board`), {
+                    [i]: ''
+                })
+            }
+        }
+        remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
     }
 
     // FX ความช่วยเหลือของเกรซมิลเลอร์
     const swapXO = async () => {
+        const dbBoard = (await get(ref(db, `Matching/${roomId}/board`))).val()
         console.log('callswapXO')
-        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/swapXO`), {
-            turn: 1,
-            target: enemyId
-        })
+        for (let i = 0 ; i < 16 ; i++){
+            console.log(i)
+            if (Object.values(dbBoard)[i] == imgX){
+                update(ref(db, `Matching/${roomId}/board`), {
+                    [i]: imgO
+                })
+                console.log('x -> o')
+            }
+            else if (Object.values(dbBoard)[i] == imgO){
+                update(ref(db, `Matching/${roomId}/board`), {
+                    [i]: imgX
+                })
+                console.log('o -> x')
+            }
+        }
     }
 
     // FX บัญชาจากราชินีหงส์
@@ -666,10 +692,17 @@ export default function TicTacToe(params: any) {
 
     // FX ของขวัญจากมือระเบิด
     const bombRandomBoard = async () => {
-        update(ref(db, `Matching/${roomId}/effect/${myPlayer}/bombRandomBoard`), {
-            turn: 1,
-            target: currentUid
-        })
+        console.log('callbomb')
+        let bomb = randomBoard(3)
+        console.log('bomb is ',bomb)
+        for (let i = 0 ; i < 16 ; i++){
+            if (i == bomb[0] || i == bomb[1] || i == bomb[2]) {
+                console.log(i)
+                update(ref(db, `Matching/${roomId}/board`), {
+                    [i]: ''
+                })
+            }    
+        }
     }
 
     // FX ธุรกิจของนายหน้า
@@ -740,68 +773,6 @@ export default function TicTacToe(params: any) {
                     }
                 }
 
-                // FX พายุฤดูร้อน
-                if (data[p]['resetBoard']) {
-                    for (let i = 0 ; i < 16 ; i++){
-                        console.log(i)
-                        if ((Object.values(dbBoard)[i] == '/image/displayFX/displayFX1.svg') || 
-                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX2.svg') || 
-                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX3.svg') || 
-                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX4.svg') || 
-                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX5.svg') || 
-                        (Object.values(dbBoard)[i] == '/image/displayFX/displayFX6.svg')){
-                        }
-                        else {
-                            update(ref(db, `Matching/${roomId}/board`), {
-                                [i]: ''
-                            })
-                        }
-                    }
-                    remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
-                }
-
-                // FX ความช่วยเหลือเกรซ
-                if (data[p]['swapXO']) {
-                    // let Xplayer = Object.values(userList)[1]
-                    // let Oplayer = Object.values(userList)[2]
-                    // console.log('swapXO')
-                    // console.log(currentUid)
-                    // console.log(userList)
-                    // console.log('me', Object.values(userList))
-                    // console.log('me', Object.values(XandO)[1])
-                    // console.log('enemy', data[p]['swapXO']['target'])
-                    // for (let i = 0 ; i < 16 ; i++){
-                    //     console.log(i)
-                    //     if (Object.values(dbBoard)[i] == Object.values(userList)[currentUid]){
-                    //         update(ref(db, `Matching/${roomId}/board`), {
-                    //             [i]: imgO
-                    //         })
-                    //         console.log('x -> o')
-                    //     }
-                    //     else if (Object.values(dbBoard)[i] == Object.values(userList)[data[p]['swapXO']['target']]){
-                    //         update(ref(db, `Matching/${roomId}/board`), {
-                    //             [i]: imgX
-                    //         })
-                    //         console.log('o -> x')
-                    //     }
-                    // }
-                    remove(ref(db, `Matching/${roomId}/effect/${p}/resetBoard`));
-                }
-
-                // FX ของขวัญจากมือระเบิด
-                if (data[p]['bombRandomBoard']) {
-                    let board = randomBoard(3)
-                    console.log(board)
-                    for (let i = 0 ; i < 16 ; i++){
-                        if (i == board[0] || i == board[1] || i == board[2]) {
-                            console.log(i)
-                            update(ref(db, `Matching/${roomId}/board`), {
-                                [i]: ''
-                            })
-                        }    
-                    }
-                    remove(ref(db, `Matching/${roomId}/effect/${p}/bombRandomBoard`));
-                }
             }
 
         })
