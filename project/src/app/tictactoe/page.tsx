@@ -774,6 +774,7 @@ export default function TicTacToe(params: any) {
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgO
                 })
+                console.log('X -> O')
             }
             else if (Object.values(dbBoard)[i] == imgO) {
                 update(ref(db, `Matching/${roomId}/board`), {
