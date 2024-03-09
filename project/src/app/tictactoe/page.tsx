@@ -521,6 +521,8 @@ export default function TicTacToe(params: any) {
         // turn listener
         onValue(turnRef, (snapshot: any) => {
             const data = snapshot.val();
+
+            // console.log('thie player is ', PlayerData)
             console.log('turnref is ',data)
             console.log('x is ',x)
 
@@ -534,7 +536,23 @@ export default function TicTacToe(params: any) {
             setXTurn(data) // update turn ในเกม
             effectTurn() // update turn ในเอฟเฟคที่ทำงานอยู่
 
-            notifyStartTurn()
+            get(ref(db, `Matching/${roomId}/player`)).then((snapshot) => {
+                const PlayerData = snapshot.val();
+
+                console.log(PlayerData['player1'])
+                console.log(PlayerData['player2'])
+                console.log('data is ',data)
+
+                if ((data && currentUid == PlayerData['player1']) || (!data && currentUid == PlayerData['player2'])) {
+                    setShowStartTurn(true);
+                }
+                setTimeout(() => {
+                    setShowStartTurn(false);
+                }, 1000);
+                })
+            .catch((error) => {
+                console.error("Error fetching player data:", error);
+            });
         })
 
         //time listener
@@ -671,20 +689,6 @@ export default function TicTacToe(params: any) {
             setShowBoardFXNotify(false);
             remove(ref(db, `Matching/${roomId}/notify/${currentUid}/boardFX`));
         }, 3000);
-    }
-
-    const notifyStartTurn = async () => {
-        // ขึ้นมา 1 วิแล้วหายไป
-        console.log('xTurn ' ,xTurn)
-        console.log('currentUid', currentUid)
-        console.log('x', x)
-        console.log('o', o)
-        if ((xTurn && currentUid == x) || (!xTurn && currentUid == o)) {
-            setShowStartTurn(true);
-        }
-        setTimeout(() => {
-            setShowStartTurn(false);
-        }, 1000);
     }
 
     const addCard = async (card: Object, target: string) => {
