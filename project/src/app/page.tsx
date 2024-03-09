@@ -278,7 +278,7 @@ export default function Home() {
                           </div>
                           {/* ข้อมูล */}
                           <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
-                            <div className="text-4xl mb-3 font-medium">{username}</div>
+                            <div className="text-4xl mb-3 font-medium break-all">{username}</div>
                             {(win / match) >= 0 ? <><div>อัตราชนะ <span className="text-primary font-bold"> {`${((win / match) * 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`}</span></div>
                               <div>คะแนน <span className="text-primary font-bold">{score.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div></>
                               : <div className="text-primary font-bold">เริ่มต้นการต่อสู้ครั้งแรกได้แล้ว!</div>}
