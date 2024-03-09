@@ -780,6 +780,7 @@ export default function TicTacToe(params: any) {
                 update(ref(db, `Matching/${roomId}/board`), {
                     [i]: imgX
                 })
+                console.log('O -> X')
             }
         }
     }
