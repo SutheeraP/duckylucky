@@ -5,7 +5,7 @@ const NotifyBoardFX = (props:any) => {
     // console.log('this notifyBoardFX is ', boardFXNotify)
 
     return(
-        <div className="flex bg-black bg-opacity-50 justify-center items-center w-screen z-30 h-screen absolute top-0">
+        <div className="flex bg-black bg-opacity-70 justify-center items-center w-screen z-30 h-screen absolute top-0">
             <div className="flex flex-col gap-4 w-screen p-4">
                 <div className="flex justify-center items-center">
                     <div className={` bg-grayFX rounded-full py-2 px-4 font-bold md:text-md text-center`}>

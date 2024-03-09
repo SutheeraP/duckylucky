@@ -21,7 +21,7 @@ const SubTutorial = () => {
                     <div>เมื่อเข้าเกม</div>
                     <ol className='ml-4'>
                         <li className='list-disc'>แต่ละฝั่งจะได้รับ<span className='font-semibold'>การ์ด</span> 2 ใบ</li>
-                        <li className='list-disc'>บอดร์ดจะสุ่ม<span className='font-semibold'>ช่องพิศษ</span> 3 ช่องที่สามารถเลือกลงหรือหลบเลี่ยงได้</li>
+                        <li className='list-disc'>บอดร์จะสุ่ม<span className='font-semibold'>ช่องพิเศษ</span> 3 ช่องที่สามารถเลือกลงหรือหลบเลี่ยงได้</li>
                     </ol>
                 </li>
                 <li className='list-decimal'>

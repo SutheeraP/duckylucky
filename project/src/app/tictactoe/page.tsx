@@ -213,6 +213,8 @@ export default function TicTacToe(params: any) {
             numbers.splice(randomIndex, 1);
             numboard.push(randomNumber)
         }
+
+        // return ช่องที่มี effect พิเศษ
         return numboard;
     }
 
@@ -237,11 +239,14 @@ export default function TicTacToe(params: any) {
         for (let i = 0; i < 4; i++) {
             numbers.push(i);
         }
+        // ลิสสี่ช่อง
+
+        // ใส่เอเฟคตามจำนวนที่บอก
         for (let i = 1; i <= num; i++) {
-            const randomIndex = Math.floor(Math.random() * numbers.length);
-            const randomNumber = numbers[randomIndex];
-            numbers.splice(randomIndex, 1);
-            numFX.push(randomNumber)
+            const randomIndex = Math.floor(Math.random() * numbers.length); // สุ่ม 1-4
+            const randomNumber = numbers[randomIndex]; // ชี้ 1-4
+            // numbers.splice(randomIndex, 1); // เอาออก
+            numFX.push(randomNumber) // เอาเอฟคเฟคใส่ลิส
         }
         return numFX;
     }
@@ -466,12 +471,12 @@ export default function TicTacToe(params: any) {
                 }
 
                 // random ค่าเพื่อหา board ที่จะมี FX และ รูปของ FX ที่จะเอามาแสดงผลแบบสุ่ม
-                const numBoard = [...randomBoard(3)]
-                const numDisplay = [...randomDisplayFX(3)]
-                const effectonboard = [...randomFX(3)]
+                const numBoard = [...randomBoard(6)] //ได้ช่อง 6 ช่อง จาก 16
+                const numDisplay = [...randomDisplayFX(6)] //ได้รูป 6 รูป
+                const effectonboard = [...randomFX(6)] //ได้เอฟเฟค 6 เอฟเฟค
 
                 // set ค่าของ initBoard ให้เป็นรูป FX ตามช่องที่สุ่มได้
-                for (let i = 0; i < 4; i++) {
+                for (let i = 0; i < 6; i++) {
                     initBoard[numBoard[i]] = `/image/displayFX/displayFX${numDisplay[i]}.svg`
                 }
 
@@ -929,7 +934,7 @@ export default function TicTacToe(params: any) {
                 :null}
 
             {showNotify ?
-                <div className="bg-black bg-opacity-50 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
+                <div className="bg-black bg-opacity-70 w-full z-30 h-screen absolute top-0 flex flex-col justify-center items-center">
                     <div className="flex flex-col gap-4 items-center px-4">
                         <div className="bg-white px-8 py-2 rounded-full font-bold w-fit text-xl">{x == currentUid ? nameO : nameX} โจมตี !</div>
                         <div className="grid grid-cols-2 bg-white p-4 rounded-lg md:w-[400px] w-[350px] relative">
