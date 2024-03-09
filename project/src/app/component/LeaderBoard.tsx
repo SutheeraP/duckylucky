@@ -62,13 +62,14 @@ const LeaderBoard = (uid: any) => {
         <>
         {Board ?
         <>
-        {Board.forEach((e:any)=>{
+        <div className="f-full text-center h-36 text-3xl bg-black text-white p-6 ">เป็ดดีเด่น...</div>
+        {Board.map((e:any)=>{
             return <div key={e[0]}>{`${e[1]}${e[4]}`}</div>
         })}
         </>
         :
         <>
-        <div className="f-full text-center h-36 text-3xl bg-black text-white p-6 ">เป็ดดีเด่น...</div>
+        <div className="f-full text-center h-36 text-3xl ">เป็ดดีเด่น...</div>
         </>
         
         }
