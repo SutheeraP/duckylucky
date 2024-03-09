@@ -5,7 +5,7 @@ import { getDatabase, ref, set, onValue, update, remove, child, get, push } from
 const LeaderBoard = (uid: any) => {
     const db = getDatabase();
     const userRef = ref(db, `UserList`);
-
+    const takeRight = (arr:any, n = 1) => arr.slice(-n);
 
     interface User {
         email: string;
@@ -62,7 +62,8 @@ const LeaderBoard = (uid: any) => {
         {Board ?
         <>
         <div className="f-full text-center h-36 text-3xl bg-black text-white p-6 ">เป็ดดีเด่น...</div>
-        {Board.map((e:any)=>{
+        {
+        takeRight(Board, Board.length-3).map((e:any)=>{
             return <div key={e[0]}>{`${e[1]}${e[4]}`}</div>
         })}
         </>
