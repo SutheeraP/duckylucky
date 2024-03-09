@@ -22,7 +22,7 @@ export default function Home() {
   })
 
   // base
-  const [currentUid, setcurrentUid] = useState("loading");
+  const [currentUid, setcurrentUid] = useState<any>()
   const [status, setStatus] = useState('Loading...');
   const [email, setEmail] = useState("Loading...");
   const [username, setUsername] = useState("Loading...");
@@ -105,13 +105,17 @@ export default function Home() {
 
         setEditIcon(data.profile_img)
         setEditName(data.username)
-        
+
+        if (data.match == 0) {
+          // show tutorial คนไม่เคยเล่น
+          setShowTutorial(true)
+        }
+
       }
     });
 
-    // show tutorial ครั้งแรก
-    setShowTutorial(true)
-  }, [currentUid])
+
+  }, currentUid)
 
   interface User {
     email: string;
@@ -169,7 +173,7 @@ export default function Home() {
 
   return (
     <>
-      {currentUid != 'loading' ?
+      {currentUid ?
         <div className=''>
           <main className="min-h-screen items-center relative overflow-hidden">
             <Background />
@@ -244,9 +248,10 @@ export default function Home() {
             }
 
             <div className="min-h-screen flex">
-              <div className="container px-6 relative z-10 my-auto mx-auto">
-                <div className="">
+              <div className="container px-6 py-10 relative z-10 my-auto mx-auto">
+                <div className="max-w-[1200px] mx-auto">
                   <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-2">
+
                     <div id="profile" className="ring-2 ring-black rounded-xl bg-white">
                       <div className="px-3 py-2 w-full flex justify-between">
                         <div>
@@ -262,31 +267,36 @@ export default function Home() {
                           <ImageComp path='/image/icon/logout.svg' />
                         </button>
                       </div>
-
                       <div className="w-full ring-black ring-1 "></div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-1 p-6">
-                        <div className='md:w-2/5 md:mx-auto'>
-                          <ImageComp path={img} />
+                      <div className="h-full w-full md:flex md:justify-center">
+                        <div className="md:flex md:items-center">
+                          <div className="grid grid-cols-2 md:flex md:flex-col md:items-center p-6">
+                         {/* รูป */}
+                          <div className='md:w-2/5 lg:w-3/5 md:mx-auto'>
+                            <ImageComp path={img} />
+                          </div>
+                          {/* ข้อมูล */}
+                          <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
+                            <div className="text-4xl mb-3 font-medium">{username}</div>
+                            {(win / match) >= 0 ? <><div>อัตราชนะ <span className="text-primary font-bold"> {`${((win / match) * 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`}</span></div>
+                              <div>คะแนน <span className="text-primary font-bold">{score.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div></>
+                              : <div className="text-primary font-bold">เริ่มต้นการต่อสู้ครั้งแรกได้แล้ว!</div>}
+                          </div>
                         </div>
-
-                        <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
-                          <div className="text-4xl mb-3 font-medium">{username}</div>
-                          {(win / match) >= 0 ? <><div>อัตราชนะ <span className="text-primary font-bold"> {`${((win / match) * 100).toLocaleString(undefined, {maximumFractionDigits:2})}%`}</span></div>
-                            <div>คะแนน <span className="text-primary font-bold">{score.toLocaleString(undefined, {maximumFractionDigits:2})}</span></div></>
-                            : <div className="text-primary font-bold">เริ่มต้นการต่อสู้ครั้งแรกได้แล้ว!</div>}
-                        </div> 
+                        </div>
+                        
                       </div>
                     </div>
+
                     <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white overflow-y-scroll max-h-custom-1">
-                      <LeaderBoard uid={currentUid}/>
+                      <LeaderBoard uid={currentUid} />
                     </div>
                   </div>
 
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                    <button className=' rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 text-center hover:scale-105 transition duration-200 ease-in-out' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
-                    <button className=" rounded-lg bg-black text-white hover:bg-primary py-2 md:py-4 hover:scale-105 transition duration-200 ease-in-out" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
+                    <button className=' rounded-lg bg-black text-white hover:bg-primary py-3 md:py-4 text-center hover:scale-105 transition duration-200 ease-in-out' onClick={() => { router.push('/waitingroom?intend=challenge') }}>สุ่มห้อง</button>
+                    <button className=" rounded-lg bg-black text-white hover:bg-primary py-3 md:py-4 hover:scale-105 transition duration-200 ease-in-out" onClick={() => { router.push('/waitingroom?intend=custom') }}>สร้างห้อง</button>
                   </div>
                 </div>
               </div>

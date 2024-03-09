@@ -58,7 +58,7 @@ const LeaderBoard = (uid: any) => {
         if (uid && !Board) {
             PrepareBoard()
         }
-    }, [uid])
+    }, uid)
 
     return (
         <>

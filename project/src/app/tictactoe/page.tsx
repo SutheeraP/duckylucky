@@ -523,8 +523,8 @@ export default function TicTacToe(params: any) {
             const data = snapshot.val();
 
             // console.log('thie player is ', PlayerData)
-            console.log('turnref is ',data)
-            console.log('x is ',x)
+            // console.log('turnref is ',data)
+            // console.log('x is ',x)
 
             // update player action
             setMaxPoint(5)
