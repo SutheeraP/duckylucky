@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { ref, onValue, update, remove, get } from "firebase/database";
 import Tutorial from "./component/Tutorial";
+import LeaderBoard from "./component/LeaderBoard";
 
 export default function Home() {
   const router = useRouter()
@@ -77,7 +78,6 @@ export default function Home() {
       }
     }
     getUserId()
-
   }, [session?.data?.user?.email])
 
 
@@ -105,6 +105,7 @@ export default function Home() {
 
         setEditIcon(data.profile_img)
         setEditName(data.username)
+        
       }
     });
 
@@ -271,13 +272,14 @@ export default function Home() {
 
                         <div className="pl-4 md:pl-0 md:pt-4 my-auto md:text-center">
                           <div className="text-4xl mb-3 font-medium">{username}</div>
-                          <div>อัตราชนะ <span className="text-primary font-bold">xx</span></div>
-                          <div>คะแนน <span className="text-primary font-bold">{score}</span></div>
+                          {(win / match) >= 0 ? <><div>อัตราชนะ <span className="text-primary font-bold"> {`${((win / match) * 100).toLocaleString(undefined, {maximumFractionDigits:2})}%`}</span></div>
+                            <div>คะแนน <span className="text-primary font-bold">{score.toLocaleString(undefined, {maximumFractionDigits:2})}</span></div></>
+                            : <div className="text-primary font-bold">เริ่มต้นการต่อสู้ครั้งแรกได้แล้ว!</div>}
                         </div>
                       </div>
                     </div>
-                    <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white p-6">
-                      <div className="text-center h-20 text-lg">เป็ดดีเด่น...</div>
+                    <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white overflow-hidden">
+                      <LeaderBoard uid={currentUid}/>
                     </div>
                   </div>
 
