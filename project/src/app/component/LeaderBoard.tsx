@@ -55,9 +55,8 @@ const LeaderBoard = (uid: any) => {
     }
 
     useEffect(() => {
-        if (uid) {
+        if (uid && !Board) {
             PrepareBoard()
-
         }
     }, [uid])
 
@@ -66,36 +65,40 @@ const LeaderBoard = (uid: any) => {
             {Board ?
                 <>
                     <div className="f-full text-center text-3xl relative pb-6">
-                        <div className='bg-black w-full h-44 z-0 absolute'></div>
+                        <div className='bg-black w-full h-36 z-0 absolute'></div>
                         <div className='relative text-white pt-6'>เป็ดดีเด่น...</div>
-                        <div className='flex gap-20 justify-between px-10 pt-6 text-2xl relative'>
-                            <div className='pt-10'>
+                        <div className='flex gap-5 justify-between px-10 pt-6 text-sm sticky'>
+                            {Board.length >1 ?
+                            <div className='pt-12 w-16 lg:w-28 lg:text-xl font-medium'>
                                 <ImageComp path={Board[1][6]} />
-                                <div>{Board[1][1]}</div>
-                                <div className='text-xl font-medium text-primary'>{Board[1][4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
-                            </div>
-                            <div className=''>
+                                <div className='w-full'>{Board[1][1]}</div>
+                                <div className='text-sm font-medium text-primary lg:text-lg'>{Board[1][4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
+                            </div>:''}
+                            {Board.length >0 ?
+                            <div className='w-20 lg:w-36 lg:text-xl font-medium'>
                                 <ImageComp path={Board[0][6]} />
                                 <div>{Board[0][1]}</div>
-                                <div className='text-xl font-medium text-primary'>{Board[0][4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
-                            </div>
-                            <div className='pt-10'>
+                                <div className='text-sm font-medium text-primary lg:text-lg'>{Board[0][4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
+                            </div>:''}
+                            {Board.length >2 ?
+                            <div className='pt-12 w-16 lg:w-28 lg:text-xl font-medium'>
                                 <ImageComp path={Board[2][6]} />
                                 <div>{Board[2][1]}</div>
-                                <div className='text-xl font-medium text-primary'>{Board[2][4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
-                            </div>
+                                <div className='text-sm font-medium text-primary lg:text-lg'>{Board[2][4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
+                            </div>:''}
                         </div>
                     </div>
-                    {
+                    {   
+                        Board.length > 3 ?
                         Board.slice(3, 10).map((e: any) => {
                             seq++
-                            return  <div className='flex w-full justify-between px-20 py-3 gap-20 text-xl font-medium' >
+                            return  <div className='flex w-full justify-between px-10 py-3 gap-20 text-sm font-medium lg:text-xl lg:px-20' key={e[0]}>
                                         <div className='text-grayFX'>{seq}</div>
                                         <div className='flex-1'>{e[1]}</div>
                                         <div className='text-primary'>{e[4].toLocaleString(undefined, {maximumFractionDigits:2})}</div>
 
                                     </div>
-                        })}
+                        }):''}
                 </>
                 :
                 <>
@@ -103,7 +106,7 @@ const LeaderBoard = (uid: any) => {
                     <div className='relative text-white pt-6'>เป็ดดีเด่น...</div>
                 </div>
 
-                
+
                     {/* <div className="f-full text-center text-3xl relative">
                         <div className='bg-black w-full h-32 z-0 absolute'></div>
                         <div className='relative text-white pt-6'>เป็ดดีเด่น...</div>
