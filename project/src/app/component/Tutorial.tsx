@@ -20,7 +20,7 @@ const Tutorial = (props:any) => {
                     <div className='text-3xl font-semibold text-center'>Ducky Lucky</div>
                     <div className='flex gap-4 justify-between px-4'>
                         {data.map(item =>
-                            <div key={item.id} onClick={()=>{setContent(item.id)}} className={`border-2 border-black rounded-lg w-full text-center py-1 transition duration-200 ease-in-out hover:bg-black hover:text-white ${content == item.id? 'bg-black text-white': ''}`}>
+                            <div key={item.id} onClick={()=>{setContent(item.id)}} className={`border-2 border-black rounded-lg w-full text-center py-1 transition duration-200 ease-in-out hover:bg-black hover:text-white ${content == item.id? 'bg-black text-white font-semibold': ''}`}>
                                 {item.title}
                             </div>
                         )}

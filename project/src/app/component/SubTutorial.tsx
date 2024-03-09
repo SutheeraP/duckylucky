@@ -21,11 +21,11 @@ const SubTutorial = () => {
                     <div>เมื่อเข้าเกม</div>
                     <ol className='ml-4'>
                         <li className='list-disc'>แต่ละฝั่งจะได้รับ<span className='font-semibold'>การ์ด</span> 2 ใบ</li>
-                        <li className='list-disc'>บอดร์จะสุ่ม<span className='font-semibold'>ช่องพิเศษ</span> 6 ช่องที่สามารถเลือกลงหรือหลบเลี่ยงได้</li>
+                        <li className='list-disc'>บอร์ดจะสุ่ม<span className='font-semibold'>ช่องพิเศษ</span> 6 ช่องที่สามารถเลือกลงหรือหลบเลี่ยงได้</li>
                     </ol>
                 </li>
                 <li className='list-decimal'>
-                    <div>ในแต่ละเทิร์นจะมีเวลา 20 วิ และแต้มการ์ด 5 แต้ม</div>
+                    <div>ในแต่ละเทิร์นมีเวลา 20 วิ และแต้มการ์ด 5 แต้ม</div>
                     <div className='relative'>
                         
                         <div id="time&point_sm" className="flex w-72 h-20 items-center">
