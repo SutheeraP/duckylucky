@@ -543,12 +543,15 @@ export default function TicTacToe(params: any) {
                 console.log(PlayerData['player2'])
                 console.log('data is ',data)
 
-                if ((data && currentUid == PlayerData['player1']) || (!data && currentUid == PlayerData['player2'])) {
-                    setShowStartTurn(true);
+                if (!(data === null)){
+                    if ((data && currentUid == PlayerData['player1']) || (!data && currentUid == PlayerData['player2'])) {
+                        setShowStartTurn(true);
+                    }
+                    setTimeout(() => {
+                        setShowStartTurn(false);
+                    }, 1000);
                 }
-                setTimeout(() => {
-                    setShowStartTurn(false);
-                }, 1000);
+                
                 })
             .catch((error) => {
                 console.error("Error fetching player data:", error);
