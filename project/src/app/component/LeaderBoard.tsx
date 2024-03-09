@@ -99,8 +99,12 @@ const LeaderBoard = (uid: any) => {
                 </>
                 :
                 <>
+                <div className="f-full text-center text-3xl relative pb-6">
+                    <div className='relative text-white pt-6'>เป็ดดีเด่น...</div>
+                </div>
 
-                    <div className="f-full text-center text-3xl relative">
+                
+                    {/* <div className="f-full text-center text-3xl relative">
                         <div className='bg-black w-full h-32 z-0 absolute'></div>
                         <div className='relative text-white pt-6'>เป็ดดีเด่น...</div>
                         <div className='flex gap-20 justify-between px-10 pt-6 text-2xl relative'>
@@ -156,7 +160,7 @@ const LeaderBoard = (uid: any) => {
                         <div className='flex-1'>eiei</div>
                         <div className='text-primary'>2000</div>
 
-                    </div>
+                    </div> */}
 
                 </>
 
