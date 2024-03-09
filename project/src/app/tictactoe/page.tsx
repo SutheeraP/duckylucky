@@ -61,6 +61,7 @@ export default function TicTacToe(params: any) {
 
     // for effect
     const [blinding, setBlinding] = useState(false)
+    const [cnacelBoard, setCancelBoard] = useState(false)
     const [showNotify, setShowNotify] = useState(false)
     const [cardNotify, setCardNotify] = useState<any>(``)
     const [winner, setWinner] = useState('');
@@ -309,6 +310,7 @@ export default function TicTacToe(params: any) {
         //ใช้ คำสั่งการ์ด
         if (thiscard.id == 1) {
             // ขอปฎิเสธ
+            setCancelBoard(true)
         }
 
         else if (thiscard.id == 2) {
@@ -1036,6 +1038,8 @@ export default function TicTacToe(params: any) {
                             roomId={roomId}
                             db={db}
                             blinding={blinding}
+                            cancelBoard={cnacelBoard}
+                            setCancelBoard={setCancelBoard}
                             resetBoard={resetBoard}
                             swapXO={swapXO}
                             increaseActionPoint={increaseActionPoint}

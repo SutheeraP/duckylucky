@@ -18,7 +18,8 @@ const WINNING_COMBO = [
 const Board = (props: any) => {
     const { xTurn, won, draw, boardData, result, setXTurn, setWon, setDraw, setBoardData, setResult, reset,
         gameStatus, selectedCard, x, o, currentUid, player, updateBoard, roomId, db, blinding, resetBoard,
-        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore, enemyId, enemyScore, effectOnBoard, boardFX } = props;
+        swapXO, increaseActionPoint, bombRandomBoard, building, imgX, imgO, myScore, enemyId, enemyScore,
+        effectOnBoard, boardFX, cancelBoard, setCancelBoard } = props;
 
     const updateBoardData = async (idx: number) => {
         if (xTurn && x == currentUid || !xTurn && o == currentUid) {
@@ -26,16 +27,17 @@ const Board = (props: any) => {
 
             if (boardData[idx] != imgO && boardData[idx] != imgX && !won) {
                 // ลงช่องพิเศษ + 200
-                if (boardData[idx].includes('display')) {
+                if (boardData[idx].includes('display') && !cancelBoard) {
+                    // ไม่ใช้การ์ดป้องกัน ทำงานตามบอด
                     console.log('in special')
                     update(ref(db, `Matching/${roomId}/score`), {
                         [currentUid]: myScore + 200
                     })
 
-                    
+
                     // เรียก boardFX จาก listindex ตัวที่ 0 ซึ่งเก็บ index ที่จะใช้เรียก boardFX
                     let effect = boardFX[effectOnBoard[0]]
-                    
+
                     // ก็อบ listindex ที่จะเอาไปใช้เรียก boardFX มาแล้ว ตัดตัวหน้าออก
                     let cuteffect = [...effectOnBoard]
                     cuteffect.shift()
@@ -49,7 +51,7 @@ const Board = (props: any) => {
                     else {
                         remove(ref(db, `Matching/${roomId}/effectonboard`))
                     }
-                    
+
 
                     // สั่ง notify ด้วย id
                     update(ref(db, `Matching/${roomId}/notify/${currentUid}`), {
@@ -83,6 +85,8 @@ const Board = (props: any) => {
                     update(ref(db, `Matching/${roomId}/score`), {
                         [currentUid]: myScore + 20
                     })
+                    // ล้าง cancel board
+                    setCancelBoard(false)
                 }
 
                 //เพิ่ม local แล้วเชคก่อน
