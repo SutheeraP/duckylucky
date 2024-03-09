@@ -36,7 +36,7 @@ export default function Home() {
   const [invite, setInvite] = useState('')
   const [showLogout, setShowLogout] = useState(false)
   const [showEdit, setShowEdit] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
 
   // for edit profile
@@ -105,11 +105,6 @@ export default function Home() {
 
         setEditIcon(data.profile_img)
         setEditName(data.username)
-
-        if (data.match == 0) {
-          // show tutorial คนไม่เคยเล่น
-          setShowTutorial(true)
-        }
 
       }
     });
