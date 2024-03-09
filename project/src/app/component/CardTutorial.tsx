@@ -17,8 +17,8 @@ const CardTutorial = () => {
   return (
 
     <div className='relative'>
-      <div className='absolute w-full h-full flex z-20 justify-between'>
-        <div className='my-auto text-3xl  w-10 h-10 flex  items-center rounded-full'
+      <div className='absolute w-full h-full flex z-20 justify-between px-5'>
+        <div className='my-auto text-3xl  w-10 h-10 flex justify-center items-center rounded-full '
           onClick={() => {
             let prev = selectId === 1 ? 5 : selectId - 1;
             setSelectedId(prev)
@@ -26,7 +26,7 @@ const CardTutorial = () => {
           }}>
           {`${'<'}`}
         </div>
-        <div className='my-auto text-3xl  w-10 h-10 flex items-center rounded-full'
+        <div className='my-auto text-3xl w-10 h-10 flex items-center justify-center rounded-full'
           onClick={() => {
             let prev = selectId === 5 ? 1 : selectId + 1;
             setSelectedId(prev)
@@ -37,7 +37,7 @@ const CardTutorial = () => {
       </div>
       {/* currentCard */}
       <div className='flex flex-col gap-4 items-center relative'>
-        <div className='rounded-lg border border-black w-3/5'>
+        <div className='rounded-lg border border-black w-2/5'>
           <ImageComp path={card.find(item => item.id == selectId)?.img} />
         </div>
         <div className='font-semibold text-lg'>{card.find(item => item.id == selectId)?.name}</div>

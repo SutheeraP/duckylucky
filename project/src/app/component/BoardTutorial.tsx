@@ -13,8 +13,8 @@ const BoardTutorial = () => {
   return (
 
     <div className='relative'>
-      <div className='absolute w-full h-full flex z-20 justify-between'>
-        <div className='my-auto text-3xl  w-10 h-10 flex  items-center rounded-full'
+      <div className='absolute w-full h-full flex z-20 justify-between px-5'>
+        <div className='my-auto text-3xl  w-10 h-10 flex  items-center justify-center rounded-full'
           onClick={() => {
             let prev = selectId === 1 ? 4 : selectId - 1;
             setSelectedId(prev)
@@ -22,7 +22,7 @@ const BoardTutorial = () => {
           }}>
           {`${'<'}`}
         </div>
-        <div className='my-auto text-3xl  w-10 h-10 flex items-center rounded-full'
+        <div className='my-auto text-3xl  w-10 h-10 flex items-center justify-center rounded-full'
           onClick={() => {
             let prev = selectId === 4 ? 1 : selectId + 1;
             setSelectedId(prev)

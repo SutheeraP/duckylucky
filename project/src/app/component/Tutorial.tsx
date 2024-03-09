@@ -14,13 +14,13 @@ const Tutorial = (props:any) => {
     ]
     return (
         <div className="absolute h-full w-full flex z-20 bg-[#0005]">
-            <div className="container px-4 m-auto md:w-[500px] w-[400px]">
+            <div className="container px-4 m-auto md:w-[600px] w-[400px]">
                 <div className=" bg-white ring-2 ring-black py-12 rounded-lg grid gap-4 relative">
                 <div className="absolute top-4 right-4 w-7 h-7 bg-black rounded-full text-white text-lg font-semibold flex justify-center items-center" onClick={() => { setShowTutorial(false) }}>x</div>
                     <div className='text-3xl font-semibold text-center'>Ducky Lucky</div>
                     <div className='flex gap-4 justify-between px-4'>
                         {data.map(item =>
-                            <div key={item.id} onClick={()=>{setContent(item.id)}} className={`border-2 border-black rounded-lg w-full text-center py-1 transition duration-200 ease-in-out ${content == item.id? 'bg-black text-white': ''}`}>
+                            <div key={item.id} onClick={()=>{setContent(item.id)}} className={`border-2 border-black rounded-lg w-full text-center py-1 transition duration-200 ease-in-out hover:bg-black hover:text-white ${content == item.id? 'bg-black text-white': ''}`}>
                                 {item.title}
                             </div>
                         )}

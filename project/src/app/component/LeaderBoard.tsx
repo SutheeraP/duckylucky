@@ -54,7 +54,6 @@ const LeaderBoard = (uid: any) => {
     useEffect(() => {
         if (uid) {
             PrepareBoard()
-            
         }
     }, [uid])
 
