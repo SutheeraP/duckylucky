@@ -87,7 +87,7 @@ const LeaderBoard = (uid: any) => {
                         </div>
                     </div>
                     {
-                        takeRight(Board, 4).map((e: any) => {
+                        Board.slice(3, 10).map((e: any) => {
                             seq++
                             return  <div className='flex w-full justify-between px-20 py-3 gap-20 text-xl font-medium' >
                                         <div className='text-grayFX'>{seq}</div>

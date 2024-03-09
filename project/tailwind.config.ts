@@ -37,7 +37,7 @@ const config: Config = {
         '34':'8.5rem',
         '38':'9.5rem'
       },
-      height:{
+      maxHeight:{
         'custom-1':'600px'
       }
     },
