@@ -536,13 +536,11 @@ export default function TicTacToe(params: any) {
             setXTurn(data) // update turn ในเกม
             effectTurn() // update turn ในเอฟเฟคที่ทำงานอยู่
 
+            // get ข้อมูล Player มาใหม่ เหมือนปัญหามันเป็นเกี่ยวกะบล็อคสโคปรึป่าวไม่แน่ใจ
             get(ref(db, `Matching/${roomId}/player`)).then((snapshot) => {
                 const PlayerData = snapshot.val();
 
-                console.log(PlayerData['player1'])
-                console.log(PlayerData['player2'])
-                console.log('data is ',data)
-
+                // show แจ้งเตือนตอนเริ่มเทริ์น 1 วิ
                 if (!(data === null)){
                     if ((data && currentUid == PlayerData['player1']) || (!data && currentUid == PlayerData['player2'])) {
                         setShowStartTurn(true);
@@ -551,8 +549,7 @@ export default function TicTacToe(params: any) {
                         setShowStartTurn(false);
                     }, 1000);
                 }
-                
-                })
+            })
             .catch((error) => {
                 console.error("Error fetching player data:", error);
             });
@@ -918,9 +915,11 @@ export default function TicTacToe(params: any) {
                 <div className="flex justify-center items-center w-screen z-30 h-screen absolute top-0">
                     <div className="w-screen flex flex-row justify-center items-center gap-2">
                         <div className="translate-y-4"><Image src={'/image/sword_L.svg'} alt="" width={50} height={16}></Image></div>
-                        <div className="w-52">
-                            <div className="text-white font-bold text-2xl absolute text-center font-outline-6">ถึงตาของคุณแล้ว !</div>
-                            <div className="text-white font-bold text-2xl absolute text-center">ถึงตาของคุณแล้ว !</div>
+                        <div className="w-52 flex justify-center">
+                            <div className="w-52">
+                                <div className="text-white font-bold text-2xl absolute text-center font-outline-6">ถึงตาของคุณแล้ว !</div>
+                                <div className="text-white font-bold text-2xl absolute text-center">ถึงตาของคุณแล้ว !</div>
+                            </div>
                         </div>
                         <div className="translate-y-4"><Image src={'/image/sword_R.svg'} alt="" width={50} height={16}></Image></div>
                     </div>
