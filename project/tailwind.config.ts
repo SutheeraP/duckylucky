@@ -36,6 +36,9 @@ const config: Config = {
       spacing: {
         '34':'8.5rem',
         '38':'9.5rem'
+      },
+      height:{
+        'custom-1':'600px'
       }
     },
 

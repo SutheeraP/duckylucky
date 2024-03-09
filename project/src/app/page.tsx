@@ -275,10 +275,10 @@ export default function Home() {
                           {(win / match) >= 0 ? <><div>อัตราชนะ <span className="text-primary font-bold"> {`${((win / match) * 100).toLocaleString(undefined, {maximumFractionDigits:2})}%`}</span></div>
                             <div>คะแนน <span className="text-primary font-bold">{score.toLocaleString(undefined, {maximumFractionDigits:2})}</span></div></>
                             : <div className="text-primary font-bold">เริ่มต้นการต่อสู้ครั้งแรกได้แล้ว!</div>}
-                        </div>
+                        </div> 
                       </div>
                     </div>
-                    <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white overflow-hidden">
+                    <div id="leaderboard" className="ring-2 ring-black rounded-xl bg-white overflow-y-scroll max-h-custom-1">
                       <LeaderBoard uid={currentUid}/>
                     </div>
                   </div>
